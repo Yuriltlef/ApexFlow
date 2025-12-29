@@ -4614,3 +4614,108 @@ INSERT INTO apexflow_system_user (
 2025-12-29 20:29:15.481 [main] INFO  com.apex.core.dao.UserDAO - [UPDATE_USER] User updated successfully in 2 ms. ID: 8, Username: timestamp_test
 2025-12-29 20:29:15.481 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 8
 2025-12-29 20:29:15.482 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 1 ms. ID: 8, Username: timestamp_test
+2025-12-29 20:38:14.302 [main] INFO  com.apex.core.dao.UserDAO - [CREATE_USER] Creating new user. Username: newuser
+2025-12-29 20:38:14.310 [main] INFO  com.apex.core.dao.UserDAO - [CREATE_USER] User created with ID: 6
+2025-12-29 20:38:14.310 [main] INFO  com.apex.core.dao.UserDAO - [CREATE_USER] User created successfully in 9 ms. Username: newuser, ID: 6
+2025-12-29 20:38:14.318 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 6
+2025-12-29 20:38:14.322 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 4 ms. ID: 6, Username: newuser
+2025-12-29 20:38:14.333 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 1
+2025-12-29 20:38:14.334 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 1 ms. ID: 1, Username: admin
+2025-12-29 20:38:14.338 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 999
+2025-12-29 20:38:14.339 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] No user found with ID: 999 (searched for 1 ms)
+2025-12-29 20:38:14.344 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_USERNAME] Searching for user by username: manager1
+2025-12-29 20:38:14.345 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_USERNAME] User found in 2 ms. Username: manager1, ID: 2
+2025-12-29 20:38:14.350 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_EMAIL] Searching for user by email: manager2@apexflow.com
+2025-12-29 20:38:14.351 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_EMAIL] User found in 1 ms. Email: manager2@apexflow.com, ID: 3
+2025-12-29 20:38:14.355 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 2
+2025-12-29 20:38:14.356 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 1 ms. ID: 2, Username: manager1
+2025-12-29 20:38:14.356 [main] INFO  com.apex.core.dao.UserDAO - [UPDATE_USER] Updating user. ID: 2, Username: manager1
+2025-12-29 20:38:14.359 [main] INFO  com.apex.core.dao.UserDAO - [UPDATE_USER] User updated successfully in 3 ms. ID: 2, Username: manager1
+2025-12-29 20:38:14.359 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 2
+2025-12-29 20:38:14.360 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 1 ms. ID: 2, Username: manager1
+2025-12-29 20:38:14.365 [main] DEBUG com.apex.core.dao.UserDAO - [UPDATE_LAST_LOGIN_TIME] Updating last login time for user ID: 1
+2025-12-29 20:38:14.366 [main] DEBUG com.apex.core.dao.UserDAO - [UPDATE_LAST_LOGIN_TIME] Last login time updated successfully in 1 ms. User ID: 1
+2025-12-29 20:38:14.366 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 1
+2025-12-29 20:38:14.366 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 0 ms. ID: 1, Username: admin
+2025-12-29 20:38:14.370 [main] INFO  com.apex.core.dao.UserDAO - [UPDATE_USER_STATUS] Updating user status. User ID: 1, New Status: 0
+2025-12-29 20:38:14.371 [main] INFO  com.apex.core.dao.UserDAO - [UPDATE_USER_STATUS] User status updated successfully in 1 ms. User ID: 1, New Status: 0
+2025-12-29 20:38:14.371 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 1
+2025-12-29 20:38:14.371 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 0 ms. ID: 1, Username: admin
+2025-12-29 20:38:14.376 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 4
+2025-12-29 20:38:14.377 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 1 ms. ID: 4, Username: operator1
+2025-12-29 20:38:14.377 [main] WARN  com.apex.core.dao.UserDAO - [DELETE_USER] Attempting to delete user. User ID: 4
+2025-12-29 20:38:14.377 [main] WARN  com.apex.core.dao.UserDAO - [DELETE_USER] User deleted successfully in 0 ms. User ID: 4
+2025-12-29 20:38:14.377 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 4
+2025-12-29 20:38:14.377 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] No user found with ID: 4 (searched for 0 ms)
+2025-12-29 20:38:14.382 [main] WARN  com.apex.core.dao.UserDAO - [DELETE_USER] Attempting to delete user. User ID: 999
+2025-12-29 20:38:14.382 [main] WARN  com.apex.core.dao.UserDAO - [DELETE_USER] No user found to delete. User ID: 999 (took 0 ms)
+2025-12-29 20:38:14.387 [main] INFO  com.apex.core.dao.UserDAO - [FIND_ALL_USERS] Retrieving users. Page: 1, PageSize: 2, Offset: 0
+2025-12-29 20:38:14.388 [main] INFO  com.apex.core.dao.UserDAO - [FIND_ALL_USERS] Retrieved 2 users in 1 ms. Page: 1, PageSize: 2
+2025-12-29 20:38:14.388 [main] INFO  com.apex.core.dao.UserDAO - [FIND_ALL_USERS] Retrieving users. Page: 2, PageSize: 2, Offset: 2
+2025-12-29 20:38:14.388 [main] INFO  com.apex.core.dao.UserDAO - [FIND_ALL_USERS] Retrieved 2 users in 0 ms. Page: 2, PageSize: 2
+2025-12-29 20:38:14.388 [main] INFO  com.apex.core.dao.UserDAO - [FIND_ALL_USERS] Retrieving users. Page: 3, PageSize: 2, Offset: 4
+2025-12-29 20:38:14.389 [main] INFO  com.apex.core.dao.UserDAO - [FIND_ALL_USERS] Retrieved 1 users in 1 ms. Page: 3, PageSize: 2
+2025-12-29 20:38:14.394 [main] INFO  com.apex.core.dao.UserDAO - [FIND_USERS_BY_STATUS] Retrieving users by status. Status: 1, Page: 1, PageSize: 10
+2025-12-29 20:38:14.395 [main] INFO  com.apex.core.dao.UserDAO - [FIND_USERS_BY_STATUS] Retrieved 4 users with status 1 in 1 ms
+2025-12-29 20:38:14.395 [main] INFO  com.apex.core.dao.UserDAO - [FIND_USERS_BY_STATUS] Retrieving users by status. Status: 0, Page: 1, PageSize: 10
+2025-12-29 20:38:14.396 [main] INFO  com.apex.core.dao.UserDAO - [FIND_USERS_BY_STATUS] Retrieved 1 users with status 0 in 1 ms
+2025-12-29 20:38:14.400 [main] INFO  com.apex.core.dao.UserDAO - [SEARCH_USERS] Searching users with keyword: '经理', Page: 1, PageSize: 10
+2025-12-29 20:38:14.405 [main] INFO  com.apex.core.dao.UserDAO - [SEARCH_USERS] Found 2 users with keyword '经理' in 5 ms
+2025-12-29 20:38:14.410 [main] INFO  com.apex.core.dao.UserDAO - [SEARCH_USERS] Searching users with keyword: 'apexflow.com', Page: 1, PageSize: 10
+2025-12-29 20:38:14.411 [main] INFO  com.apex.core.dao.UserDAO - [SEARCH_USERS] Found 5 users with keyword 'apexflow.com' in 1 ms
+2025-12-29 20:38:14.415 [main] INFO  com.apex.core.dao.UserDAO - [SEARCH_USERS] Searching users with keyword: '8001', Page: 1, PageSize: 10
+2025-12-29 20:38:14.417 [main] INFO  com.apex.core.dao.UserDAO - [SEARCH_USERS] Found 5 users with keyword '8001' in 2 ms
+2025-12-29 20:38:14.422 [main] DEBUG com.apex.core.dao.UserDAO - [COUNT_USERS] Counting total users
+2025-12-29 20:38:14.423 [main] INFO  com.apex.core.dao.UserDAO - [COUNT_USERS] Total users: 5 (counted in 1 ms)
+2025-12-29 20:38:14.427 [main] DEBUG com.apex.core.dao.UserDAO - [COUNT_ACTIVE_USERS] Counting active users
+2025-12-29 20:38:14.430 [main] INFO  com.apex.core.dao.UserDAO - [COUNT_ACTIVE_USERS] Active users: 4 (counted in 3 ms)
+2025-12-29 20:38:14.434 [main] DEBUG com.apex.core.dao.UserDAO - [CHECK_USERNAME_EXISTS] Checking if username exists: admin
+2025-12-29 20:38:14.436 [main] DEBUG com.apex.core.dao.UserDAO - [CHECK_USERNAME_EXISTS] Username 'admin' exists: true (checked in 2 ms)
+2025-12-29 20:38:14.440 [main] DEBUG com.apex.core.dao.UserDAO - [CHECK_USERNAME_EXISTS] Checking if username exists: nonexistent
+2025-12-29 20:38:14.440 [main] DEBUG com.apex.core.dao.UserDAO - [CHECK_USERNAME_EXISTS] Username 'nonexistent' exists: false (checked in 0 ms)
+2025-12-29 20:38:14.444 [main] DEBUG com.apex.core.dao.UserDAO - [CHECK_EMAIL_EXISTS] Checking if email exists: admin@apexflow.com
+2025-12-29 20:38:14.445 [main] DEBUG com.apex.core.dao.UserDAO - [CHECK_EMAIL_EXISTS] Email 'admin@apexflow.com' exists: true (checked in 1 ms)
+2025-12-29 20:38:14.448 [main] DEBUG com.apex.core.dao.UserDAO - [CHECK_EMAIL_EXISTS] Checking if email exists: nonexistent@apexflow.com
+2025-12-29 20:38:14.449 [main] DEBUG com.apex.core.dao.UserDAO - [CHECK_EMAIL_EXISTS] Email 'nonexistent@apexflow.com' exists: false (checked in 1 ms)
+2025-12-29 20:38:14.493 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_USERNAME] Searching for user by username: admin
+2025-12-29 20:38:14.494 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_USERNAME] User found in 1 ms. Username: admin, ID: 1
+2025-12-29 20:38:14.507 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_USERNAME] Searching for user by username: manager1
+2025-12-29 20:38:14.508 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_USERNAME] User found in 1 ms. Username: manager1, ID: 2
+2025-12-29 20:38:14.512 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_USERNAME] Searching for user by username: manager2
+2025-12-29 20:38:14.513 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_USERNAME] User found in 1 ms. Username: manager2, ID: 3
+2025-12-29 20:38:14.517 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_USERNAME] Searching for user by username: operator1
+2025-12-29 20:38:14.518 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_USERNAME] User found in 1 ms. Username: operator1, ID: 4
+2025-12-29 20:38:14.522 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_USERNAME] Searching for user by username: inactive_user
+2025-12-29 20:38:14.522 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_USERNAME] User found in 0 ms. Username: inactive_user, ID: 5
+2025-12-29 20:38:14.547 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 1
+2025-12-29 20:38:14.548 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 1 ms. ID: 1, Username: admin
+2025-12-29 20:38:14.553 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 2
+2025-12-29 20:38:14.564 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 11 ms. ID: 2, Username: manager1
+2025-12-29 20:38:14.571 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 3
+2025-12-29 20:38:14.572 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 1 ms. ID: 3, Username: manager2
+2025-12-29 20:38:14.577 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 4
+2025-12-29 20:38:14.578 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 1 ms. ID: 4, Username: operator1
+2025-12-29 20:38:14.592 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 5
+2025-12-29 20:38:14.597 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 5 ms. ID: 5, Username: inactive_user
+2025-12-29 20:38:14.602 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 1
+2025-12-29 20:38:14.603 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 1 ms. ID: 1, Username: admin
+2025-12-29 20:38:14.603 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 4
+2025-12-29 20:38:14.603 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 0 ms. ID: 4, Username: operator1
+2025-12-29 20:38:14.610 [main] INFO  com.apex.core.dao.UserDAO - [CREATE_USER] Creating new user. Username: minimal
+2025-12-29 20:38:14.612 [main] INFO  com.apex.core.dao.UserDAO - [CREATE_USER] User created with ID: 7
+2025-12-29 20:38:14.612 [main] INFO  com.apex.core.dao.UserDAO - [CREATE_USER] User created successfully in 2 ms. Username: minimal, ID: 7
+2025-12-29 20:38:14.612 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 7
+2025-12-29 20:38:14.613 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 1 ms. ID: 7, Username: minimal
+2025-12-29 20:38:14.617 [main] INFO  com.apex.core.dao.UserDAO - [FIND_ALL_USERS] Retrieving users. Page: 1, PageSize: 10, Offset: 0
+2025-12-29 20:38:14.617 [main] INFO  com.apex.core.dao.UserDAO - [FIND_ALL_USERS] Retrieved 0 users in 0 ms. Page: 1, PageSize: 10
+2025-12-29 20:38:14.620 [main] INFO  com.apex.core.dao.UserDAO - [SEARCH_USERS] Searching users with keyword: '不存在的关键词', Page: 1, PageSize: 10
+2025-12-29 20:38:14.621 [main] INFO  com.apex.core.dao.UserDAO - [SEARCH_USERS] Found 0 users with keyword '不存在的关键词' in 1 ms
+2025-12-29 20:38:14.625 [main] INFO  com.apex.core.dao.UserDAO - [UPDATE_USER] Updating user. ID: 999, Username: nonexistent
+2025-12-29 20:38:14.626 [main] WARN  com.apex.core.dao.UserDAO - [UPDATE_USER] User update did not affect any rows. ID: 999 (took 1 ms)
+2025-12-29 20:38:14.629 [main] INFO  com.apex.core.dao.UserDAO - [CREATE_USER] Creating new user. Username: timestamp_test
+2025-12-29 20:38:14.630 [main] INFO  com.apex.core.dao.UserDAO - [CREATE_USER] User created with ID: 8
+2025-12-29 20:38:14.630 [main] INFO  com.apex.core.dao.UserDAO - [CREATE_USER] User created successfully in 1 ms. Username: timestamp_test, ID: 8
+2025-12-29 20:38:14.653 [main] INFO  com.apex.core.dao.UserDAO - [UPDATE_USER] Updating user. ID: 8, Username: timestamp_test
+2025-12-29 20:38:14.655 [main] INFO  com.apex.core.dao.UserDAO - [UPDATE_USER] User updated successfully in 2 ms. ID: 8, Username: timestamp_test
+2025-12-29 20:38:14.656 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] Searching for user by ID: 8
+2025-12-29 20:38:14.656 [main] DEBUG com.apex.core.dao.UserDAO - [FIND_USER_BY_ID] User found in 0 ms. ID: 8, Username: timestamp_test
