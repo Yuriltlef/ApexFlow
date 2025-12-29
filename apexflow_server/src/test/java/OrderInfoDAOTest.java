@@ -194,15 +194,16 @@ public class OrderInfoDAOTest {
         OrderInfo order = orderInfoDAO.findById("TEST001");
         assertNotNull(order, "Order should exist before deletion");
 
-        // Act
-        boolean result = orderInfoDAO.delete("TEST001");
-
-        // Assert
-        assertTrue(result, "Deletion should succeed");
+        // Act & Assert
+        assertThrows(
+                UnsupportedOperationException.class,
+                () -> orderInfoDAO.delete("TEST001"),
+                "Expected delete() to throw UnsupportedOperationException"
+        );
 
         // Verify deletion
         OrderInfo deletedOrder = orderInfoDAO.findById("TEST001");
-        assertNull(deletedOrder, "Order should be deleted");
+        assertNotNull(deletedOrder, "Order should be not deleted");
     }
 
     @Test

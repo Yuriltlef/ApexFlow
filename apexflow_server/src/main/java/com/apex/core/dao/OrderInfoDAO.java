@@ -13,9 +13,8 @@ import java.util.List;
 /**
  * OrderInfo Data Access Object with comprehensive English logging
  */
-public class OrderInfoDAO {
+public class OrderInfoDAO implements IOrderInfoDAO {
     private static final Logger logger = LoggerFactory.getLogger(OrderInfoDAO.class);
-    private static final Logger sqlLogger = LoggerFactory.getLogger("SQL_LOGGER");
 
     /**
      * Create a new order
@@ -25,8 +24,8 @@ public class OrderInfoDAO {
         long startTime = System.currentTimeMillis();
 
         String sql = """
-            INSERT INTO apexflow_order (id, user_id, total_amount, status, 
-                                       payment_method, address_id, created_at, 
+            INSERT INTO apexflow_order (id, user_id, total_amount, status,
+                                       payment_method, address_id, created_at,
                                        paid_at, shipped_at, completed_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
@@ -144,9 +143,9 @@ public class OrderInfoDAO {
         long startTime = System.currentTimeMillis();
 
         String sql = """
-            UPDATE apexflow_order 
-            SET user_id = ?, total_amount = ?, status = ?, 
-                payment_method = ?, address_id = ?, created_at = ?, 
+            UPDATE apexflow_order
+            SET user_id = ?, total_amount = ?, status = ?,
+                payment_method = ?, address_id = ?, created_at = ?,
                 paid_at = ?, shipped_at = ?, completed_at = ?
             WHERE id = ?
             """;
@@ -262,38 +261,18 @@ public class OrderInfoDAO {
      * Delete an order
      */
     public boolean delete(String orderId) {
-        String operation = "DELETE_ORDER";
-        long startTime = System.currentTimeMillis();
+        String operation = "DELETE_ORDER_DISABLED";
 
-        String sql = "DELETE FROM apexflow_order WHERE id = ?";
+        logger.error("[{}] Direct deletion of orders is disabled due to foreign key constraints. Order ID: {}. " +
+                        "Please use OrderManager.deleteOrderWithItems() method instead.",
+                operation, orderId);
 
-        logger.warn("[{}] Attempting to delete order. Order ID: {}", operation, orderId);
-
-        try (Connection conn = ConnectionPool.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, orderId);
-
-            int rowsAffected = pstmt.executeUpdate();
-            boolean success = rowsAffected == 1;
-
-            long duration = System.currentTimeMillis() - startTime;
-
-            if (success) {
-                logger.warn("[{}] Order deleted successfully in {} ms. Order ID: {}",
-                        operation, duration, orderId);
-            } else {
-                logger.warn("[{}] No order found to delete. Order ID: {} (took {} ms)",
-                        operation, orderId, duration);
-            }
-
-            return success;
-        } catch (SQLException e) {
-            long duration = System.currentTimeMillis() - startTime;
-            logger.error("[{}] Failed to delete order after {} ms. Order ID: {}, Error: {}",
-                    operation, duration, orderId, e.getMessage(), e);
-            return false;
-        }
+        // 抛出明确的异常，提示调用者使用正确的删除方法
+        throw new UnsupportedOperationException(
+                "Direct deletion of order '" + orderId + "' is not allowed. " +
+                        "Orders have associated order items that must be deleted first. " +
+                        "Please use the OrderManager.deleteOrderWithItems() method " +
+                        "which handles cascade deletion properly.");
     }
 
     /**
@@ -333,11 +312,12 @@ public class OrderInfoDAO {
 
         List<OrderInfo> orders = new ArrayList<>();
         String sql = """
-            SELECT * FROM apexflow_order 
-            ORDER BY created_at DESC 
+            SELECT * FROM apexflow_order
+            ORDER BY created_at DESC
             LIMIT ? OFFSET ?
             """;
 
+        if (page < 1) page = 1;
         int offset = (page - 1) * pageSize;
 
         logger.info("[{}] Retrieving orders. Page: {}, PageSize: {}, Offset: {}",
@@ -379,12 +359,13 @@ public class OrderInfoDAO {
 
         List<OrderInfo> orders = new ArrayList<>();
         String sql = """
-            SELECT * FROM apexflow_order 
-            WHERE user_id = ? 
-            ORDER BY created_at DESC 
+            SELECT * FROM apexflow_order
+            WHERE user_id = ?
+            ORDER BY created_at DESC
             LIMIT ? OFFSET ?
             """;
 
+        if (page < 1) page = 1;
         int offset = (page - 1) * pageSize;
 
         logger.info("[{}] Retrieving orders for user. User ID: {}, Page: {}, PageSize: {}",

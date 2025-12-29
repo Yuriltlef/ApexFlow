@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * User Data Access Object for managing SystemUser entities
  */
-public class UserDAO {
+public class UserDAO implements IUserDAO {
     private static final Logger logger = LoggerFactory.getLogger(UserDAO.class);
 
     // SQL 常量
@@ -27,13 +27,13 @@ public class UserDAO {
         long startTime = System.currentTimeMillis();
 
         String sql = String.format("""
-            INSERT INTO %s (
-                username, password_hash, salt, real_name, email, phone,
-                is_admin, can_manage_order, can_manage_logistics,
-                can_manage_after_sales, can_manage_review,
-                can_manage_inventory, can_manage_income, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, TABLE_NAME);
+        INSERT INTO %s (
+            username, password_hash, salt, real_name, email, phone,
+            is_admin, can_manage_order, can_manage_logistics,
+            can_manage_after_sales, can_manage_review,
+            can_manage_inventory, can_manage_income, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, TABLE_NAME);
 
         logger.info("[{}] Creating new user. Username: {}", operation, user.getUsername());
 
@@ -54,7 +54,14 @@ public class UserDAO {
             pstmt.setBoolean(paramIndex++, Boolean.TRUE.equals(user.getCanManageReview()));
             pstmt.setBoolean(paramIndex++, Boolean.TRUE.equals(user.getCanManageInventory()));
             pstmt.setBoolean(paramIndex++, Boolean.TRUE.equals(user.getCanManageIncome()));
-            pstmt.setInt(paramIndex, user.getStatus() != null ? user.getStatus() : 1);
+
+            // 修复：添加空值检查
+            if (user.getStatus() != null) {
+                pstmt.setInt(paramIndex, user.getStatus());
+            } else {
+                // 如果status为null，设置为默认值1（正常状态）
+                pstmt.setInt(paramIndex, 1);
+            }
 
             int rowsAffected = pstmt.executeUpdate();
             boolean success = rowsAffected == 1;
@@ -209,14 +216,14 @@ public class UserDAO {
         long startTime = System.currentTimeMillis();
 
         String sql = String.format("""
-            UPDATE %s
-            SET username = ?, password_hash = ?, salt = ?, real_name = ?,
-                email = ?, phone = ?, is_admin = ?, can_manage_order = ?,
-                can_manage_logistics = ?, can_manage_after_sales = ?,
-                can_manage_review = ?, can_manage_inventory = ?,
-                can_manage_income = ?, status = ?, updated_at = ?
-            WHERE id = ?
-            """, TABLE_NAME);
+        UPDATE %s
+        SET username = ?, password_hash = ?, salt = ?, real_name = ?,
+            email = ?, phone = ?, is_admin = ?, can_manage_order = ?,
+            can_manage_logistics = ?, can_manage_after_sales = ?,
+            can_manage_review = ?, can_manage_inventory = ?,
+            can_manage_income = ?, status = ?, updated_at = ?
+        WHERE id = ?
+        """, TABLE_NAME);
 
         logger.info("[{}] Updating user. ID: {}, Username: {}",
                 operation, user.getId(), user.getUsername());
@@ -238,7 +245,15 @@ public class UserDAO {
             pstmt.setBoolean(paramIndex++, Boolean.TRUE.equals(user.getCanManageReview()));
             pstmt.setBoolean(paramIndex++, Boolean.TRUE.equals(user.getCanManageInventory()));
             pstmt.setBoolean(paramIndex++, Boolean.TRUE.equals(user.getCanManageIncome()));
-            pstmt.setInt(paramIndex++, user.getStatus());
+
+            // 修复：添加空值检查
+            if (user.getStatus() != null) {
+                pstmt.setInt(paramIndex++, user.getStatus());
+            } else {
+                // 如果status为null，设置为默认值1（正常状态）
+                pstmt.setInt(paramIndex++, 1);
+            }
+
             pstmt.setTimestamp(paramIndex++, Timestamp.valueOf(LocalDateTime.now()));
             pstmt.setInt(paramIndex, user.getId());
 
@@ -396,6 +411,7 @@ public class UserDAO {
             LIMIT ? OFFSET ?
             """, TABLE_NAME);
 
+        if (page < 1) page = 1;
         int offset = (page - 1) * pageSize;
 
         logger.info("[{}] Retrieving users. Page: {}, PageSize: {}, Offset: {}",
@@ -443,6 +459,7 @@ public class UserDAO {
             LIMIT ? OFFSET ?
             """, TABLE_NAME);
 
+        if (page < 1) page = 1;
         int offset = (page - 1) * pageSize;
 
         logger.info("[{}] Retrieving users by status. Status: {}, Page: {}, PageSize: {}",
@@ -491,6 +508,7 @@ public class UserDAO {
             LIMIT ? OFFSET ?
             """, TABLE_NAME);
 
+        if (page < 1) page = 1;
         int offset = (page - 1) * pageSize;
         String searchPattern = "%" + keyword + "%";
 
