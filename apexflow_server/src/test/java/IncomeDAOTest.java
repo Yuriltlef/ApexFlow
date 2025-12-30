@@ -1,5 +1,5 @@
-import com.apex.core.dao.IncomeDAO;
 import com.apex.core.dao.IIncomeDAO;
+import com.apex.core.dao.IncomeDAO;
 import com.apex.core.model.Income;
 import com.apex.util.ConnectionPool;
 import org.junit.jupiter.api.*;
@@ -63,28 +63,28 @@ public class IncomeDAOTest {
 
             // 插入商品
             stmt.execute("""
-                INSERT INTO apexflow_product (id, name, category, price, stock, status) VALUES
-                (1, 'iPhone 14 Pro', '手机', 7999.00, 100, 1),
-                (2, 'MacBook Pro 16英寸', '电脑', 18999.00, 50, 1)
-            """);
+                        INSERT INTO apexflow_product (id, name, category, price, stock, status) VALUES
+                        (1, 'iPhone 14 Pro', '手机', 7999.00, 100, 1),
+                        (2, 'MacBook Pro 16英寸', '电脑', 18999.00, 50, 1)
+                    """);
 
             // 插入订单
             stmt.execute("""
-                INSERT INTO apexflow_order (id, user_id, total_amount, status, payment_method, created_at, paid_at) VALUES
-                ('ORDER001', 1001, 7999.00, 4, 'alipay', '2023-12-01 10:00:00', '2023-12-01 10:05:00'),
-                ('ORDER002', 1002, 18999.00, 4, 'wxpay', '2023-12-01 11:00:00', '2023-12-01 11:05:00'),
-                ('ORDER003', 1001, 299.99, 4, 'alipay', '2023-12-01 12:00:00', '2023-12-01 12:05:00')
-            """);
+                        INSERT INTO apexflow_order (id, user_id, total_amount, status, payment_method, created_at, paid_at) VALUES
+                        ('ORDER001', 1001, 7999.00, 4, 'alipay', '2023-12-01 10:00:00', '2023-12-01 10:05:00'),
+                        ('ORDER002', 1002, 18999.00, 4, 'wxpay', '2023-12-01 11:00:00', '2023-12-01 11:05:00'),
+                        ('ORDER003', 1001, 299.99, 4, 'alipay', '2023-12-01 12:00:00', '2023-12-01 12:05:00')
+                    """);
 
             // 插入财务记录
             stmt.execute("""
-                INSERT INTO apexflow_income (id, order_id, type, amount, payment_method, status, transaction_time, remark) VALUES
-                (1, 'ORDER001', 'income', 7999.00, 'alipay', 2, '2023-12-01 10:05:00', '订单支付'),
-                (2, 'ORDER001', 'refund', -500.00, 'alipay', 2, '2023-12-02 10:00:00', '部分退款'),
-                (3, 'ORDER002', 'income', 18999.00, 'wxpay', 2, '2023-12-01 11:05:00', '订单支付'),
-                (4, 'ORDER003', 'income', 299.99, 'alipay', 1, '2023-12-01 12:05:00', '订单支付（待入账）'),
-                (5, 'ORDER001', 'refund', -1000.00, 'alipay', 1, '2023-12-02 11:00:00', '待退款')
-            """);
+                        INSERT INTO apexflow_income (id, order_id, type, amount, payment_method, status, transaction_time, remark) VALUES
+                        (1, 'ORDER001', 'income', 7999.00, 'alipay', 2, '2023-12-01 10:05:00', '订单支付'),
+                        (2, 'ORDER001', 'refund', -500.00, 'alipay', 2, '2023-12-02 10:00:00', '部分退款'),
+                        (3, 'ORDER002', 'income', 18999.00, 'wxpay', 2, '2023-12-01 11:05:00', '订单支付'),
+                        (4, 'ORDER003', 'income', 299.99, 'alipay', 1, '2023-12-01 12:05:00', '订单支付（待入账）'),
+                        (5, 'ORDER001', 'refund', -1000.00, 'alipay', 1, '2023-12-02 11:00:00', '待退款')
+                    """);
         }
     }
 

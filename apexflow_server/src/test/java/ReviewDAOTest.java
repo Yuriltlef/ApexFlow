@@ -1,6 +1,6 @@
 import com.apex.core.dao.ReviewDAO;
+import com.apex.core.dto.RatingDistribution;
 import com.apex.core.model.Review;
-import com.apex.core.dao.ReviewDAO.RatingDistribution;
 import com.apex.util.ConnectionPool;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -56,39 +56,39 @@ public class ReviewDAOTest {
         try (var stmt = conn.createStatement()) {
             // 插入用户
             stmt.execute("""
-                INSERT INTO apexflow_system_user (id, username, password_hash, salt, real_name) VALUES
-                (1, 'user1', 'hash1', 'salt1', '用户1'),
-                (2, 'user2', 'hash2', 'salt2', '用户2'),
-                (3, 'user3', 'hash3', 'salt3', '用户3')
-            """);
+                        INSERT INTO apexflow_system_user (id, username, password_hash, salt, real_name) VALUES
+                        (1, 'user1', 'hash1', 'salt1', '用户1'),
+                        (2, 'user2', 'hash2', 'salt2', '用户2'),
+                        (3, 'user3', 'hash3', 'salt3', '用户3')
+                    """);
 
             // 插入商品
             stmt.execute("""
-                INSERT INTO apexflow_product (id, name, category, price, stock, status) VALUES
-                (1, 'iPhone 14 Pro', '手机', 7999.00, 100, 1),
-                (2, 'MacBook Pro 16英寸', '电脑', 18999.00, 50, 1),
-                (3, '华为Mate 50', '手机', 4999.00, 150, 1)
-            """);
+                        INSERT INTO apexflow_product (id, name, category, price, stock, status) VALUES
+                        (1, 'iPhone 14 Pro', '手机', 7999.00, 100, 1),
+                        (2, 'MacBook Pro 16英寸', '电脑', 18999.00, 50, 1),
+                        (3, '华为Mate 50', '手机', 4999.00, 150, 1)
+                    """);
 
             // 插入订单
             stmt.execute("""
-                INSERT INTO apexflow_order (id, user_id, total_amount, status, created_at) VALUES
-                ('REVIEW001', 1, 7999.00, 4, '2023-12-01 10:00:00'),
-                ('REVIEW002', 2, 18999.00, 4, '2023-12-02 11:00:00'),
-                ('REVIEW003', 3, 4999.00, 4, '2023-12-03 12:00:00'),
-                ('REVIEW004', 1, 7999.00, 4, '2023-12-04 13:00:00'),
-                ('REVIEW005', 2, 18999.00, 4, '2023-12-05 14:00:00')
-            """);
+                        INSERT INTO apexflow_order (id, user_id, total_amount, status, created_at) VALUES
+                        ('REVIEW001', 1, 7999.00, 4, '2023-12-01 10:00:00'),
+                        ('REVIEW002', 2, 18999.00, 4, '2023-12-02 11:00:00'),
+                        ('REVIEW003', 3, 4999.00, 4, '2023-12-03 12:00:00'),
+                        ('REVIEW004', 1, 7999.00, 4, '2023-12-04 13:00:00'),
+                        ('REVIEW005', 2, 18999.00, 4, '2023-12-05 14:00:00')
+                    """);
 
             // 插入评价
             stmt.execute("""
-                INSERT INTO apexflow_review (id, order_id, product_id, user_id, rating, content, images, is_anonymous, created_at) VALUES
-                (1, 'REVIEW001', 1, 1, 5, '手机很好用，拍照很清晰', 'image1.jpg,image2.jpg', FALSE, '2023-12-10 09:00:00'),
-                (2, 'REVIEW002', 2, 2, 4, '电脑性能很强，但有点重', 'image3.jpg', FALSE, '2023-12-11 10:00:00'),
-                (3, 'REVIEW003', 1, 3, 3, '一般般，电池续航不够', NULL, TRUE, '2023-12-12 11:00:00'),
-                (4, 'REVIEW004', 1, 1, 5, '第二次购买了，非常满意', 'image4.jpg,image5.jpg', FALSE, '2023-12-13 12:00:00'),
-                (5, 'REVIEW005', 3, 2, 2, '性价比不高，不推荐购买', NULL, FALSE, '2023-12-14 13:00:00')
-            """);
+                        INSERT INTO apexflow_review (id, order_id, product_id, user_id, rating, content, images, is_anonymous, created_at) VALUES
+                        (1, 'REVIEW001', 1, 1, 5, '手机很好用，拍照很清晰', 'image1.jpg,image2.jpg', FALSE, '2023-12-10 09:00:00'),
+                        (2, 'REVIEW002', 2, 2, 4, '电脑性能很强，但有点重', 'image3.jpg', FALSE, '2023-12-11 10:00:00'),
+                        (3, 'REVIEW003', 1, 3, 3, '一般般，电池续航不够', NULL, TRUE, '2023-12-12 11:00:00'),
+                        (4, 'REVIEW004', 1, 1, 5, '第二次购买了，非常满意', 'image4.jpg,image5.jpg', FALSE, '2023-12-13 12:00:00'),
+                        (5, 'REVIEW005', 3, 2, 2, '性价比不高，不推荐购买', NULL, FALSE, '2023-12-14 13:00:00')
+                    """);
         }
     }
 

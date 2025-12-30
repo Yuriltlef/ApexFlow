@@ -1,7 +1,7 @@
 package com.apex.core.dao;
 
 import com.apex.core.model.Review;
-import com.apex.core.dao.ReviewDAO.RatingDistribution;
+import com.apex.core.dto.RatingDistribution;
 
 import java.util.List;
 

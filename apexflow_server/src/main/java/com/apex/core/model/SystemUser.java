@@ -109,7 +109,8 @@ public class SystemUser {
      */
     private LocalDateTime lastLoginAt;
 
-    public SystemUser() {}
+    public SystemUser() {
+    }
 
     public Integer getId() {
         return id;

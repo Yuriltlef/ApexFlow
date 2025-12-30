@@ -1,7 +1,7 @@
 package com.apex.core.dao;
 
 import com.apex.core.model.Logistics;
-import com.apex.core.dao.LogisticsDAO.LogisticsStats;
+import com.apex.core.dto.LogisticsStats;
 
 import java.time.LocalDateTime;
 import java.util.List;

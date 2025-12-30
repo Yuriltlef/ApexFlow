@@ -112,6 +112,7 @@ public class UserService {
 
         return permissions;
     }
+}
 
     /**
      * 验证用户权限

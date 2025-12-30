@@ -1,5 +1,5 @@
-import com.apex.core.dao.ProductDAO;
 import com.apex.core.dao.IProductDAO;
+import com.apex.core.dao.ProductDAO;
 import com.apex.core.model.Product;
 import com.apex.util.ConnectionPool;
 import org.junit.jupiter.api.*;
@@ -10,8 +10,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -65,28 +65,28 @@ public class ProductDAOTest {
 
             // 插入商品数据
             stmt.execute("""
-                INSERT INTO apexflow_product (id, name, category, price, stock, status, image, created_at) VALUES
-                (1, 'iPhone 14 Pro', '手机', 7999.00, 50, 1, 'iphone14pro.jpg', '2023-12-01 10:00:00'),
-                (2, 'MacBook Pro 16英寸', '电脑', 18999.00, 20, 1, 'macbookpro.jpg', '2023-12-01 11:00:00'),
-                (3, '华为Mate 50', '手机', 4999.00, 30, 1, 'mate50.jpg', '2023-12-01 12:00:00'),
-                (4, '小米13', '手机', 3999.00, 0, 0, 'xiaomi13.jpg', '2023-12-01 13:00:00'),  -- 下架商品
-                (5, '戴尔XPS 13', '电脑', 8999.00, 15, 1, NULL, '2023-12-01 14:00:00'),
-                (6, 'iPad Air', '平板', 4999.00, 25, 1, 'ipadair.jpg', '2023-12-01 15:00:00'),
-                (7, '三星Galaxy S23', '手机', 5999.00, 10, 1, 'galaxys23.jpg', '2023-12-01 16:00:00'),
-                (8, '联想ThinkPad X1', '电脑', 12999.00, 8, 1, 'thinkpad.jpg', '2023-12-01 17:00:00')
-            """);
+                        INSERT INTO apexflow_product (id, name, category, price, stock, status, image, created_at) VALUES
+                        (1, 'iPhone 14 Pro', '手机', 7999.00, 50, 1, 'iphone14pro.jpg', '2023-12-01 10:00:00'),
+                        (2, 'MacBook Pro 16英寸', '电脑', 18999.00, 20, 1, 'macbookpro.jpg', '2023-12-01 11:00:00'),
+                        (3, '华为Mate 50', '手机', 4999.00, 30, 1, 'mate50.jpg', '2023-12-01 12:00:00'),
+                        (4, '小米13', '手机', 3999.00, 0, 0, 'xiaomi13.jpg', '2023-12-01 13:00:00'),  -- 下架商品
+                        (5, '戴尔XPS 13', '电脑', 8999.00, 15, 1, NULL, '2023-12-01 14:00:00'),
+                        (6, 'iPad Air', '平板', 4999.00, 25, 1, 'ipadair.jpg', '2023-12-01 15:00:00'),
+                        (7, '三星Galaxy S23', '手机', 5999.00, 10, 1, 'galaxys23.jpg', '2023-12-01 16:00:00'),
+                        (8, '联想ThinkPad X1', '电脑', 12999.00, 8, 1, 'thinkpad.jpg', '2023-12-01 17:00:00')
+                    """);
 
             // 插入订单（用于测试外键约束）
             stmt.execute("""
-                INSERT INTO apexflow_order (id, user_id, total_amount, status, payment_method, created_at, paid_at) VALUES
-                ('ORDER001', 1001, 7999.00, 4, 'alipay', '2023-12-01 10:00:00', '2023-12-01 10:05:00')
-            """);
+                        INSERT INTO apexflow_order (id, user_id, total_amount, status, payment_method, created_at, paid_at) VALUES
+                        ('ORDER001', 1001, 7999.00, 4, 'alipay', '2023-12-01 10:00:00', '2023-12-01 10:05:00')
+                    """);
 
             // 插入订单项（引用商品）
             stmt.execute("""
-                INSERT INTO apexflow_order_item (order_id, product_id, product_name, quantity, price, subtotal) VALUES
-                ('ORDER001', 1, 'iPhone 14 Pro', 1, 7999.00, 7999.00)
-            """);
+                        INSERT INTO apexflow_order_item (order_id, product_id, product_name, quantity, price, subtotal) VALUES
+                        ('ORDER001', 1, 'iPhone 14 Pro', 1, 7999.00, 7999.00)
+                    """);
         }
     }
 
@@ -560,7 +560,8 @@ public class ProductDAOTest {
 
     @Test
     @Order(21)
-    void testFindAll_EmptyDatabase() {}
+    void testFindAll_EmptyDatabase() {
+    }
 
     @Test
     @Order(22)

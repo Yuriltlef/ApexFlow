@@ -63,34 +63,34 @@ public class AfterSalesDAOTest {
 
             // 插入商品
             stmt.execute("""
-                INSERT INTO apexflow_product (id, name, category, price, stock, status) VALUES
-                (1, 'iPhone 14 Pro', '手机', 7999.00, 100, 1),
-                (2, 'MacBook Pro 16英寸', '电脑', 18999.00, 50, 1)
-            """);
+                        INSERT INTO apexflow_product (id, name, category, price, stock, status) VALUES
+                        (1, 'iPhone 14 Pro', '手机', 7999.00, 100, 1),
+                        (2, 'MacBook Pro 16英寸', '电脑', 18999.00, 50, 1)
+                    """);
 
             // 插入订单
             stmt.execute("""
-                INSERT INTO apexflow_order (id, user_id, total_amount, status, payment_method, created_at, paid_at) VALUES
-                ('ORDER001', 1001, 7999.00, 4, 'alipay', '2023-12-01 10:00:00', '2023-12-01 10:05:00'),
-                ('ORDER002', 1002, 18999.00, 4, 'wxpay', '2023-12-01 11:00:00', '2023-12-01 11:05:00'),
-                ('ORDER003', 1001, 299.99, 4, 'alipay', '2023-12-01 12:00:00', '2023-12-01 12:05:00')
-            """);
+                        INSERT INTO apexflow_order (id, user_id, total_amount, status, payment_method, created_at, paid_at) VALUES
+                        ('ORDER001', 1001, 7999.00, 4, 'alipay', '2023-12-01 10:00:00', '2023-12-01 10:05:00'),
+                        ('ORDER002', 1002, 18999.00, 4, 'wxpay', '2023-12-01 11:00:00', '2023-12-01 11:05:00'),
+                        ('ORDER003', 1001, 299.99, 4, 'alipay', '2023-12-01 12:00:00', '2023-12-01 12:05:00')
+                    """);
 
             // 插入订单项
             stmt.execute("""
-                INSERT INTO apexflow_order_item (order_id, product_id, product_name, quantity, price, subtotal) VALUES
-                ('ORDER001', 1, 'iPhone 14 Pro', 1, 7999.00, 7999.00),
-                ('ORDER002', 2, 'MacBook Pro 16英寸', 1, 18999.00, 18999.00)
-            """);
+                        INSERT INTO apexflow_order_item (order_id, product_id, product_name, quantity, price, subtotal) VALUES
+                        ('ORDER001', 1, 'iPhone 14 Pro', 1, 7999.00, 7999.00),
+                        ('ORDER002', 2, 'MacBook Pro 16英寸', 1, 18999.00, 18999.00)
+                    """);
 
             // 插入售后记录
             stmt.execute("""
-                INSERT INTO apexflow_after_sales (id, order_id, type, reason, status, refund_amount, apply_time, process_time, process_remark) VALUES
-                (1, 'ORDER001', 1, '质量问题', 1, 7999.00, '2023-12-02 10:00:00', NULL, NULL),
-                (2, 'ORDER001', 2, '颜色不喜欢', 2, NULL, '2023-12-02 11:00:00', '2023-12-02 12:00:00', '审核通过，安排换货'),
-                (3, 'ORDER002', 1, '功能故障', 3, NULL, '2023-12-02 12:00:00', '2023-12-02 13:00:00', '审核拒绝，已过退货期'),
-                (4, 'ORDER003', 3, '维修需求', 4, 100.00, '2023-12-02 13:00:00', '2023-12-02 14:00:00', '维修完成')
-            """);
+                        INSERT INTO apexflow_after_sales (id, order_id, type, reason, status, refund_amount, apply_time, process_time, process_remark) VALUES
+                        (1, 'ORDER001', 1, '质量问题', 1, 7999.00, '2023-12-02 10:00:00', NULL, NULL),
+                        (2, 'ORDER001', 2, '颜色不喜欢', 2, NULL, '2023-12-02 11:00:00', '2023-12-02 12:00:00', '审核通过，安排换货'),
+                        (3, 'ORDER002', 1, '功能故障', 3, NULL, '2023-12-02 12:00:00', '2023-12-02 13:00:00', '审核拒绝，已过退货期'),
+                        (4, 'ORDER003', 3, '维修需求', 4, 100.00, '2023-12-02 13:00:00', '2023-12-02 14:00:00', '维修完成')
+                    """);
         }
     }
 

@@ -32,7 +32,7 @@ public interface IProductDAO {
     boolean update(Product product);
 
     /**
-     * 删除商品
+     * 删除商品（已禁用，需要在业务层处理级联删除）
      * @param id 要删除的商品ID
      * @return 删除成功返回true，失败返回false
      */

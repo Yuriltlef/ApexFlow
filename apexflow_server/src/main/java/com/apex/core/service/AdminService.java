@@ -1,4 +1,4 @@
 package com.apex.core.service;
 
-public class LogisticManager {
+public class AdminService {
 }

@@ -1,4 +1,5 @@
 import com.apex.core.dao.LogisticsDAO;
+import com.apex.core.dto.LogisticsStats;
 import com.apex.core.model.Logistics;
 import com.apex.util.ConnectionPool;
 import org.junit.jupiter.api.*;
@@ -55,19 +56,19 @@ public class LogisticsDAOTest {
         try (var stmt = conn.createStatement()) {
             // 插入订单
             stmt.execute("""
-                INSERT INTO apexflow_order (id, user_id, total_amount, status, payment_method, created_at, paid_at) VALUES
-                ('LOG001', 1001, 7999.00, 1, 'alipay', '2023-12-01 10:00:00', NULL),
-                ('LOG002', 1002, 18999.00, 2, 'wxpay', '2023-12-01 11:00:00', '2023-12-01 11:05:00'),
-                ('LOG003', 1001, 299.99, 3, 'alipay', '2023-12-01 12:00:00', '2023-12-01 12:05:00')
-            """);
+                        INSERT INTO apexflow_order (id, user_id, total_amount, status, payment_method, created_at, paid_at) VALUES
+                        ('LOG001', 1001, 7999.00, 1, 'alipay', '2023-12-01 10:00:00', NULL),
+                        ('LOG002', 1002, 18999.00, 2, 'wxpay', '2023-12-01 11:00:00', '2023-12-01 11:05:00'),
+                        ('LOG003', 1001, 299.99, 3, 'alipay', '2023-12-01 12:00:00', '2023-12-01 12:05:00')
+                    """);
 
             // 插入物流数据
             stmt.execute("""
-                INSERT INTO apexflow_logistics (id, order_id, express_company, tracking_number, status, sender_address, receiver_address) VALUES
-                (1, 'LOG001', '顺丰速运', 'SF1234567890', 'pending', '北京市朝阳区', '上海市浦东新区'),
-                (2, 'LOG002', '圆通快递', 'YT9876543210', 'shipped', '广州市天河区', '深圳市南山区'),
-                (3, 'LOG003', '中通快递', 'ZT5556667778', 'delivered', '杭州市西湖区', '南京市鼓楼区')
-            """);
+                        INSERT INTO apexflow_logistics (id, order_id, express_company, tracking_number, status, sender_address, receiver_address) VALUES
+                        (1, 'LOG001', '顺丰速运', 'SF1234567890', 'pending', '北京市朝阳区', '上海市浦东新区'),
+                        (2, 'LOG002', '圆通快递', 'YT9876543210', 'shipped', '广州市天河区', '深圳市南山区'),
+                        (3, 'LOG003', '中通快递', 'ZT5556667778', 'delivered', '杭州市西湖区', '南京市鼓楼区')
+                    """);
         }
     }
 
@@ -286,7 +287,7 @@ public class LogisticsDAOTest {
     @Order(13)
     void testGetLogisticsStats() {
         // Act
-        LogisticsDAO.LogisticsStats stats = logisticsDAO.getLogisticsStats();
+        LogisticsStats stats = logisticsDAO.getLogisticsStats();
 
         // Assert
         assertNotNull(stats);

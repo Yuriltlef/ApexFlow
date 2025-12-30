@@ -23,6 +23,25 @@ public class UserDAOTest {
     private UserDAO userDAO;
     private Connection conn;
 
+    private static @NotNull SystemUser getSystemUser() {
+        SystemUser user = new SystemUser();
+        user.setUsername("newuser");
+        user.setPasswordHash("$2a$10$NewHashValue1234567890");
+        user.setSalt("newsalt1234678901234567890123456");
+        user.setRealName("新用户");
+        user.setEmail("newuser@apexflow.com");
+        user.setPhone("13900139000");
+        user.setAdmin(false);
+        user.setCanManageOrder(true);
+        user.setCanManageLogistics(false);
+        user.setCanManageAfterSales(true);
+        user.setCanManageReview(false);
+        user.setCanManageInventory(true);
+        user.setCanManageIncome(false);
+        user.setStatus(1);
+        return user;
+    }
+
     @BeforeAll
     void setUpAll() throws Exception {
         // 确保使用H2内存数据库
@@ -56,21 +75,21 @@ public class UserDAOTest {
         try (var stmt = conn.createStatement()) {
             // 插入用户数据
             stmt.execute("""
-                INSERT INTO apexflow_system_user (id, username, password_hash, salt, real_name, email, phone,
-                                                  is_admin, can_manage_order, can_manage_logistics,
-                                                  can_manage_after_sales, can_manage_review,
-                                                  can_manage_inventory, can_manage_income, status) VALUES
-                (1, 'admin', '$2a$10$AbCdEfGhIjKlMnOpQrStUv', 'a1b2c3d4e5f678901234567890123456', '系统管理员',
-                 'admin@apexflow.com', '13800138000', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 1),
-                (2, 'manager1', 'hash2', 'salt2', '经理1', 'manager1@apexflow.com', '13800138001',
-                 FALSE, TRUE, TRUE, FALSE, TRUE, FALSE, TRUE, 1),
-                (3, 'manager2', 'hash3', 'salt3', '经理2', 'manager2@apexflow.com', '13800138002',
-                 FALSE, FALSE, TRUE, TRUE, FALSE, TRUE, FALSE, 1),
-                (4, 'operator1', 'hash4', 'salt4', '操作员1', 'operator1@apexflow.com', '13800138003',
-                 FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, 1),
-                (5, 'inactive_user', 'hash5', 'salt5', '禁用用户', 'inactive@apexflow.com', '13800138004',
-                 FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, 0)
-            """);
+                        INSERT INTO apexflow_system_user (id, username, password_hash, salt, real_name, email, phone,
+                                                          is_admin, can_manage_order, can_manage_logistics,
+                                                          can_manage_after_sales, can_manage_review,
+                                                          can_manage_inventory, can_manage_income, status) VALUES
+                        (1, 'admin', '$2a$10$AbCdEfGhIjKlMnOpQrStUv', 'a1b2c3d4e5f678901234567890123456', '系统管理员',
+                         'admin@apexflow.com', '13800138000', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 1),
+                        (2, 'manager1', 'hash2', 'salt2', '经理1', 'manager1@apexflow.com', '13800138001',
+                         FALSE, TRUE, TRUE, FALSE, TRUE, FALSE, TRUE, 1),
+                        (3, 'manager2', 'hash3', 'salt3', '经理2', 'manager2@apexflow.com', '13800138002',
+                         FALSE, FALSE, TRUE, TRUE, FALSE, TRUE, FALSE, 1),
+                        (4, 'operator1', 'hash4', 'salt4', '操作员1', 'operator1@apexflow.com', '13800138003',
+                         FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, 1),
+                        (5, 'inactive_user', 'hash5', 'salt5', '禁用用户', 'inactive@apexflow.com', '13800138004',
+                         FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, 0)
+                    """);
         }
     }
 
@@ -97,25 +116,6 @@ public class UserDAOTest {
         assertTrue(retrieved.getCanManageOrder());
         assertFalse(retrieved.getCanManageLogistics());
         assertEquals(1, retrieved.getStatus());
-    }
-
-    private static @NotNull SystemUser getSystemUser() {
-        SystemUser user = new SystemUser();
-        user.setUsername("newuser");
-        user.setPasswordHash("$2a$10$NewHashValue1234567890");
-        user.setSalt("newsalt1234678901234567890123456");
-        user.setRealName("新用户");
-        user.setEmail("newuser@apexflow.com");
-        user.setPhone("13900139000");
-        user.setAdmin(false);
-        user.setCanManageOrder(true);
-        user.setCanManageLogistics(false);
-        user.setCanManageAfterSales(true);
-        user.setCanManageReview(false);
-        user.setCanManageInventory(true);
-        user.setCanManageIncome(false);
-        user.setStatus(1);
-        return user;
     }
 
     @Test

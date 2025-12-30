@@ -10,6 +10,7 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 // https://vite.dev/config/
 export default defineConfig({
+
   plugins: [
     vue(),
     vueDevTools(),
@@ -20,12 +21,12 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()],
     })
   ],
+
   base: './',
   server: {
     port: 3000,      // 开发服务器端口
     open: true       // 自动打开浏览器
   },
-
 
   resolve: {
     alias: {

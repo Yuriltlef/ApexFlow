@@ -1,5 +1,5 @@
-import com.apex.core.dao.InventoryLogDAO;
 import com.apex.core.dao.IInventoryLogDAO;
+import com.apex.core.dao.InventoryLogDAO;
 import com.apex.core.model.InventoryLog;
 import com.apex.util.ConnectionPool;
 import org.junit.jupiter.api.*;
@@ -62,34 +62,34 @@ public class InventoryLogDAOTest {
 
             // 插入商品
             stmt.execute("""
-                INSERT INTO apexflow_product (id, name, category, price, stock, status) VALUES
-                (1, 'iPhone 14 Pro', '手机', 7999.00, 50, 1),
-                (2, 'MacBook Pro 16英寸', '电脑', 18999.00, 20, 1),
-                (3, '华为Mate 50', '手机', 4999.00, 5, 1),  -- 低库存
-                (4, '小米13', '手机', 3999.00, 0, 1)       -- 零库存
-            """);
+                        INSERT INTO apexflow_product (id, name, category, price, stock, status) VALUES
+                        (1, 'iPhone 14 Pro', '手机', 7999.00, 50, 1),
+                        (2, 'MacBook Pro 16英寸', '电脑', 18999.00, 20, 1),
+                        (3, '华为Mate 50', '手机', 4999.00, 5, 1),  -- 低库存
+                        (4, '小米13', '手机', 3999.00, 0, 1)       -- 零库存
+                    """);
 
             // 插入订单
             stmt.execute("""
-                INSERT INTO apexflow_order (id, user_id, total_amount, status, payment_method, created_at, paid_at) VALUES
-                ('ORDER001', 1001, 7999.00, 4, 'alipay', '2023-12-01 10:00:00', '2023-12-01 10:05:00'),
-                ('ORDER002', 1002, 18999.00, 4, 'wxpay', '2023-12-01 11:00:00', '2023-12-01 11:05:00')
-            """);
+                        INSERT INTO apexflow_order (id, user_id, total_amount, status, payment_method, created_at, paid_at) VALUES
+                        ('ORDER001', 1001, 7999.00, 4, 'alipay', '2023-12-01 10:00:00', '2023-12-01 10:05:00'),
+                        ('ORDER002', 1002, 18999.00, 4, 'wxpay', '2023-12-01 11:00:00', '2023-12-01 11:05:00')
+                    """);
 
             // 插入库存变更记录
             stmt.execute("""
-                INSERT INTO apexflow_inventory_log (id, product_id, change_type, quantity, before_stock, after_stock, order_id, created_at) VALUES
-                (1, 1, 'purchase', 100, 0, 100, NULL, '2023-11-01 09:00:00'),
-                (2, 1, 'sale', -2, 100, 98, 'ORDER001', '2023-12-01 10:00:00'),
-                (3, 1, 'sale', -1, 98, 97, 'ORDER001', '2023-12-01 10:30:00'),
-                (4, 1, 'adjust', -47, 97, 50, NULL, '2023-12-01 11:00:00'),
-                (5, 2, 'purchase', 30, 0, 30, NULL, '2023-11-15 09:00:00'),
-                (6, 2, 'sale', -10, 30, 20, 'ORDER002', '2023-12-01 11:00:00'),
-                (7, 3, 'purchase', 10, 0, 10, NULL, '2023-11-20 09:00:00'),
-                (8, 3, 'sale', -5, 10, 5, NULL, '2023-12-01 12:00:00'),
-                (9, 4, 'purchase', 5, 0, 5, NULL, '2023-11-25 09:00:00'),
-                (10, 4, 'sale', -5, 5, 0, NULL, '2023-12-01 13:00:00')
-            """);
+                        INSERT INTO apexflow_inventory_log (id, product_id, change_type, quantity, before_stock, after_stock, order_id, created_at) VALUES
+                        (1, 1, 'purchase', 100, 0, 100, NULL, '2023-11-01 09:00:00'),
+                        (2, 1, 'sale', -2, 100, 98, 'ORDER001', '2023-12-01 10:00:00'),
+                        (3, 1, 'sale', -1, 98, 97, 'ORDER001', '2023-12-01 10:30:00'),
+                        (4, 1, 'adjust', -47, 97, 50, NULL, '2023-12-01 11:00:00'),
+                        (5, 2, 'purchase', 30, 0, 30, NULL, '2023-11-15 09:00:00'),
+                        (6, 2, 'sale', -10, 30, 20, 'ORDER002', '2023-12-01 11:00:00'),
+                        (7, 3, 'purchase', 10, 0, 10, NULL, '2023-11-20 09:00:00'),
+                        (8, 3, 'sale', -5, 10, 5, NULL, '2023-12-01 12:00:00'),
+                        (9, 4, 'purchase', 5, 0, 5, NULL, '2023-11-25 09:00:00'),
+                        (10, 4, 'sale', -5, 5, 0, NULL, '2023-12-01 13:00:00')
+                    """);
         }
     }
 

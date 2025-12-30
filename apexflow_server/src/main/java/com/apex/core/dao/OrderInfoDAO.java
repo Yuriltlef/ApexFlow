@@ -219,36 +219,70 @@ public class OrderInfoDAO implements IOrderInfoDAO {
 
     /**
      * Update order status only
+     *
+     * @param orderId 订单ID
+     * @param status 新的订单状态
+     * @return 更新成功返回true，失败返回false
      */
     public boolean updateStatus(String orderId, int status) {
         String operation = "UPDATE_ORDER_STATUS";
         long startTime = System.currentTimeMillis();
 
-        String sql = "UPDATE apexflow_order SET status = ? WHERE id = ?";
-
         logger.info("[{}] Updating order status. Order ID: {}, New Status: {}",
                 operation, orderId, status);
 
-        try (Connection conn = ConnectionPool.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionPool.getConnection()) {
+            // 先查询当前状态
+            String selectSql = "SELECT status FROM apexflow_order WHERE id = ?";
+            String updateSql = "UPDATE apexflow_order SET status = ? WHERE id = ?";
 
-            pstmt.setInt(1, status);
-            pstmt.setString(2, orderId);
+            int currentStatus;
 
-            int rowsAffected = pstmt.executeUpdate();
-            boolean success = rowsAffected == 1;
-
-            long duration = System.currentTimeMillis() - startTime;
-
-            if (success) {
-                logger.info("[{}] Order status updated successfully in {} ms. Order ID: {}, New Status: {}",
-                        operation, duration, orderId, status);
-            } else {
-                logger.warn("[{}] No order found to update status. Order ID: {} (took {} ms)",
-                        operation, orderId, duration);
+            // 1. 查询当前状态
+            try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
+                selectStmt.setString(1, orderId);
+                try (ResultSet rs = selectStmt.executeQuery()) {
+                    if (rs.next()) {
+                        currentStatus = rs.getInt("status");
+                    } else {
+                        // 订单不存在
+                        long duration = System.currentTimeMillis() - startTime;
+                        logger.warn("[{}] Order not found. Order ID: {} (took {} ms)",
+                                operation, orderId, duration);
+                        return false;
+                    }
+                }
             }
 
-            return success;
+            // 2. 检查状态是否相同
+            if (currentStatus == status) {
+                long duration = System.currentTimeMillis() - startTime;
+                logger.info("[{}] Order status unchanged. Order ID: {}, Current Status: {} (took {} ms)",
+                        operation, orderId, status, duration);
+                return true; // 状态相同，直接返回成功（幂等操作）
+            }
+
+            // 3. 执行状态更新
+            try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                updateStmt.setInt(1, status);
+                updateStmt.setString(2, orderId);
+
+                int rowsAffected = updateStmt.executeUpdate();
+                boolean success = rowsAffected == 1;
+
+                long duration = System.currentTimeMillis() - startTime;
+
+                if (success) {
+                    logger.info("[{}] Order status updated successfully in {} ms. Order ID: {}, " +
+                                    "Old Status: {}, New Status: {}",
+                            operation, duration, orderId, currentStatus, status);
+                } else {
+                    logger.warn("[{}] Failed to update order status. Order ID: {} (took {} ms)",
+                            operation, orderId, duration);
+                }
+
+                return success;
+            }
         } catch (SQLException e) {
             long duration = System.currentTimeMillis() - startTime;
             logger.error("[{}] Failed to update order status after {} ms. Order ID: {}, Error: {}",

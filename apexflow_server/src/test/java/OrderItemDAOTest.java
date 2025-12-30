@@ -25,6 +25,30 @@ public class OrderItemDAOTest {
     private OrderItemDAO orderItemDAO;
     private Connection conn;
 
+    private static @NotNull List<OrderItem> getOrderItems() {
+        List<OrderItem> batchItems = new ArrayList<>();
+
+        OrderItem item1 = new OrderItem();
+        item1.setOrderId("ITEM_BATCH_001");
+        item1.setProductId(1);
+        item1.setProductName("iPhone 14 Pro");
+        item1.setQuantity(2);
+        item1.setPrice(new BigDecimal("7999.00"));
+        item1.setSubtotal(new BigDecimal("15998.00"));
+
+        OrderItem item2 = new OrderItem();
+        item2.setOrderId("ITEM_BATCH_001");
+        item2.setProductId(2);
+        item2.setProductName("MacBook Pro 16英寸");
+        item2.setQuantity(1);
+        item2.setPrice(new BigDecimal("18999.00"));
+        item2.setSubtotal(new BigDecimal("18999.00"));
+
+        batchItems.add(item1);
+        batchItems.add(item2);
+        return batchItems;
+    }
+
     @BeforeAll
     void setUpAll() throws Exception {
         // 确保使用H2内存数据库
@@ -58,30 +82,30 @@ public class OrderItemDAOTest {
         try (var stmt = conn.createStatement()) {
             // 插入商品
             stmt.execute("""
-                INSERT INTO apexflow_product (id, name, category, price, stock, status) VALUES
-                (1, 'iPhone 14 Pro', '手机', 7999.00, 100, 1),
-                (2, 'MacBook Pro 16英寸', '电脑', 18999.00, 50, 1),
-                (3, '华为Mate 50', '手机', 4999.00, 150, 1),
-                (4, '小米13', '手机', 3999.00, 200, 1),
-                (5, '戴尔XPS 13', '电脑', 8999.00, 80, 1)
-            """);
+                        INSERT INTO apexflow_product (id, name, category, price, stock, status) VALUES
+                        (1, 'iPhone 14 Pro', '手机', 7999.00, 100, 1),
+                        (2, 'MacBook Pro 16英寸', '电脑', 18999.00, 50, 1),
+                        (3, '华为Mate 50', '手机', 4999.00, 150, 1),
+                        (4, '小米13', '手机', 3999.00, 200, 1),
+                        (5, '戴尔XPS 13', '电脑', 8999.00, 80, 1)
+                    """);
 
             // 插入订单
             stmt.execute("""
-                INSERT INTO apexflow_order (id, user_id, total_amount, status, payment_method, created_at) VALUES
-                ('ITEM001', 1001, 15998.00, 2, 'alipay', '2023-12-01 10:00:00'),
-                ('ITEM002', 1002, 18999.00, 4, 'wxpay', '2023-12-01 11:00:00'),
-                ('ITEM003', 1003, 7998.00, 4, 'alipay', '2023-12-01 12:00:00')
-            """);
+                        INSERT INTO apexflow_order (id, user_id, total_amount, status, payment_method, created_at) VALUES
+                        ('ITEM001', 1001, 15998.00, 2, 'alipay', '2023-12-01 10:00:00'),
+                        ('ITEM002', 1002, 18999.00, 4, 'wxpay', '2023-12-01 11:00:00'),
+                        ('ITEM003', 1003, 7998.00, 4, 'alipay', '2023-12-01 12:00:00')
+                    """);
 
             // 插入订单项
             stmt.execute("""
-                INSERT INTO apexflow_order_item (id, order_id, product_id, product_name, quantity, price, subtotal) VALUES
-                (1, 'ITEM001', 1, 'iPhone 14 Pro', 2, 7999.00, 15998.00),
-                (2, 'ITEM002', 2, 'MacBook Pro 16英寸', 1, 18999.00, 18999.00),
-                (3, 'ITEM001', 3, '华为Mate 50', 1, 4999.00, 4999.00),
-                (4, 'ITEM003', 1, 'iPhone 14 Pro', 1, 7999.00, 7999.00)
-            """);
+                        INSERT INTO apexflow_order_item (id, order_id, product_id, product_name, quantity, price, subtotal) VALUES
+                        (1, 'ITEM001', 1, 'iPhone 14 Pro', 2, 7999.00, 15998.00),
+                        (2, 'ITEM002', 2, 'MacBook Pro 16英寸', 1, 18999.00, 18999.00),
+                        (3, 'ITEM001', 3, '华为Mate 50', 1, 4999.00, 4999.00),
+                        (4, 'ITEM003', 1, 'iPhone 14 Pro', 1, 7999.00, 7999.00)
+                    """);
         }
     }
 
@@ -227,30 +251,6 @@ public class OrderItemDAOTest {
         // Verify
         List<OrderItem> retrievedItems = orderItemDAO.findByOrderId("ITEM_BATCH_001");
         assertEquals(2, retrievedItems.size(), "批量创建后应该有2个订单项");
-    }
-
-    private static @NotNull List<OrderItem> getOrderItems() {
-        List<OrderItem> batchItems = new ArrayList<>();
-
-        OrderItem item1 = new OrderItem();
-        item1.setOrderId("ITEM_BATCH_001");
-        item1.setProductId(1);
-        item1.setProductName("iPhone 14 Pro");
-        item1.setQuantity(2);
-        item1.setPrice(new BigDecimal("7999.00"));
-        item1.setSubtotal(new BigDecimal("15998.00"));
-
-        OrderItem item2 = new OrderItem();
-        item2.setOrderId("ITEM_BATCH_001");
-        item2.setProductId(2);
-        item2.setProductName("MacBook Pro 16英寸");
-        item2.setQuantity(1);
-        item2.setPrice(new BigDecimal("18999.00"));
-        item2.setSubtotal(new BigDecimal("18999.00"));
-
-        batchItems.add(item1);
-        batchItems.add(item2);
-        return batchItems;
     }
 
     @Test

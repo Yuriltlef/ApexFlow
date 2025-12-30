@@ -61,25 +61,25 @@ public class OrderInfoDAOTest {
 
             // 插入商品
             stmt.execute("""
-                INSERT INTO apexflow_product (id, name, category, price, stock, status) VALUES
-                (1, 'iPhone 14 Pro', '手机', 7999.00, 100, 1),
-                (2, 'MacBook Pro 16英寸', '电脑', 18999.00, 50, 1)
-            """);
+                        INSERT INTO apexflow_product (id, name, category, price, stock, status) VALUES
+                        (1, 'iPhone 14 Pro', '手机', 7999.00, 100, 1),
+                        (2, 'MacBook Pro 16英寸', '电脑', 18999.00, 50, 1)
+                    """);
 
             // 插入订单
             stmt.execute("""
-                INSERT INTO apexflow_order (id, user_id, total_amount, status, payment_method, created_at, paid_at) VALUES
-                ('TEST001', 1001, 7999.00, 1, 'alipay', '2023-12-01 10:00:00', NULL),
-                ('TEST002', 1002, 18999.00, 2, 'wxpay', '2023-12-01 11:00:00', '2023-12-01 11:05:00'),
-                ('TEST003', 1001, 299.99, 3, 'alipay', '2023-12-01 12:00:00', '2023-12-01 12:05:00')
-            """);
+                        INSERT INTO apexflow_order (id, user_id, total_amount, status, payment_method, created_at, paid_at) VALUES
+                        ('TEST001', 1001, 7999.00, 1, 'alipay', '2023-12-01 10:00:00', NULL),
+                        ('TEST002', 1002, 18999.00, 2, 'wxpay', '2023-12-01 11:00:00', '2023-12-01 11:05:00'),
+                        ('TEST003', 1001, 299.99, 3, 'alipay', '2023-12-01 12:00:00', '2023-12-01 12:05:00')
+                    """);
 
             // 插入订单项
             stmt.execute("""
-                INSERT INTO apexflow_order_item (order_id, product_id, product_name, quantity, price, subtotal) VALUES
-                ('TEST001', 1, 'iPhone 14 Pro', 1, 7999.00, 7999.00),
-                ('TEST002', 2, 'MacBook Pro 16英寸', 1, 18999.00, 18999.00)
-            """);
+                        INSERT INTO apexflow_order_item (order_id, product_id, product_name, quantity, price, subtotal) VALUES
+                        ('TEST001', 1, 'iPhone 14 Pro', 1, 7999.00, 7999.00),
+                        ('TEST002', 2, 'MacBook Pro 16英寸', 1, 18999.00, 18999.00)
+                    """);
         }
     }
 
