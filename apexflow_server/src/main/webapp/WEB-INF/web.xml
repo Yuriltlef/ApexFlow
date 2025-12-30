@@ -8,6 +8,28 @@
     <!-- 应用名称 -->
     <display-name>ApexFlow API Server</display-name>
 
+    <!-- 登录过滤器 -->
+    <filter>
+        <filter-name>LoginFilter</filter-name>
+        <filter-class>com.apex.web.filter.LoginFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>LoginFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 权限过滤器 -->
+    <filter>
+        <filter-name>PermissionFilter</filter-name>
+        <filter-class>com.apex.web.filter.PermissionFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>PermissionFilter</filter-name>
+        <url-pattern>/api/*</url-pattern>
+    </filter-mapping>
+
     <!-- ========== JAX-RS Servlet配置 ========== -->
     <servlet>
         <servlet-name>JerseyServlet</servlet-name>
@@ -100,6 +122,22 @@
         <filter-name>CharacterEncodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+
+    <!-- 错误页面 -->
+    <error-page>
+        <error-code>401</error-code>
+        <location>/error/401.html</location>
+    </error-page>
+
+    <error-page>
+        <error-code>403</error-code>
+        <location>/error/403.html</location>
+    </error-page>
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error/404.html</location>
+    </error-page>
 
     <!-- ========== 欢迎页面 ========== -->
     <!-- 如果要放Vue的index.html，可以启用 -->
