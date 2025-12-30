@@ -1,279 +1,264 @@
 <template>
-  <div class="login">
-    <!-- 登录表单 -->
-    <div class="login-card">
-      <h2>🔐 用户登录</h2>
-
-      <form @submit.prevent="handleLogin">
-        <div class="form-group">
-          <label>用户名：</label>
-          <input
-            type="text"
-            v-model="username"
-            placeholder="请输入用户名"
-            required
-          />
+  <div class="login-container">
+    <!-- 背景层 -->
+    <div class="background"></div>
+    
+    <!-- 主内容区 -->
+    <main class="content">
+      <!-- 登录卡片 -->
+      <div class="login-card">
+        <!-- 品牌标识 -->
+        <div class="brand">
+          <h1>ApexFlow</h1>
+          <p>登录管理控制台</p>
         </div>
-
-        <div class="form-group">
-          <label>密码：</label>
-          <input
-            type="password"
-            v-model="password"
-            placeholder="请输入密码"
-            required
-          />
+        
+        <!-- 登录表单 -->
+        <form class="login-form" @submit.prevent="handleLogin">
+          <div class="form-group">
+            <label for="username">用户名</label>
+            <input 
+              type="text" 
+              id="username" 
+              v-model="username" 
+              placeholder="请输入用户名"
+              required
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="password">密码</label>
+            <input 
+              type="password" 
+              id="password" 
+              v-model="password" 
+              placeholder="请输入密码"
+              required
+            >
+          </div>
+          
+          <div class="form-actions">
+            <a href="#" class="forgot-link">忘记密码?</a>
+          </div>
+          
+          <button type="submit" class="btn primary">登录</button>
+        </form>
+        
+        <!-- 注册提示 -->
+        <div class="register-prompt">
+          <span>还没有账号?</span>
+          <a href="/register" class="register-link">立即注册</a>
         </div>
-
-        <div class="form-group">
-          <label>
-            <input type="checkbox" v-model="remember" />
-            记住我
-          </label>
-        </div>
-
-        <button type="submit" :disabled="loading" class="login-btn">
-          {{ loading ? '登录中...' : '登录' }}
-        </button>
-      </form>
-
-      <!-- 登录结果 -->
-      <div v-if="loginResult" class="login-result">
-        <p :class="loginResult.success ? 'success' : 'error'">
-          {{ loginResult.message }}
-        </p>
-        <p v-if="loginResult.success">
-          用户名：{{ loginResult.user.username }}<br>
-          登录时间：{{ loginResult.user.loginTime }}
-        </p>
       </div>
-
-      <!-- 底部链接 -->
-      <div class="login-footer">
-        <p>
-          还没有账号？
-          <a href="#" @click.prevent="showRegisterHint">注册账号</a>
-        </p>
-        <p>
-          <router-link to="/">← 返回首页</router-link>
-        </p>
-      </div>
-    </div>
-
-    <!-- 登录提示 -->
-    <div class="login-hint">
-      <h3>💡 这个登录页演示了什么？</h3>
-      <ul>
-        <li>Vue的响应式数据绑定：输入框和v-model</li>
-        <li>表单处理：@submit.prevent</li>
-        <li>条件渲染：v-if</li>
-        <li>事件处理：@click</li>
-        <li>路由导航：this.$router.push</li>
-        <li>动态样式：:class</li>
-      </ul>
-      <p>这是一个模拟登录，不会真正发送请求。</p>
-    </div>
+    </main>
   </div>
 </template>
 
 <script>
 export default {
   name: 'Login',
-
-  // 定义数据
   data() {
     return {
       username: '',
-      password: '',
-      remember: false,
-      loading: false,
-      loginResult: null
+      password: ''
     }
   },
-
-  // 定义方法
   methods: {
-    // 处理登录
     handleLogin() {
-      // 显示加载状态
-      this.loading = true
-      this.loginResult = null
-
-      console.log('尝试登录：', {
+      // 登录逻辑处理
+      console.log('登录信息:', {
         username: this.username,
-        password: '***隐藏***',
-        remember: this.remember
+        password: this.password
       })
-
-      // 模拟API请求（延迟1秒）
-      setTimeout(() => {
-        this.loading = false
-
-        // 模拟登录验证
-        if (this.username && this.password) {
-          this.loginResult = {
-            success: true,
-            message: '登录成功！',
-            user: {
-              username: this.username,
-              loginTime: new Date().toLocaleString()
-            }
-          }
-
-          // 2秒后跳转到首页
-          setTimeout(() => {
-            this.$router.push('/')
-          }, 2000)
-        } else {
-          this.loginResult = {
-            success: false,
-            message: '登录失败：请填写用户名和密码'
-          }
-        }
-      }, 1000)
-    },
-
-    // 显示注册提示
-    showRegisterHint() {
-      alert('注册功能暂未实现，请直接使用任意用户名和密码登录测试')
+      // 实际项目中这里会调用登录API
+      // 示例: this.$api.login(this.username, this.password).then(...)
+      this.$router.push('/dashboard')
     }
-  },
-
-  // 生命周期钩子
-  created() {
-    console.log('🔐 登录页组件已创建')
   }
 }
 </script>
 
 <style scoped>
-.login {
-  max-width: 600px;
-  margin: 0 auto;
+/* 基础样式重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+/* 容器样式 - 保持浅色主题 */
+.login-container {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: #f8fafc;
+  overflow: hidden;
+}
+
+/* 背景效果 - 与首页保持一致 */
+.background {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.08), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.08), transparent 40%);
+  z-index: 1;
+}
+
+/* 主内容区 */
+.content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 420px;
+}
+
+/* 登录卡片 */
 .login-card {
-  background: white;
-  border-radius: 10px;
-  padding: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  padding: 40px;
+  width: 100%;
 }
 
-h2 {
+/* 品牌标识 - 保持与首页一致的风格 */
+.brand {
   text-align: center;
-  color: #1890ff;
-  margin-bottom: 30px;
+  margin-bottom: 36px;
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #2563eb, #7c3aed);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 8px;
+}
+
+.brand p {
+  color: #475569;
+  font-size: 1.1rem;
+}
+
+/* 表单样式 */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 24px;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #333;
-  font-weight: 500;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
 }
 
-.form-group input[type="text"],
-.form-group input[type="password"] {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
-  font-size: 16px;
-  transition: border-color 0.3s;
+.form-group input {
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background-color: #f8fafc;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #1890ff;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background-color: #ffffff;
 }
 
-.form-group input[type="checkbox"] {
-  margin-right: 8px;
+/* 表单操作区 */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
-.login-btn {
-  width: 100%;
-  padding: 12px;
-  background: #1890ff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.login-btn:hover:not(:disabled) {
-  background: #40a9ff;
-}
-
-.login-btn:disabled {
-  background: #8c8c8c;
-  cursor: not-allowed;
-}
-
-.login-result {
-  margin-top: 20px;
-  padding: 15px;
-  border-radius: 4px;
-  text-align: center;
-}
-
-.success {
-  color: #52c41a;
-  font-weight: bold;
-}
-
-.error {
-  color: #ff4d4f;
-  font-weight: bold;
-}
-
-.login-footer {
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid #f0f0f0;
-  text-align: center;
-}
-
-.login-footer a {
-  color: #1890ff;
+.forgot-link {
+  color: #2563eb;
+  font-size: 0.9rem;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-.login-footer a:hover {
+.forgot-link:hover {
+  color: #1d4ed8;
   text-decoration: underline;
 }
 
-.login-hint {
-  background: #f6ffed;
-  border: 1px solid #b7eb8f;
-  border-radius: 8px;
-  padding: 20px;
+/* 按钮样式 - 保持与首页一致 */
+.btn {
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  outline: none;
+  width: 100%;
 }
 
-.login-hint h3 {
-  color: #389e0d;
-  margin-bottom: 15px;
+.primary {
+  background: linear-gradient(90deg, #2563eb, #7c3aed);
+  color: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.25);
 }
 
-.login-hint ul {
-  margin-bottom: 15px;
-  padding-left: 20px;
+.primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px -8px rgba(59, 130, 246, 0.35);
 }
 
-.login-hint li {
-  margin-bottom: 8px;
-  color: #666;
+/* 注册提示 */
+.register-prompt {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-top: 16px;
 }
 
-.login-hint p {
-  color: #666;
-  font-style: italic;
+.register-link {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 4px;
+  transition: color 0.2s ease;
+}
+
+.register-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .login-card {
+    padding: 30px 24px;
+  }
+  
+  .brand h1 {
+    font-size: 2rem;
+  }
+  
+  .btn {
+    padding: 12px 20px;
+    font-size: 1rem;
+  }
 }
 </style>
