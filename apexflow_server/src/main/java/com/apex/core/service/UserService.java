@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class UserService {
 
-    private IUserDAO userDAO;
+    private final IUserDAO userDAO;
 
     public UserService() {
         this.userDAO = new UserDAO();
