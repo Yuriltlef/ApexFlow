@@ -1,14 +1,21 @@
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import Layout from '@/components/layout/Layout.vue'
+import Home from '@/views/Home.vue'
 
 const routes = [
   {
     path: '/',
+    name: 'Home',
+    component: Home,
+    meta: { title: '首页' }
+  },
+  {
+    path: '/app',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/app/dashboard',
     children: [
       {
-        path: 'dashboard',
+        path: '/dashboard',
         name: 'Dashboard',
         component: () => import('@/views/business/Dashboard.vue'),
         meta: { title: '仪表盘' }

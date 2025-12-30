@@ -1,144 +1,156 @@
 <template>
-  <div class="home">
-    <!-- 页面标题 -->
-    <h2>🎉 欢迎使用极简电商系统！</h2>
-
-    <!-- 简介 -->
-    <div class="intro">
-      <p>这是一个超简化的电商管理系统示例，帮你理解Vue项目的结构和工作流程。</p>
-      <p>当前页面：首页（Home.vue）</p>
-    </div>
-
-    <!-- 功能卡片 -->
-    <div class="features">
-      <div class="feature-card" @click="goToLogin">
-        <h3>🔑 登录功能</h3>
-        <p>点击这里或使用顶部导航栏的"登录"链接，前往登录页面</p>
+  <div class="home-container">
+    <!-- 背景层 -->
+    <div class="background"></div>
+    
+    <!-- 主内容区 -->
+    <main class="content">
+      <!-- 品牌标识 -->
+      <div class="brand">
+        <h1>ApexFlow</h1>
+        <p>轻量级电商管理平台</p>
       </div>
-
-      <div class="feature-card">
-        <h3>🛒 订单管理</h3>
-        <p>这是一个功能占位，实际项目中这里会显示订单列表</p>
+      
+      <!-- 操作按钮组 -->
+      <div class="action-buttons">
+        <button @click="goToLogin" class="btn primary">登录 管理控制台</button>
+        <button @click="enterAsGuest" class="btn secondary">以游客方式进入</button>
       </div>
-
-      <div class="feature-card">
-        <h3>📊 数据统计</h3>
-        <p>这是一个功能占位，实际项目中这里会显示数据图表</p>
-      </div>
-    </div>
-
-    <!-- 状态显示 -->
-    <div class="status">
-      <h3>当前应用状态：</h3>
-      <ul>
-        <li>路由正常 ✓</li>
-        <li>Vue 3 运行正常 ✓</li>
-        <li>Vue Router 运行正常 ✓</li>
-        <li>Vite 开发服务器运行正常 ✓</li>
-      </ul>
-    </div>
+    </main>
   </div>
 </template>
 
 <script>
 export default {
   name: 'Home',
-
-  // 定义方法
   methods: {
     goToLogin() {
-      // 使用路由跳转到登录页
       this.$router.push('/login')
+    },
+    enterAsGuest() {
+      // 游客访问路径可根据实际需求修改
+      this.$router.push('/guest-dashboard')
     }
-  },
-
-  // 生命周期钩子：组件创建时执行
-  created() {
-    console.log('🏠 首页组件已创建')
-  },
-
-  // 生命周期钩子：组件挂载到DOM后执行
-  mounted() {
-    console.log('🏠 首页组件已挂载到DOM')
   }
 }
 </script>
 
 <style scoped>
-/* scoped表示这些样式只在这个组件生效 */
-
-.home {
-  padding: 20px;
+/* 基础样式重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-h2 {
-  color: #1890ff;
-  margin-bottom: 20px;
+/* 容器样式 - 改为浅色主题 */
+.home-container {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: #f8fafc; /* 浅色背景 */
+  overflow: hidden;
+}
+
+/* 背景效果 - 适配浅色主题 */
+.background {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.08), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.08), transparent 40%);
+  z-index: 1;
+}
+
+/* 主内容区 */
+.content {
+  position: relative;
+  z-index: 2;
   text-align: center;
+  max-width: 600px; /* 适度加宽 */
+  width: 100%;
 }
 
-.intro {
-  background: #f0f8ff;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 30px;
-  border-left: 4px solid #1890ff;
+/* 品牌标识 - 字体放大并调整颜色 */
+.brand {
+  margin-bottom: 56px;
 }
 
-.intro p {
-  margin-bottom: 10px;
+.brand h1 {
+  font-size: 4rem; /* 放大标题 */
+  font-weight: 800;
+  background: linear-gradient(90deg, #2563eb, #7c3aed); /* 深色渐变适应浅色背景 */
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 16px;
 }
 
-.features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+.brand p {
+  color: #475569; /* 深色文字 */
+  font-size: 1.4rem; /* 放大描述文字 */
+}
+
+/* 按钮组 */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
   gap: 20px;
-  margin-bottom: 30px;
 }
 
-.feature-card {
-  background: white;
-  border: 1px solid #e8e8e8;
-  border-radius: 8px;
-  padding: 20px;
+/* 按钮样式 - 放大并调整颜色 */
+.btn {
+  padding: 16px 28px; /* 加大内边距 */
+  border-radius: 12px;
+  font-size: 1.15rem; /* 放大按钮文字 */
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  border: none;
+  outline: none;
 }
 
-.feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  border-color: #1890ff;
+/* 主按钮 - 适配浅色主题 */
+.primary {
+  background: linear-gradient(90deg, #2563eb, #7c3aed);
+  color: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.25);
 }
 
-.feature-card h3 {
-  color: #1890ff;
-  margin-bottom: 10px;
+.primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px -8px rgba(59, 130, 246, 0.35);
 }
 
-.feature-card p {
-  color: #666;
-  font-size: 14px;
+/* 次要按钮 - 适配浅色主题 */
+.secondary {
+  background: rgba(226, 232, 240, 0.8); /* 浅灰色背景 */
+  color: #1e293b; /* 深色文字 */
+  border: 1px solid rgba(148, 163, 184, 0.3);
 }
 
-.status {
-  background: #f9f9f9;
-  padding: 20px;
-  border-radius: 8px;
+.secondary:hover {
+  background: rgba(226, 232, 240, 1);
+  transform: translateY(-3px);
 }
 
-.status h3 {
-  margin-bottom: 15px;
-  color: #333;
-}
-
-.status ul {
-  list-style: none;
-}
-
-.status li {
-  padding: 8px 0;
-  color: #52c41a;
-  font-weight: bold;
+/* 响应式调整 - 保持比例放大 */
+@media (max-width: 768px) {
+  .brand h1 {
+    font-size: 3rem;
+  }
+  
+  .brand p {
+    font-size: 1.2rem;
+  }
+  
+  .btn {
+    padding: 14px 24px;
+    font-size: 1.05rem;
+  }
 }
 </style>
