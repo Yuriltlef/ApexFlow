@@ -152,6 +152,43 @@ DELETE FROM apexflow_order WHERE id = ? [23503-220]
 2025-12-29 09:47:43.282 [main] INFO  com.zaxxer.hikari.HikariDataSource - ApexFlow-HikariPool - Shutdown initiated...
 2025-12-29 09:47:43.291 [main] INFO  com.zaxxer.hikari.HikariDataSource - ApexFlow-HikariPool - Shutdown completed.
 2025-12-29 09:47:43.291 [main] INFO  com.apex.util.ConnectionPool - HikariCP connection pool shutdown completed
+2025-12-29 10:22:23.394 [main] INFO  com.apex.util.ConnectionPool - Initializing HikariCP connection pool...
+2025-12-29 10:22:23.408 [main] INFO  com.zaxxer.hikari.HikariDataSource - ApexFlow-HikariPool - Starting...
+2025-12-29 10:22:23.697 [main] INFO  com.zaxxer.hikari.pool.HikariPool - ApexFlow-HikariPool - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
+2025-12-29 10:22:23.700 [main] INFO  com.zaxxer.hikari.HikariDataSource - ApexFlow-HikariPool - Start completed.
+2025-12-29 10:22:23.702 [main] INFO  com.apex.util.ConnectionPool - HikariCP connection pool initialized successfully
+2025-12-29 10:22:23.703 [main] INFO  com.apex.util.ConnectionPool - Connection Pool Name: ApexFlow-HikariPool
+2025-12-29 10:22:23.704 [main] INFO  com.apex.util.ConnectionPool - Maximum Pool Size: 20
+2025-12-29 10:22:23.704 [main] INFO  com.apex.util.ConnectionPool - JDBC URL: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+2025-12-29 10:22:23.710 [main] INFO  H2DatabaseInitializer - Initializing H2 in-memory database...
+2025-12-29 10:22:23.767 [main] INFO  H2DatabaseInitializer - All tables created successfully
+2025-12-29 10:22:23.782 [main] INFO  H2DatabaseInitializer - Test data inserted successfully
+2025-12-29 10:22:23.782 [main] INFO  H2DatabaseInitializer - H2 database initialization completed successfully
+2025-12-29 10:22:23.796 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:23.860 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:23.876 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:23.920 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:23.950 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:23.962 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:23.976 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:23.991 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:24.004 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:24.010 [main] ERROR SQL_LOGGER - PreparedUpdate failed after 1 ms: DELETE FROM apexflow_order WHERE id = ? with params: [1="TEST001"] - Error: Referential integrity constraint violation: "CONSTRAINT_52: PUBLIC.APEXFLOW_ORDER_ITEM FOREIGN KEY(ORDER_ID) REFERENCES PUBLIC.APEXFLOW_ORDER(ID) ('TEST001')"; SQL statement:
+DELETE FROM apexflow_order WHERE id = ? [23503-220]
+2025-12-29 10:22:24.028 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:24.039 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:24.071 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:24.084 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:24.099 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:24.108 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:24.118 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:24.137 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:24.145 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:24.150 [main] INFO  H2DatabaseInitializer - All tables cleared successfully
+2025-12-29 10:22:24.155 [main] INFO  com.apex.util.ConnectionPool - Shutting down HikariCP connection pool...
+2025-12-29 10:22:24.155 [main] INFO  com.zaxxer.hikari.HikariDataSource - ApexFlow-HikariPool - Shutdown initiated...
+2025-12-29 10:22:24.158 [main] INFO  com.zaxxer.hikari.HikariDataSource - ApexFlow-HikariPool - Shutdown completed.
+2025-12-29 10:22:24.158 [main] INFO  com.apex.util.ConnectionPool - HikariCP connection pool shutdown completed
 2025-12-29 10:48:53.534 [main] INFO  com.apex.util.ConnectionPool - Initializing HikariCP connection pool...
 2025-12-29 10:48:53.543 [main] INFO  com.zaxxer.hikari.HikariDataSource - ApexFlow-HikariPool - Starting...
 2025-12-29 10:48:53.904 [main] INFO  com.zaxxer.hikari.pool.HikariPool - ApexFlow-HikariPool - Added connection conn0: url=jdbc:h2:mem:testdb user=SA

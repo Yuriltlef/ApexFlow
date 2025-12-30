@@ -574,6 +574,157 @@ DELETE FROM apexflow_order WHERE id = ? [23503-220]
 2025-12-29 09:47:43.257 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ALL_ORDERS_PAGINATED] Retrieved 2 orders in 16 ms. Page: 1, PageSize: 2
 2025-12-29 09:47:43.268 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ALL_ORDERS_PAGINATED] Retrieving orders. Page: 2, PageSize: 2, Offset: 2
 2025-12-29 09:47:43.269 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ALL_ORDERS_PAGINATED] Retrieved 1 orders in 1 ms. Page: 2, PageSize: 2
+2025-12-29 10:22:23.802 [main] INFO  com.apex.core.dao.OrderInfoDAO - [INSERT_ORDER] Starting order creation. Order ID: TEST_CREATE_001, User ID: 1001
+2025-12-29 10:22:23.815 [main] INFO  com.apex.core.dao.OrderInfoDAO - [INSERT_ORDER] Order created successfully in 13 ms. Order ID: TEST_CREATE_001, Rows affected: 1
+2025-12-29 10:22:23.830 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Searching for order by ID: TEST_CREATE_001
+2025-12-29 10:22:23.835 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Order found in 5 ms. Order ID: TEST_CREATE_001, Status: 1
+2025-12-29 10:22:23.865 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Searching for order by ID: TEST001
+2025-12-29 10:22:23.867 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Order found in 2 ms. Order ID: TEST001, Status: 1
+2025-12-29 10:22:23.879 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Searching for order by ID: NON_EXISTENT
+2025-12-29 10:22:23.880 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] No order found with ID: NON_EXISTENT (searched for 1 ms)
+2025-12-29 10:22:23.940 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Searching for order by ID: TEST001
+2025-12-29 10:22:23.941 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Order found in 1 ms. Order ID: TEST001, Status: 1
+2025-12-29 10:22:23.954 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Searching for order by ID: TEST002
+2025-12-29 10:22:23.955 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Order found in 1 ms. Order ID: TEST002, Status: 2
+2025-12-29 10:22:23.966 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Searching for order by ID: TEST003
+2025-12-29 10:22:23.967 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Order found in 1 ms. Order ID: TEST003, Status: 3
+2025-12-29 10:22:23.982 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Searching for order by ID: TEST001
+2025-12-29 10:22:23.983 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Order found in 1 ms. Order ID: TEST001, Status: 1
+2025-12-29 10:22:23.983 [main] INFO  com.apex.core.dao.OrderInfoDAO - [UPDATE_ORDER] Starting order update. Order ID: TEST001, New Status: 2
+2025-12-29 10:22:23.985 [main] INFO  com.apex.core.dao.OrderInfoDAO - [UPDATE_ORDER] Order updated successfully in 2 ms. Order ID: TEST001, Rows affected: 1
+2025-12-29 10:22:23.985 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Searching for order by ID: TEST001
+2025-12-29 10:22:23.986 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Order found in 1 ms. Order ID: TEST001, Status: 2
+2025-12-29 10:22:23.996 [main] INFO  com.apex.core.dao.OrderInfoDAO - [UPDATE_ORDER_STATUS] Updating order status. Order ID: TEST001, New Status: 2
+2025-12-29 10:22:23.998 [main] INFO  com.apex.core.dao.OrderInfoDAO - [UPDATE_ORDER_STATUS] Order status updated successfully in 2 ms. Order ID: TEST001, New Status: 2
+2025-12-29 10:22:23.998 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Searching for order by ID: TEST001
+2025-12-29 10:22:23.999 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Order found in 1 ms. Order ID: TEST001, Status: 2
+2025-12-29 10:22:24.007 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Searching for order by ID: TEST001
+2025-12-29 10:22:24.008 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Order found in 1 ms. Order ID: TEST001, Status: 1
+2025-12-29 10:22:24.008 [main] WARN  com.apex.core.dao.OrderInfoDAO - [DELETE_ORDER] Attempting to delete order. Order ID: TEST001
+2025-12-29 10:22:24.010 [main] ERROR com.apex.core.dao.OrderInfoDAO - [DELETE_ORDER] Failed to delete order after 2 ms. Order ID: TEST001, Error: Referential integrity constraint violation: "CONSTRAINT_52: PUBLIC.APEXFLOW_ORDER_ITEM FOREIGN KEY(ORDER_ID) REFERENCES PUBLIC.APEXFLOW_ORDER(ID) ('TEST001')"; SQL statement:
+DELETE FROM apexflow_order WHERE id = ? [23503-220]
+org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Referential integrity constraint violation: "CONSTRAINT_52: PUBLIC.APEXFLOW_ORDER_ITEM FOREIGN KEY(ORDER_ID) REFERENCES PUBLIC.APEXFLOW_ORDER(ID) ('TEST001')"; SQL statement:
+DELETE FROM apexflow_order WHERE id = ? [23503-220]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:365)
+	at org.h2.constraint.ConstraintReferential.checkRowRefTable(ConstraintReferential.java:382)
+	at org.h2.constraint.ConstraintReferential.checkRow(ConstraintReferential.java:256)
+	at org.h2.table.Table.fireConstraints(Table.java:1200)
+	at org.h2.table.Table.fireAfterRow(Table.java:1218)
+	at org.h2.command.dml.Delete.update(Delete.java:92)
+	at org.h2.command.dml.DataChangeStatement.update(DataChangeStatement.java:74)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:169)
+	at org.h2.command.Command.executeUpdate(Command.java:252)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:209)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:169)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at com.apex.util.LoggingPreparedStatement.executeUpdate(LoggingPreparedStatement.java:53)
+	at com.apex.core.dao.OrderInfoDAO.delete(OrderInfoDAO.java:277)
+	at OrderInfoDAOTest.testDeleteOrder_Success(OrderInfoDAOTest.java:198)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:727)
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:217)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:213)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:138)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:68)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:151)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:147)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:127)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:90)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:55)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:102)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:86)
+	at org.junit.platform.launcher.core.DefaultLauncherSession$DelegatingLauncher.execute(DefaultLauncherSession.java:86)
+	at org.junit.platform.launcher.core.SessionPerRequestLauncher.execute(SessionPerRequestLauncher.java:53)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:57)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:232)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:55)
+2025-12-29 10:22:24.030 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ALL_ORDERS_PAGINATED] Retrieving orders. Page: 1, PageSize: 2, Offset: 0
+2025-12-29 10:22:24.031 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ALL_ORDERS_PAGINATED] Retrieved 2 orders in 1 ms. Page: 1, PageSize: 2
+2025-12-29 10:22:24.031 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ALL_ORDERS_PAGINATED] Retrieving orders. Page: 2, PageSize: 2, Offset: 2
+2025-12-29 10:22:24.032 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ALL_ORDERS_PAGINATED] Retrieved 1 orders in 1 ms. Page: 2, PageSize: 2
+2025-12-29 10:22:24.043 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ORDERS_BY_USER] Retrieving orders for user. User ID: 1001, Page: 1, PageSize: 10
+2025-12-29 10:22:24.046 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ORDERS_BY_USER] Retrieved 2 orders for user 1001 in 3 ms
+2025-12-29 10:22:24.075 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ORDERS_BY_USER] Retrieving orders for user. User ID: 1001, Page: 1, PageSize: 10
+2025-12-29 10:22:24.076 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ORDERS_BY_USER] Retrieved 2 orders for user 1001 in 1 ms
+2025-12-29 10:22:24.088 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ORDERS_BY_USER] Retrieving orders for user. User ID: 1002, Page: 1, PageSize: 10
+2025-12-29 10:22:24.090 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ORDERS_BY_USER] Retrieved 1 orders for user 1002 in 2 ms
+2025-12-29 10:22:24.102 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ORDERS_BY_USER] Retrieving orders for user. User ID: 9999, Page: 1, PageSize: 10
+2025-12-29 10:22:24.103 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ORDERS_BY_USER] Retrieved 0 orders for user 9999 in 1 ms
+2025-12-29 10:22:24.111 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [COUNT_ORDERS] Counting total orders
+2025-12-29 10:22:24.113 [main] INFO  com.apex.core.dao.OrderInfoDAO - [COUNT_ORDERS] Total orders: 3 (counted in 2 ms)
+2025-12-29 10:22:24.127 [main] INFO  com.apex.core.dao.OrderInfoDAO - [INSERT_ORDER] Starting order creation. Order ID: STATUS_FLOW_TEST, User ID: 1001
+2025-12-29 10:22:24.128 [main] INFO  com.apex.core.dao.OrderInfoDAO - [INSERT_ORDER] Order created successfully in 1 ms. Order ID: STATUS_FLOW_TEST, Rows affected: 1
+2025-12-29 10:22:24.128 [main] INFO  com.apex.core.dao.OrderInfoDAO - [UPDATE_ORDER_STATUS] Updating order status. Order ID: STATUS_FLOW_TEST, New Status: 2
+2025-12-29 10:22:24.128 [main] INFO  com.apex.core.dao.OrderInfoDAO - [UPDATE_ORDER_STATUS] Order status updated successfully in 0 ms. Order ID: STATUS_FLOW_TEST, New Status: 2
+2025-12-29 10:22:24.128 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Searching for order by ID: STATUS_FLOW_TEST
+2025-12-29 10:22:24.130 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Order found in 2 ms. Order ID: STATUS_FLOW_TEST, Status: 2
+2025-12-29 10:22:24.130 [main] INFO  com.apex.core.dao.OrderInfoDAO - [UPDATE_ORDER_STATUS] Updating order status. Order ID: STATUS_FLOW_TEST, New Status: 3
+2025-12-29 10:22:24.131 [main] INFO  com.apex.core.dao.OrderInfoDAO - [UPDATE_ORDER_STATUS] Order status updated successfully in 1 ms. Order ID: STATUS_FLOW_TEST, New Status: 3
+2025-12-29 10:22:24.131 [main] INFO  com.apex.core.dao.OrderInfoDAO - [UPDATE_ORDER_STATUS] Updating order status. Order ID: STATUS_FLOW_TEST, New Status: 4
+2025-12-29 10:22:24.131 [main] INFO  com.apex.core.dao.OrderInfoDAO - [UPDATE_ORDER_STATUS] Order status updated successfully in 0 ms. Order ID: STATUS_FLOW_TEST, New Status: 4
+2025-12-29 10:22:24.140 [main] INFO  com.apex.core.dao.OrderInfoDAO - [INSERT_ORDER] Starting order creation. Order ID: NULL_TEST, User ID: 1001
+2025-12-29 10:22:24.141 [main] INFO  com.apex.core.dao.OrderInfoDAO - [INSERT_ORDER] Order created successfully in 1 ms. Order ID: NULL_TEST, Rows affected: 1
+2025-12-29 10:22:24.141 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Searching for order by ID: NULL_TEST
+2025-12-29 10:22:24.142 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Order found in 1 ms. Order ID: NULL_TEST, Status: 1
+2025-12-29 10:22:24.151 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ALL_ORDERS_PAGINATED] Retrieving orders. Page: 1, PageSize: 10, Offset: 0
+2025-12-29 10:22:24.151 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ALL_ORDERS_PAGINATED] Retrieved 0 orders in 0 ms. Page: 1, PageSize: 10
 2025-12-29 10:48:54.002 [main] INFO  com.apex.core.dao.OrderInfoDAO - [INSERT_ORDER] Starting order creation. Order ID: TEST_CREATE_001, User ID: 1001
 2025-12-29 10:48:54.015 [main] INFO  com.apex.core.dao.OrderInfoDAO - [INSERT_ORDER] Order created successfully in 13 ms. Order ID: TEST_CREATE_001, Rows affected: 1
 2025-12-29 10:48:54.026 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Searching for order by ID: TEST_CREATE_001
