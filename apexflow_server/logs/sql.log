@@ -234,3 +234,84 @@
 2025-12-30 10:40:01.218 [main] DEBUG com.apex.core.dao.OrderInfoDAO - [SELECT_ORDER_BY_ID] Order found in 1 ms. Order ID: NULL_TEST, Status: 1
 2025-12-30 10:40:01.227 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ALL_ORDERS_PAGINATED] Retrieving orders. Page: 1, PageSize: 10, Offset: 0
 2025-12-30 10:40:01.228 [main] INFO  com.apex.core.dao.OrderInfoDAO - [SELECT_ALL_ORDERS_PAGINATED] Retrieved 0 orders in 1 ms. Page: 1, PageSize: 10
+2025-12-30 16:27:18.595 [main] INFO  com.apex.core.dao.ReviewDAO - Creating review for product: 2 by user: 1
+2025-12-30 16:27:18.607 [main] INFO  com.apex.core.dao.ReviewDAO - Review created successfully. ID: 6
+2025-12-30 16:27:18.618 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding review by ID: 6
+2025-12-30 16:27:18.646 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding review by ID: 1
+2025-12-30 16:27:18.658 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding review by ID: 999
+2025-12-30 16:27:18.669 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding review by order ID: REVIEW001
+2025-12-30 16:27:18.681 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding reviews for product: 1. Page: 1, PageSize: 10
+2025-12-30 16:27:18.692 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding reviews for product: 1. Page: 1, PageSize: 2
+2025-12-30 16:27:18.694 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding reviews for product: 1. Page: 2, PageSize: 2
+2025-12-30 16:27:18.704 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding reviews by user: 1. Page: 1, PageSize: 10
+2025-12-30 16:27:18.718 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding review by ID: 1
+2025-12-30 16:27:18.719 [main] INFO  com.apex.core.dao.ReviewDAO - Updating review ID: 1
+2025-12-30 16:27:18.723 [main] INFO  com.apex.core.dao.ReviewDAO - Review updated. Rows affected: 1
+2025-12-30 16:27:18.723 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding review by ID: 1
+2025-12-30 16:27:18.733 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding review by ID: 1
+2025-12-30 16:27:18.735 [main] WARN  com.apex.core.dao.ReviewDAO - Deleting review ID: 1
+2025-12-30 16:27:18.736 [main] WARN  com.apex.core.dao.ReviewDAO - Review deleted. Rows affected: 1
+2025-12-30 16:27:18.737 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding review by ID: 1
+2025-12-30 16:27:18.745 [main] DEBUG com.apex.core.dao.ReviewDAO - Getting average rating for product: 1
+2025-12-30 16:27:18.749 [main] INFO  com.apex.core.dao.ReviewDAO - Average rating for product 1: 4.333333333333333
+2025-12-30 16:27:18.761 [main] DEBUG com.apex.core.dao.ReviewDAO - Getting average rating for product: 999
+2025-12-30 16:27:18.764 [main] INFO  com.apex.core.dao.ReviewDAO - Average rating for product 999: 0.0
+2025-12-30 16:27:18.774 [main] DEBUG com.apex.core.dao.ReviewDAO - Getting rating distribution for product: 1
+2025-12-30 16:27:18.778 [main] INFO  com.apex.core.dao.ReviewDAO - Rating distribution for product 1: 1星:0, 2星:0, 3星:1, 4星:0, 5星:2 (总计:3)
+2025-12-30 16:27:18.786 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding reviews with images for product: 1. Limit: 3
+2025-12-30 16:27:18.795 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding latest reviews. Limit: 3
+2025-12-30 16:27:18.805 [main] DEBUG com.apex.core.dao.ReviewDAO - Counting reviews for product: 1
+2025-12-30 16:27:18.806 [main] INFO  com.apex.core.dao.ReviewDAO - Review count for product 1: 3
+2025-12-30 16:27:18.815 [main] DEBUG com.apex.core.dao.ReviewDAO - Counting reviews for product: 999
+2025-12-30 16:27:18.816 [main] INFO  com.apex.core.dao.ReviewDAO - Review count for product 999: 0
+2025-12-30 16:27:18.824 [main] INFO  com.apex.core.dao.ReviewDAO - Creating review for product: 2 by user: 1
+2025-12-30 16:27:18.825 [main] INFO  com.apex.core.dao.ReviewDAO - Review created successfully. ID: 7
+2025-12-30 16:27:18.825 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding review by ID: 7
+2025-12-30 16:27:18.834 [main] INFO  com.apex.core.dao.ReviewDAO - Creating review for product: 2 by user: 1
+2025-12-30 16:27:18.835 [main] INFO  com.apex.core.dao.ReviewDAO - Review created successfully. ID: 8
+2025-12-30 16:27:18.835 [main] DEBUG com.apex.core.dao.ReviewDAO - Finding review by ID: 8
+2025-12-30 16:27:18.914 [main] DEBUG com.apex.core.dao.ReviewDAO - Counting reviews for product: 1
+2025-12-30 16:27:18.915 [main] INFO  com.apex.core.dao.ReviewDAO - Review count for product 1: 3
+2025-12-30 16:27:18.929 [main] DEBUG com.apex.core.dao.ReviewDAO - Counting reviews for product: 2
+2025-12-30 16:27:18.931 [main] INFO  com.apex.core.dao.ReviewDAO - Review count for product 2: 1
+2025-12-30 16:27:18.938 [main] DEBUG com.apex.core.dao.ReviewDAO - Counting reviews for product: 3
+2025-12-30 16:27:18.939 [main] INFO  com.apex.core.dao.ReviewDAO - Review count for product 3: 1
+2025-12-30 16:27:18.948 [main] DEBUG com.apex.core.dao.ReviewDAO - Counting reviews for product: 999
+2025-12-30 16:27:18.948 [main] INFO  com.apex.core.dao.ReviewDAO - Review count for product 999: 0
+2025-12-30 16:27:18.957 [main] DEBUG com.apex.core.dao.ReviewDAO - Getting rating distribution for product: 2
+2025-12-30 16:27:18.959 [main] INFO  com.apex.core.dao.ReviewDAO - Rating distribution for product 2: 1星:1, 2星:1, 3星:0, 4星:1, 5星:0 (总计:3)
+2025-12-30 16:27:26.562 [main] INFO  com.apex.core.dao.LogisticsDAO - Creating logistics record for order: LOG_NEW_001
+2025-12-30 16:27:26.574 [main] INFO  com.apex.core.dao.LogisticsDAO - Logistics record created successfully. ID: 4
+2025-12-30 16:27:26.585 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding logistics record by ID: 4
+2025-12-30 16:27:26.606 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding logistics record by ID: 1
+2025-12-30 16:27:26.613 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding logistics record by ID: 999
+2025-12-30 16:27:26.621 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding logistics record by order ID: LOG001
+2025-12-30 16:27:26.629 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding logistics record by order ID: LOG001
+2025-12-30 16:27:26.630 [main] INFO  com.apex.core.dao.LogisticsDAO - Updating logistics record for order: LOG001
+2025-12-30 16:27:26.634 [main] INFO  com.apex.core.dao.LogisticsDAO - Logistics record updated. Rows affected: 1
+2025-12-30 16:27:26.635 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding logistics record by ID: 1
+2025-12-30 16:27:26.641 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding logistics record by ID: 1
+2025-12-30 16:27:26.643 [main] WARN  com.apex.core.dao.LogisticsDAO - Deleting logistics record ID: 1
+2025-12-30 16:27:26.643 [main] WARN  com.apex.core.dao.LogisticsDAO - Logistics record deleted. Rows affected: 1
+2025-12-30 16:27:26.643 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding logistics record by ID: 1
+2025-12-30 16:27:26.650 [main] INFO  com.apex.core.dao.LogisticsDAO - Updating logistics status. Order: LOG001, New Status: shipped
+2025-12-30 16:27:26.651 [main] INFO  com.apex.core.dao.LogisticsDAO - Logistics status updated. Rows affected: 1
+2025-12-30 16:27:26.651 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding logistics record by order ID: LOG001
+2025-12-30 16:27:26.744 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding logistics record by order ID: LOG001
+2025-12-30 16:27:26.764 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding logistics record by order ID: LOG002
+2025-12-30 16:27:26.772 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding logistics record by order ID: LOG003
+2025-12-30 16:27:26.781 [main] INFO  com.apex.core.dao.LogisticsDAO - Updating shipping info for order: LOG001
+2025-12-30 16:27:26.787 [main] INFO  com.apex.core.dao.LogisticsDAO - Shipping info updated. Rows affected: 1
+2025-12-30 16:27:26.787 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding logistics record by order ID: LOG001
+2025-12-30 16:27:26.795 [main] INFO  com.apex.core.dao.LogisticsDAO - Updating delivery info for order: LOG002
+2025-12-30 16:27:26.797 [main] INFO  com.apex.core.dao.LogisticsDAO - Delivery info updated. Rows affected: 1
+2025-12-30 16:27:26.797 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding logistics record by order ID: LOG002
+2025-12-30 16:27:26.804 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding pending shipping logistics. Page: 1, PageSize: 10
+2025-12-30 16:27:26.810 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding in-transit logistics. Page: 1, PageSize: 10
+2025-12-30 16:27:26.816 [main] DEBUG com.apex.core.dao.LogisticsDAO - Getting logistics statistics
+2025-12-30 16:27:26.821 [main] INFO  com.apex.core.dao.LogisticsDAO - Logistics stats: Pending=1, Shipped=1, Delivered=1
+2025-12-30 16:27:26.830 [main] INFO  com.apex.core.dao.LogisticsDAO - Creating logistics record for order: LOG_NULL_TEST
+2025-12-30 16:27:26.830 [main] INFO  com.apex.core.dao.LogisticsDAO - Logistics record created successfully. ID: 5
+2025-12-30 16:27:26.831 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding logistics record by order ID: LOG_NULL_TEST
+2025-12-30 16:27:26.843 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding pending shipping logistics. Page: 1, PageSize: 5
+2025-12-30 16:27:26.844 [main] DEBUG com.apex.core.dao.LogisticsDAO - Finding pending shipping logistics. Page: 2, PageSize: 5

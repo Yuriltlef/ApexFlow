@@ -1,9 +1,11 @@
 import com.apex.core.dao.*;
+import com.apex.core.dto.OrderWithItemsResponse;
 import com.apex.core.model.*;
 import com.apex.core.service.OrderService;
 import com.apex.util.ConnectionPool;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
+import com.apex.core.dto.OrderDetail;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -528,7 +530,7 @@ public class OrderServiceTest {
         when(reviewDAO.findByOrderId("DETAIL_ORDER")).thenReturn(review);
 
         // Act
-        OrderService.OrderDetail detail = orderService.getOrderDetail("DETAIL_ORDER");
+        OrderDetail detail = orderService.getOrderDetail("DETAIL_ORDER");
 
         // Assert
         assertNotNull(detail, "订单详情不应该为null");
@@ -547,7 +549,7 @@ public class OrderServiceTest {
         when(orderInfoDAO.findById("NON_EXISTENT_ORDER")).thenReturn(null);
 
         // Act
-        OrderService.OrderDetail detail = orderService.getOrderDetail("NON_EXISTENT_ORDER");
+        OrderDetail detail = orderService.getOrderDetail("NON_EXISTENT_ORDER");
 
         // Assert
         assertNull(detail, "不存在的订单应该返回null");
@@ -571,7 +573,7 @@ public class OrderServiceTest {
         when(reviewDAO.findByOrderId("MINIMAL_ORDER")).thenReturn(null);
 
         // Act
-        OrderService.OrderDetail detail = orderService.getOrderDetail("MINIMAL_ORDER");
+        OrderDetail detail = orderService.getOrderDetail("MINIMAL_ORDER");
 
         // Assert
         assertNotNull(detail, "最小化订单应该返回详情");
@@ -842,5 +844,445 @@ public class OrderServiceTest {
 
         boolean result4 = orderService.createOrder(largeOrder, largeItems);
         assertTrue(result4, "大数量订单应该成功处理");
+    }
+
+    @Test
+    @Order(25)
+    void testGetAllOrdersWithItems_Success() {
+        // Arrange
+        int page = 1;
+        int pageSize = 10;
+
+        // 创建测试订单列表
+        List<OrderInfo> mockOrders = new ArrayList<>();
+        for (int i = 1; i <= 3; i++) {
+            OrderInfo order = new OrderInfo();
+            order.setId("ORDER2023120100" + i);
+            order.setUserId(1000 + i);
+            order.setTotalAmount(new BigDecimal(1000 * i));
+            order.setStatus(i % 4 + 1); // 不同状态
+            order.setCreatedAt(LocalDateTime.now());
+            mockOrders.add(order);
+        }
+
+        // 创建测试订单项
+        List<OrderItem> mockItems1 = new ArrayList<>();
+        OrderItem item1 = new OrderItem();
+        item1.setId(1);
+        item1.setOrderId("ORDER20231201001");
+        item1.setProductId(1);
+        item1.setProductName("iPhone 14 Pro");
+        item1.setQuantity(1);
+        item1.setPrice(new BigDecimal("7999.00"));
+        mockItems1.add(item1);
+
+        List<OrderItem> mockItems2 = new ArrayList<>();
+        OrderItem item2 = new OrderItem();
+        item2.setId(2);
+        item2.setOrderId("ORDER20231201002");
+        item2.setProductId(2);
+        item2.setProductName("MacBook Pro");
+        item2.setQuantity(2);
+        item2.setPrice(new BigDecimal("18999.00"));
+        mockItems2.add(item2);
+
+        // 设置Mock行为
+        when(orderInfoDAO.findAll(page, pageSize)).thenReturn(mockOrders);
+        when(orderItemDAO.findByOrderId("ORDER20231201001")).thenReturn(mockItems1);
+        when(orderItemDAO.findByOrderId("ORDER20231201002")).thenReturn(mockItems2);
+        when(orderItemDAO.findByOrderId("ORDER20231201003")).thenReturn(new ArrayList<>());
+
+        // Act
+        List<OrderWithItemsResponse> result = orderService.getAllOrdersWithItems(page, pageSize);
+
+        // Assert
+        assertNotNull(result, "结果不应该为null");
+        assertEquals(3, result.size(), "应该返回3个订单");
+
+        // 验证第一个订单
+        OrderWithItemsResponse response1 = result.get(0);
+        assertEquals("ORDER20231201001", response1.getOrder().getId());
+        assertEquals(1, response1.getItems().size());
+        assertEquals("iPhone 14 Pro", response1.getItems().get(0).getProductName());
+
+        // 验证第二个订单
+        OrderWithItemsResponse response2 = result.get(1);
+        assertEquals("ORDER20231201002", response2.getOrder().getId());
+        assertEquals(1, response2.getItems().size());
+        assertEquals("MacBook Pro", response2.getItems().get(0).getProductName());
+
+        // 验证第三个订单
+        OrderWithItemsResponse response3 = result.get(2);
+        assertEquals("ORDER20231201003", response3.getOrder().getId());
+        assertTrue(response3.getItems().isEmpty(), "第三个订单应该没有订单项");
+
+        // 验证DAO调用
+        verify(orderInfoDAO, times(1)).findAll(page, pageSize);
+        verify(orderItemDAO, times(3)).findByOrderId(anyString());
+    }
+
+    @Test
+    @Order(26)
+    void testGetAllOrdersWithItems_NoOrders() {
+        // Arrange
+        int page = 1;
+        int pageSize = 10;
+
+        // 返回空列表
+        when(orderInfoDAO.findAll(page, pageSize)).thenReturn(new ArrayList<>());
+
+        // Act
+        List<OrderWithItemsResponse> result = orderService.getAllOrdersWithItems(page, pageSize);
+
+        // Assert
+        assertNotNull(result, "结果不应该为null，即使没有数据也应该返回空列表");
+        assertTrue(result.isEmpty(), "没有订单时应该返回空列表");
+
+        // 验证DAO调用
+        verify(orderInfoDAO, times(1)).findAll(page, pageSize);
+        verify(orderItemDAO, never()).findByOrderId(anyString());
+    }
+
+    @Test
+    @Order(27)
+    void testGetAllOrdersWithItems_DifferentPageSizes() {
+        // Arrange
+        List<OrderInfo> mockOrders = new ArrayList<>();
+
+        // 测试不同分页大小
+        int[] pageSizes = {5, 10, 20, 50};
+
+        for (int pageSize : pageSizes) {
+            resetDAOMocks();
+            setupCommonMockBehaviors();
+
+            // 创建指定数量的订单
+            mockOrders.clear();
+            for (int i = 0; i < pageSize; i++) {
+                OrderInfo order = new OrderInfo();
+                order.setId("ORDER-PAGE-" + pageSize + "-" + i);
+                order.setUserId(1000 + i);
+                order.setTotalAmount(new BigDecimal((i + 1) * 100));
+                order.setStatus(1);
+                mockOrders.add(order);
+            }
+
+            when(orderInfoDAO.findAll(1, pageSize)).thenReturn(mockOrders);
+            when(orderItemDAO.findByOrderId(anyString())).thenReturn(new ArrayList<>());
+
+            // Act
+            List<OrderWithItemsResponse> result = orderService.getAllOrdersWithItems(1, pageSize);
+
+            // Assert
+            assertEquals(pageSize, result.size(), "第" + pageSize + "页应该返回" + pageSize + "个订单");
+
+            // 验证DAO调用
+            verify(orderInfoDAO, times(1)).findAll(1, pageSize);
+            verify(orderItemDAO, times(pageSize)).findByOrderId(anyString());
+        }
+    }
+
+    @Test
+    @Order(28)
+    void testGetAllOrdersWithItems_DAOException() {
+        // Arrange
+        int page = 1;
+        int pageSize = 10;
+
+        // 模拟DAO抛出异常
+        when(orderInfoDAO.findAll(page, pageSize)).thenThrow(new RuntimeException("Database connection failed"));
+
+        // Act
+        List<OrderWithItemsResponse> result = orderService.getAllOrdersWithItems(page, pageSize);
+
+        // Assert
+        assertNotNull(result, "异常情况下也应该返回空列表而不是null");
+        assertTrue(result.isEmpty(), "DAO异常时应该返回空列表");
+
+        // 验证DAO调用
+        verify(orderInfoDAO, times(1)).findAll(page, pageSize);
+    }
+
+    @Test
+    @Order(29)
+    void testGetAllOrdersWithItems_InvalidPageParameters() {
+        // Arrange
+        List<OrderInfo> mockOrders = new ArrayList<>();
+
+        // 测试各种边界情况
+        // 情况1：页码为0（应该从1开始）
+        mockOrders.add(testOrder);
+        when(orderInfoDAO.findAll(0, 10)).thenReturn(new ArrayList<>());
+
+        List<OrderWithItemsResponse> result1 = orderService.getAllOrdersWithItems(0, 10);
+        assertNotNull(result1);
+        assertTrue(result1.isEmpty());
+
+        // 情况2：页码为负数
+        resetDAOMocks();
+        when(orderInfoDAO.findAll(-1, 10)).thenReturn(new ArrayList<>());
+
+        List<OrderWithItemsResponse> result2 = orderService.getAllOrdersWithItems(-1, 10);
+        assertNotNull(result2);
+        assertTrue(result2.isEmpty());
+
+        // 情况3：页面大小为0
+        resetDAOMocks();
+        when(orderInfoDAO.findAll(1, 0)).thenReturn(new ArrayList<>());
+
+        List<OrderWithItemsResponse> result3 = orderService.getAllOrdersWithItems(1, 0);
+        assertNotNull(result3);
+        assertTrue(result3.isEmpty());
+
+        // 情况4：页面大小为负数
+        resetDAOMocks();
+        when(orderInfoDAO.findAll(1, -5)).thenReturn(new ArrayList<>());
+
+        List<OrderWithItemsResponse> result4 = orderService.getAllOrdersWithItems(1, -5);
+        assertNotNull(result4);
+        assertTrue(result4.isEmpty());
+
+        // 情况5：非常大的页面大小
+        resetDAOMocks();
+        when(orderInfoDAO.findAll(1, 1000)).thenReturn(new ArrayList<>());
+
+        List<OrderWithItemsResponse> result5 = orderService.getAllOrdersWithItems(1, 1000);
+        assertNotNull(result5);
+        assertTrue(result5.isEmpty());
+    }
+
+    @Test
+    @Order(30)
+    void testGetAllOrdersWithItems_OrderItemDAOReturnsNull() {
+        // Arrange
+        int page = 1;
+        int pageSize = 10;
+
+        List<OrderInfo> mockOrders = new ArrayList<>();
+        OrderInfo order1 = new OrderInfo();
+        order1.setId("ORDER-TEST-001");
+        order1.setUserId(1001);
+        mockOrders.add(order1);
+
+        OrderInfo order2 = new OrderInfo();
+        order2.setId("ORDER-TEST-002");
+        order2.setUserId(1002);
+        mockOrders.add(order2);
+
+        when(orderInfoDAO.findAll(page, pageSize)).thenReturn(mockOrders);
+
+        // orderItemDAO.findByOrderId 返回 null（模拟异常情况）
+        when(orderItemDAO.findByOrderId("ORDER-TEST-001")).thenReturn(null);
+        when(orderItemDAO.findByOrderId("ORDER-TEST-002")).thenReturn(null);
+
+        // Act
+        List<OrderWithItemsResponse> result = orderService.getAllOrdersWithItems(page, pageSize);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size(), "应该返回2个订单");
+
+        // 即使订单项为null，响应中的items应该为空列表而不是null
+        for (OrderWithItemsResponse response : result) {
+            assertNotNull(response.getItems(), "订单项列表不应该为null");
+            assertTrue(response.getItems().isEmpty(), "当订单项为null时，应该返回空列表");
+        }
+    }
+
+    @Test
+    @Order(31)
+    void testGetAllOrdersWithItems_OrderInfoDAOReturnsNull() {
+        // Arrange
+        int page = 1;
+        int pageSize = 10;
+
+        // orderInfoDAO.findAll 返回 null
+        when(orderInfoDAO.findAll(page, pageSize)).thenReturn(null);
+
+        // Act
+        List<OrderWithItemsResponse> result = orderService.getAllOrdersWithItems(page, pageSize);
+
+        // Assert
+        assertNotNull(result, "即使findAll返回null，也应该返回空列表而不是null");
+        assertTrue(result.isEmpty(), "当findAll返回null时，应该返回空列表");
+
+        // 验证DAO调用
+        verify(orderInfoDAO, times(1)).findAll(page, pageSize);
+        verify(orderItemDAO, never()).findByOrderId(anyString());
+    }
+
+    @Test
+    @Order(32)
+    void testGetAllOrdersWithItems_MultiplePages() {
+        // Arrange
+        int pageSize = 5;
+
+        // 模拟分页查询
+        for (int page = 1; page <= 3; page++) {
+            resetDAOMocks();
+            setupCommonMockBehaviors();
+
+            List<OrderInfo> mockOrders = new ArrayList<>();
+            int startIndex = (page - 1) * pageSize;
+
+            // 创建当前页的订单
+            for (int i = 0; i < pageSize; i++) {
+                OrderInfo order = new OrderInfo();
+                int orderNum = startIndex + i + 1;
+                order.setId("ORDER-PAGE" + page + "-" + orderNum);
+                order.setUserId(1000 + orderNum);
+                order.setTotalAmount(new BigDecimal(orderNum * 100));
+                order.setStatus((orderNum % 4) + 1);
+                mockOrders.add(order);
+            }
+
+            when(orderInfoDAO.findAll(page, pageSize)).thenReturn(mockOrders);
+            when(orderItemDAO.findByOrderId(anyString())).thenReturn(new ArrayList<>());
+
+            // Act
+            List<OrderWithItemsResponse> result = orderService.getAllOrdersWithItems(page, pageSize);
+
+            // Assert
+            assertEquals(pageSize, result.size(), "第" + page + "页应该返回" + pageSize + "个订单");
+
+            // 验证订单ID包含正确的页码信息
+            for (int i = 0; i < result.size(); i++) {
+                String expectedId = "ORDER-PAGE" + page + "-" + (startIndex + i + 1);
+                assertEquals(expectedId, result.get(i).getOrder().getId());
+            }
+        }
+    }
+
+    @Test
+    @Order(33)
+    void testGetAllOrdersWithItems_PerformanceTest() {
+        // Arrange
+        int page = 1;
+        int pageSize = 100;
+
+        List<OrderInfo> mockOrders = new ArrayList<>();
+        for (int i = 0; i < pageSize; i++) {
+            OrderInfo order = new OrderInfo();
+            order.setId("ORDER-PERF-" + i);
+            order.setUserId(1000 + i);
+            order.setTotalAmount(new BigDecimal((i + 1) * 50));
+            order.setStatus(1);
+            mockOrders.add(order);
+        }
+
+        // 重置并重新设置 Mock
+        reset(orderItemDAO);
+
+        // 为第一个订单设置特殊的订单项
+        List<OrderItem> mockItems = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            OrderItem item = new OrderItem();
+            item.setId(i + 1);
+            item.setOrderId("ORDER-PERF-0");
+            item.setProductId(i + 1);
+            item.setProductName("Product " + (i + 1));
+            item.setQuantity(i + 1);
+            item.setPrice(new BigDecimal((i + 1) * 10));
+            mockItems.add(item);
+        }
+
+        // 使用 thenAnswer 来根据订单ID返回不同的值
+        when(orderItemDAO.findByOrderId(anyString())).thenAnswer(invocation -> {
+            String orderId = invocation.getArgument(0);
+            if ("ORDER-PERF-0".equals(orderId)) {
+                return mockItems;
+            } else {
+                return new ArrayList<>();
+            }
+        });
+
+        // 设置 orderInfoDAO 的 Mock
+        when(orderInfoDAO.findAll(page, pageSize)).thenReturn(mockOrders);
+
+        // Act
+        List<OrderWithItemsResponse> result = orderService.getAllOrdersWithItems(page, pageSize);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(pageSize, result.size());
+
+        // 验证第一个订单有5个订单项
+        OrderWithItemsResponse firstOrder = result.get(0);
+        assertEquals("ORDER-PERF-0", firstOrder.getOrder().getId());
+        assertEquals(5, firstOrder.getItems().size(), "第一个订单应该有5个订单项");
+
+        // 验证其他订单没有订单项（只检查前几个）
+        for (int i = 1; i < Math.min(5, result.size()); i++) {
+            assertTrue(result.get(i).getItems().isEmpty(), "第" + i + "个订单应该没有订单项");
+        }
+    }
+
+    @Test
+    @Order(34)
+    void testGetAllOrdersWithItems_EmptyOrderItems() {
+        // Arrange
+        int page = 1;
+        int pageSize = 10;
+
+        List<OrderInfo> mockOrders = new ArrayList<>();
+        OrderInfo order = new OrderInfo();
+        order.setId("ORDER-EMPTY-ITEMS");
+        order.setUserId(1001);
+        order.setTotalAmount(new BigDecimal("0.00"));
+        order.setStatus(1);
+        mockOrders.add(order);
+
+        when(orderInfoDAO.findAll(page, pageSize)).thenReturn(mockOrders);
+        when(orderItemDAO.findByOrderId("ORDER-EMPTY-ITEMS")).thenReturn(new ArrayList<>());
+
+        // Act
+        List<OrderWithItemsResponse> result = orderService.getAllOrdersWithItems(page, pageSize);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertNotNull(result.get(0).getItems());
+        assertTrue(result.get(0).getItems().isEmpty(), "订单项列表应该为空");
+    }
+
+    @Test
+    @Order(35)
+    void testGetAllOrdersWithItems_IntegrationWithOtherMethods() {
+        // Arrange
+        int page = 1;
+        int pageSize = 3;
+
+        // 创建与之前测试一致的订单数据
+        List<OrderInfo> mockOrders = new ArrayList<>();
+        OrderInfo order1 = new OrderInfo();
+        order1.setId(testOrder.getId());
+        order1.setUserId(testOrder.getUserId());
+        order1.setTotalAmount(testOrder.getTotalAmount());
+        order1.setStatus(testOrder.getStatus());
+        mockOrders.add(order1);
+
+        when(orderInfoDAO.findAll(page, pageSize)).thenReturn(mockOrders);
+        when(orderItemDAO.findByOrderId(testOrder.getId())).thenReturn(testOrderItems);
+
+        // Act
+        List<OrderWithItemsResponse> result = orderService.getAllOrdersWithItems(page, pageSize);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+
+        OrderWithItemsResponse response = result.get(0);
+        assertEquals(testOrder.getId(), response.getOrder().getId());
+        assertEquals(testOrder.getTotalAmount(), response.getOrder().getTotalAmount());
+
+        // 验证订单项
+        assertEquals(1, response.getItems().size());
+        assertEquals(testProduct.getId(), response.getItems().get(0).getProductId());
+        assertEquals(testProduct.getName(), response.getItems().get(0).getProductName());
+
+        // 验证可以使用其他方法获取相同订单的详细信息
+        OrderDetail detail = orderService.getOrderDetail(testOrder.getId());
+        assertNotNull(detail);
+        assertEquals(testOrder.getId(), detail.getOrderInfo().getId());
     }
 }

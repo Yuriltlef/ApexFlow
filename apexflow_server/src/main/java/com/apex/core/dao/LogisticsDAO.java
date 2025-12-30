@@ -1,5 +1,6 @@
 package com.apex.core.dao;
 
+import com.apex.core.dto.LogisticsStats;
 import com.apex.core.model.Logistics;
 import com.apex.util.ConnectionPool;
 import org.slf4j.Logger;
@@ -439,38 +440,5 @@ public class LogisticsDAO implements ILogisticsDAO {
         }
 
         return logistics;
-    }
-
-    /**
-     * 物流统计信息
-     */
-    public static class LogisticsStats {
-        private int pendingCount;
-        private int shippedCount;
-        private int deliveredCount;
-
-        public int getPendingCount() {
-            return pendingCount;
-        }
-
-        public void setPendingCount(int pendingCount) {
-            this.pendingCount = pendingCount;
-        }
-
-        public int getShippedCount() {
-            return shippedCount;
-        }
-
-        public void setShippedCount(int shippedCount) {
-            this.shippedCount = shippedCount;
-        }
-
-        public int getDeliveredCount() {
-            return deliveredCount;
-        }
-
-        public void setDeliveredCount(int deliveredCount) {
-            this.deliveredCount = deliveredCount;
-        }
     }
 }

@@ -1,10 +1,13 @@
 package com.apex.core.service;
 
 import com.apex.core.dao.*;
+import com.apex.core.dto.OrderDetail;
+import com.apex.core.dto.OrderWithItemsResponse;
 import com.apex.core.model.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -524,33 +527,62 @@ public class OrderService {
     }
 
     /**
-     * 订单详情类（用于聚合订单相关所有信息）
+     * 获取所有订单及其条目信息（分页）
+     * Get all orders with their item information (paged)
+     *
+     * @param page 页码，从1开始 / Page number, starting from 1
+     * @param pageSize 每页记录数 / Number of records per page
+     * @return 包含订单和订单项信息的列表 / List containing order and order item information
      */
-    public static class OrderDetail {
-        private OrderInfo orderInfo;
-        private List<OrderItem> orderItems;
-        private Logistics logistics;
-        private List<Income> incomes;
-        private List<AfterSales> afterSalesList;
-        private Review review;
+    public List<OrderWithItemsResponse> getAllOrdersWithItems(int page, int pageSize) {
+        String operation = "GET_ALL_ORDERS_WITH_ITEMS";
+        long startTime = System.currentTimeMillis();
 
-        // getters and setters
-        public OrderInfo getOrderInfo() { return orderInfo; }
-        public void setOrderInfo(OrderInfo orderInfo) { this.orderInfo = orderInfo; }
+        logger.info("[{}] Starting to get all orders with items. Page: {}, PageSize: {}",
+                operation, page, pageSize);
 
-        public List<OrderItem> getOrderItems() { return orderItems; }
-        public void setOrderItems(List<OrderItem> orderItems) { this.orderItems = orderItems; }
+        List<OrderWithItemsResponse> result = new ArrayList<>();
 
-        public Logistics getLogistics() { return logistics; }
-        public void setLogistics(Logistics logistics) { this.logistics = logistics; }
+        try {
+            // 1. 获取分页订单主信息
+            // Get paged order main information
+            List<OrderInfo> orders = orderInfoDAO.findAll(page, pageSize);
 
-        public List<Income> getIncomes() { return incomes; }
-        public void setIncomes(List<Income> incomes) { this.incomes = incomes; }
+            if (orders == null || orders.isEmpty()) {
+                long duration = System.currentTimeMillis() - startTime;
+                logger.info("[{}] No orders found. Page: {}, Duration: {} ms",
+                        operation, page, duration);
+                return result;
+            }
 
-        public List<AfterSales> getAfterSalesList() { return afterSalesList; }
-        public void setAfterSalesList(List<AfterSales> afterSalesList) { this.afterSalesList = afterSalesList; }
+            logger.debug("[{}] Retrieved {} orders for page {}",
+                    operation, orders.size(), page);
 
-        public Review getReview() { return review; }
-        public void setReview(Review review) { this.review = review; }
+            // 2. 为每个订单获取订单项
+            // Get order items for each order
+            for (OrderInfo order : orders) {
+                OrderWithItemsResponse response = new OrderWithItemsResponse();
+                response.setOrder(order);
+
+                // 获取订单项
+                // Get order items
+                List<OrderItem> items = orderItemDAO.findByOrderId(order.getId());
+                response.setItems(items != null ? items : new ArrayList<>());
+
+                result.add(response);
+            }
+
+            long duration = System.currentTimeMillis() - startTime;
+            logger.info("[{}] Successfully retrieved {} orders with items in {} ms. Page: {}",
+                    operation, result.size(), duration, page);
+
+            return result;
+
+        } catch (Exception e) {
+            long duration = System.currentTimeMillis() - startTime;
+            logger.error("[{}] Failed to get all orders with items after {} ms. Page: {}, Error: {}",
+                    operation, duration, page, e.getMessage(), e);
+            return result; // 返回空列表而不是null / Return empty list instead of null
+        }
     }
 }

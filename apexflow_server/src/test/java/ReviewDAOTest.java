@@ -1,5 +1,5 @@
 import com.apex.core.dao.ReviewDAO;
-import com.apex.core.dao.ReviewDAO.RatingDistribution;
+import com.apex.core.dto.RatingDistribution;
 import com.apex.core.model.Review;
 import com.apex.util.ConnectionPool;
 import org.junit.jupiter.api.*;

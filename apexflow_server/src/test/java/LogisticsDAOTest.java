@@ -1,4 +1,5 @@
 import com.apex.core.dao.LogisticsDAO;
+import com.apex.core.dto.LogisticsStats;
 import com.apex.core.model.Logistics;
 import com.apex.util.ConnectionPool;
 import org.junit.jupiter.api.*;
@@ -286,7 +287,7 @@ public class LogisticsDAOTest {
     @Order(13)
     void testGetLogisticsStats() {
         // Act
-        LogisticsDAO.LogisticsStats stats = logisticsDAO.getLogisticsStats();
+        LogisticsStats stats = logisticsDAO.getLogisticsStats();
 
         // Assert
         assertNotNull(stats);
