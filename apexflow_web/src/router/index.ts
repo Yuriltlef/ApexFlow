@@ -21,49 +21,49 @@ const routes = [
         meta: { title: '仪表盘' }
       },
       {
-        path: 'orders/list',
+        path: '/orders/list',
         name: 'OrderList',
         component: () => import('@/views/business/Order.vue'),
         meta: { title: '订单列表' }
       },
       {
-        path: 'orders/analysis',
+        path: '/orders/analysis',
         name: 'OrderAnalysis',
         component: () => import('@/views/business/OrderAnalysis.vue'),
         meta: { title: '订单分析' }
       },
       {
-        path: 'logistics/tracking',
+        path: '/logistics/tracking',
         name: 'LogisticsTracking',
         component: () => import('@/views/business/Logistics.vue'),
         meta: { title: '物流跟踪' }
       },
       {
-        path: 'after-sales',
+        path: '/after-sales',
         name: 'AfterSales',
         component: () => import('@/views/business/AfterSales.vue'),
         meta: { title: '售后管理' }
       },
       {
-        path: 'evaluation',
+        path: '/evaluation',
         name: 'Evaluation',
         component: () => import('@/views/business/Evaluation.vue'),
         meta: { title: '评价管理' }
       },
       {
-        path: 'warehouse/inventory',
+        path: '/warehouse/inventory',
         name: 'WarehouseInventory',
         component: () => import('@/views/business/Warehouse.vue'),
         meta: { title: '库存管理' }
       },
       {
-        path: 'finance/income',
+        path: '/finance/income',
         name: 'FinanceIncome',
         component: () => import('@/views/business/Finance.vue'),
         meta: { title: '收入统计' }
       },
       {
-        path: 'system',
+        path: '/system',
         name: 'System',
         component: () => import('@/views/business/System.vue'),
         meta: { title: '系统设置' }
