@@ -2,6 +2,7 @@ package com.apex.core.dao;
 
 import com.apex.core.model.SystemUser;
 import com.apex.util.ConnectionPool;
+import com.apex.util.DatabaseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -666,6 +667,47 @@ public class UserDAO implements IUserDAO {
                     operation, duration, email, e.getMessage(), e);
             return false;
         }
+    }
+
+    /**
+     * 获取用户权限信息
+     */
+    public SystemUser getPermissions(Integer userId) {
+        String sql = """
+            SELECT id, is_admin, can_manage_order, can_manage_logistics,
+                   can_manage_after_sales, can_manage_review,
+                   can_manage_inventory, can_manage_income
+            FROM apexflow_system_user 
+            WHERE id = ? AND status = 1
+            """;
+
+        logger.debug("Getting permissions for user ID: {}", userId);
+
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, userId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    SystemUser user = new SystemUser();
+                    user.setId(rs.getInt("id"));
+                    user.setAdmin(rs.getBoolean("is_admin"));
+                    user.setCanManageOrder(rs.getBoolean("can_manage_order"));
+                    user.setCanManageLogistics(rs.getBoolean("can_manage_logistics"));
+                    user.setCanManageAfterSales(rs.getBoolean("can_manage_after_sales"));
+                    user.setCanManageReview(rs.getBoolean("can_manage_review"));
+                    user.setCanManageInventory(rs.getBoolean("can_manage_inventory"));
+                    user.setCanManageIncome(rs.getBoolean("can_manage_income"));
+                    return user;
+                }
+            }
+
+        } catch (SQLException e) {
+            logger.error("Failed to get permissions for user ID: {}", userId, e);
+        }
+
+        return null;
     }
 
     /**

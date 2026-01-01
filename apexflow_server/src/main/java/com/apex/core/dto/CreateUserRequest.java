@@ -1,4 +1,4 @@
-package com.apex.api.request;
+package com.apex.core.dto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;

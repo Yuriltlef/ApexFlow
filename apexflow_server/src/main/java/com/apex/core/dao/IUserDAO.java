@@ -118,4 +118,11 @@ public interface IUserDAO {
      * @return 存在返回true，不存在返回false
      */
     boolean existsByEmail(String email);
+
+    /**
+     * @param userId 用户id
+     * @return 对应的权限
+     */
+    SystemUser getPermissions(Integer userId);
+
 }

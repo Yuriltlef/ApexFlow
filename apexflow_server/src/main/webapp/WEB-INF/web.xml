@@ -125,19 +125,19 @@
 
     <!-- 错误页面 -->
     <error-page>
-        <error-code>401</error-code>
-        <location>/error/401.html</location>
-    </error-page>
-
-    <error-page>
-        <error-code>403</error-code>
-        <location>/error/403.html</location>
-    </error-page>
-
-    <error-page>
         <error-code>404</error-code>
         <location>/error/404.html</location>
     </error-page>
+
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error/500.html</location>
+    </error-page>
+
+    <!-- 会话超时配置 -->
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
 
     <!-- ========== 欢迎页面 ========== -->
     <!-- 如果要放Vue的index.html，可以启用 -->

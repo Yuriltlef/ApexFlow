@@ -1,4 +1,4 @@
-package com.apex.api.response;
+package com.apex.core.dto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
