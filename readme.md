@@ -26,9 +26,9 @@
 | **订单管理** | 订单创建/查询/筛选，订单状态跟踪，批量操作 | ✅ 已完成 |
 | **物流管理** | 物流公司对接，运单管理，物流轨迹查询 | ✅ 已完成 |
 | **售后管理** | 退货/换货申请处理，退款管理，售后记录 | ✅ 已完成 |
-| **评价管理** | 商品评价查看，回复评价，评价数据分析 | 🚧 开发中 |
-| **仓库管理** | 库存管理，入库/出库记录，库存预警 | 🚧 开发中 |
-| **财务管理** | 收支统计，财务报表，账单管理 | 🔄 规划中 |
+| **评价管理** | 商品评价查看，回复评价，评价数据分析 | ✅ 已完成 |
+| **仓库管理** | 库存管理，入库/出库记录，库存预警 | ✅ 已完成 |
+| **财务管理** | 收支统计，财务报表，账单管理 | ✅ 已完成 |
 
 ## 🛠️ 技术架构
 
@@ -41,19 +41,18 @@
 - **路由管理**: Vue Router 4
 - **HTTP客户端**: Axios
 - **构建工具**: Vite
-- **样式预处理**: SCSS
 
 **后端 (Java Servlet)**
 - **服务器**: Apache Tomcat 9.x
-- **Java版本**: JDK 8+
-- **Web框架**: Servlet 4.0
-- **数据库**: MySQL 5.7+
+- **Java版本**: JDK 17
+- **Web框架**: Servlet
+- **数据库**: MySQL 8.0+
 - **连接池**: HikariCP
 - **JSON处理**: Jackson
 - **日志框架**: Log4j2
 
 **开发工具**
-- **IDE**: IntelliJ IDEA / Eclipse + VS Code
+- **IDE**: IntelliJ IDEA  + VS Code
 - **构建工具**: Maven 3.6+
 - **数据库工具**: MySQL Workbench
 - **版本控制**: Git
@@ -62,7 +61,7 @@
 
 ```
 ┌─────────────────────────────────────────┐
-│           浏览器客户端 (Vue SPA)          │
+│           浏览器客户端 (Vue SPA)         │
 └─────────────────┬───────────────────────┘
                   │ HTTP/HTTPS
 ┌─────────────────▼───────────────────────┐
@@ -76,7 +75,7 @@
 │   │      apexflow-server (Java)     │   │
 │   │  ├── Servlet Controllers        │   │
 │   │  ├── DAO/Service 层             │   │
-│   │  └── Filters/Listeners          │   │
+│   │  └── Filters/                   │   │
 │   └─────────────────────────────────┘   │
 │                  │                      │
 │           ┌──────▼───────┐              │
@@ -86,64 +85,150 @@
 └─────────────────────────────────────────┘
 ```
 
-## 📁 项目结构
 
+## 项目结构树
 ```
-apexflow/ (项目根目录)
-├── apexflow-web/              # Vue前端源码（独立开发）
-│   ├── public/
+ApexFlow/
+├── readme.md                     # 项目说明文档
+├── apexflow_server/              # 服务器端代码
+│   ├── .smarttomcat/ApexFlow/conf/web.xml  # Tomcat配置文件
 │   ├── src/
-│   │   ├── api/              # API接口封装
-│   │   ├── assets/           # 静态资源
-│   │   ├── components/       # 组件
-│   │   ├── router/           # 路由配置
-│   │   ├── stores/           # Pinia状态管理
-│   │   ├── views/            # 页面组件
-│   │   └── utils/            # 工具函数
-│   ├── package.json
-│   └── vue.config.js         # 构建配置
-│
-└── apexflow-server/          # Java Web项目
-    ├── src/
-    │   ├── main/
-    │   │   ├── java/
-    │   │   │   └── com/
-    │   │   │       └── apex/
-    │   │   │           ├── config/           # 配置类
-    │   │   │           │   ├── CORSFilter.java
-    │   │   │           │   ├── SpaFilter.java
-    │   │   │           │   └── DatabaseConfig.java
-    │   │   │           ├── core/             # 核心业务
-    │   │   │           │   ├── controller/   # 控制器层
-    │   │   │           │   │   ├── OrderController.java
-    │   │   │           │   │   ├── LogisticsController.java
-    │   │   │           │   │   ├── AfterSalesController.java
-    │   │   │           │   │   └── ...
-    │   │   │           │   ├── service/      # 业务逻辑层
-    │   │   │           │   ├── dao/          # 数据访问层
-    │   │   │           │   ├── dto/          # 数据传输对象
-    │   │   │           │   └── model/        # 数据模型
-    │   │   │           └── util/             # 工具类
-    │   │   ├── resources/
-    │   │   │   ├── config.properties         # 配置文件
-    │   │   │   ├── log4j2.xml               # 日志配置
-    │   │   │   └── db.properties            # 数据库配置
-    │   │   └── webapp/                      # Web应用目录
-    │   │       ├── WEB-INF/
-    │   │       │   ├── web.xml              # Web配置
-    │   │       │   └── classes/
-    │   │       ├── index.jsp                 # 跳转页面
-    │   │       ├── index.html                # Vue入口页面
-    │   │       └── static/                   # Vue构建的静态资源
-    │   │           ├── css/
-    │   │           ├── js/
-    │   │           ├── fonts/
-    │   │           └── img/
-    │   └── test/
-    │       └── java/
-    ├── lib/                    # 第三方依赖库
-    ├── pom.xml                # Maven配置
-    └── README.md
+│   │   ├── main/
+│   │   │   ├── java/com/apex/
+│   │   │   │   ├── config/FrontendRouterFilter.java  # 前端路由过滤配置
+│   │   │   │   ├── core/
+│   │   │   │   │   ├── dao/
+│   │   │   │   │   │   ├── IReviewDAO.java           # 评价数据访问接口
+│   │   │   │   │   │   ├── ProductDAO.java           # 商品数据访问类
+│   │   │   │   │   ├── dto/OrderWithItemsResponse.java  # 订单及订单项响应DTO
+│   │   │   │   │   ├── model/
+│   │   │   │   │   │   ├── SystemUser.java           # 系统用户模型
+│   │   │   │   │   ├── service/UserService.java      # 用户服务类
+│   │   │   │   ├── util/
+│   │   │   │   │   ├── LoggingConnection.java        # 日志连接工具类
+│   │   │   │   │   ├── LoggingStatement.java         # 日志语句工具类
+│   │   │   ├── webapp/assets/
+│   │   │   │   ├── strings-BdNYIbtM.js               # 前端字符串处理工具
+│   │   │   │   ├── strings-BZDa8bsY.js               # 前端字符串处理工具
+│   │   ├── test/java/
+│   │   │   ├── AfterSalesDAOTest.java                # 售后DAO测试类
+│   │   │   ├── OrderItemDAOTest.java                 # 订单项DAO测试类
+│   │   │   ├── OrderServiceTest.java                 # 订单服务测试类
+│   │   │   ├── UserDAOTest.java                      # 用户DAO测试类
+├── apexflow_web/                 # 前端代码
+│   ├── package-lock.json         # npm依赖锁文件
+│   ├── src/components/layout/Sidebar.vue  # 侧边栏组件
+```
+
+
+## 核心表格说明
+
+### 1. 代码提交类型说明
+| 提交类型 | 描述 |
+|----------|------|
+| `feat` | 新增功能 |
+| `fix` | 修复bug |
+| `docs` | 文档更新 |
+| `style` | 代码格式调整（不影响代码逻辑） |
+| `refactor` | 代码重构（既不是新增功能也不是修bug） |
+| `test` | 测试相关代码（新增/修改测试用例） |
+| `chore` | 构建过程或辅助工具变动（如依赖更新、配置修改） |
+
+
+### 2. 订单状态转换规则（测试验证）
+| 原状态 | 目标状态 | 说明 |
+|--------|----------|------|
+| 1（待支付） | 2（已支付） | 支付成功后状态转换，触发收入记录创建 |
+| 2（已支付） | 3（已发货） | 商家发货后状态转换 |
+| 3（已发货） | 4（已完成） | 买家确认收货后状态转换 |
+| 1（待支付） | 5（已取消） | 订单取消，触发库存回补 |
+
+
+## 核心功能示例
+
+### 1. 订单项批量创建示例（测试用例）
+```java
+private static @NotNull List<OrderItem> getOrderItems() {
+    List<OrderItem> batchItems = new ArrayList<>();
+
+    OrderItem item1 = new OrderItem();
+    item1.setOrderId("ITEM_BATCH_001");
+    item1.setProductId(1);
+    item1.setProductName("iPhone 14 Pro");
+    item1.setQuantity(2);
+    item1.setPrice(new BigDecimal("7999.00"));
+    item1.setSubtotal(new BigDecimal("15998.00"));
+
+    OrderItem item2 = new OrderItem();
+    item2.setOrderId("ITEM_BATCH_001");
+    item2.setProductId(2);
+    item2.setProductName("MacBook Pro 16英寸");
+    item2.setQuantity(1);
+    item2.setPrice(new BigDecimal("18999.00"));
+    item2.setSubtotal(new BigDecimal("18999.00"));
+
+    batchItems.add(item1);
+    batchItems.add(item2);
+    return batchItems;
+}
+
+// 批量创建调用
+boolean result = orderItemDAO.createBatch(batchItems);
+```
+
+
+### 2. 用户权限获取示例（服务层代码）
+```java
+public Map<String, Object> getPermissions(String token) {
+    Map<String, Object> result = new HashMap<>();
+
+    // 验证Token
+    if (!JwtUtil.validateToken(token)) {
+        result.put("success", false);
+        result.put("message", "无效的Token");
+        return result;
+    }
+
+    Integer userId = JwtUtil.getUserIdFromToken(token);
+    SystemUser user = userDAO.getPermissions(userId);
+    
+    // 构建权限响应
+    Map<String, Object> permissions = new HashMap<>();
+    permissions.put("isAdmin", user.getAdmin());
+    permissions.put("canManageOrder", user.getCanManageOrder());
+    permissions.put("canManageLogistics", user.getCanManageLogistics());
+    permissions.put("canManageReview", user.getCanManageReview());
+    // ... 其他权限
+    
+    result.put("success", true);
+    result.put("data", permissions);
+    return result;
+}
+```
+
+
+### 3. 前端侧边栏样式示例（Vue组件CSS）
+```css
+/* 折叠菜单tooltip样式 */
+.sidebar-menu.el-menu--collapse :deep(.el-tooltip) {
+  font-size: 12px !important;
+  padding: 4px 8px !important;
+  background: #24292e !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 4px !important;
+  max-width: 200px !important;
+}
+
+/* 徽章样式 */
+.badge-wrapper {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0px;
+}
 ```
 
 ## 🚀 快速开始
@@ -167,26 +252,11 @@ CREATE USER 'apexflow'@'localhost' IDENTIFIED BY 'apexflow123';
 GRANT ALL PRIVILEGES ON apexflow.* TO 'apexflow'@'localhost';
 FLUSH PRIVILEGES;
 
--- 导入表结构（SQL文件位于 apexflow-server/src/main/resources/db/）
--- mysql -u root -p apexflow < apexflow-server/src/main/resources/db/schema.sql
+-- 导入表结构（SQL文件位于 /apexflow_db）
+-- mysql -u root -p apexflow < /apexflow_db/xxx.sql
 ```
 
-### 2. 配置文件设置
-
-**数据库配置** (`apexflow-server/src/main/resources/db.properties`):
-
-```properties
-# 数据库连接配置
-db.driver=com.mysql.cj.jdbc.Driver
-db.url=jdbc:mysql://localhost:3306/apexflow?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-db.username=root
-db.password=yourpassword
-db.initialSize=5
-db.maxActive=20
-db.maxWait=60000
-```
-
-### 3. 项目构建与部署
+### 2. 项目构建与部署
 
 #### 方案一：一键构建部署
 
@@ -216,7 +286,7 @@ cp target/apexflow.war /path/to/tomcat/webapps/
 
 ```bash
 # 1. 启动后端服务（在apexflow-server目录）
-mvn tomcat7:run  # 或使用IDE启动
+mvn tomcat9:run  # 或使用IDE启动
 
 # 2. 启动前端开发服务器（在apexflow-web目录）
 npm run serve
@@ -226,153 +296,38 @@ npm run serve
 # 后端API地址：http://localhost:8080
 ```
 
-### 4. 访问系统
-
-1. 启动Tomcat服务器
-2. 访问应用地址：http://localhost:8080/apexflow
-3. 使用默认管理员账号登录：
-    - 用户名：admin
-    - 密码：admin123
-
-## 🔧 配置文件说明
-
-### 前端Vue配置 (`apexflow-web/vue.config.js`)
-
-```javascript
-const path = require('path');
-
-module.exports = {
-  // 构建输出到Java项目的webapp目录
-  outputDir: path.resolve(__dirname, '../apexflow-server/src/main/webapp'),
-  
-  // 静态资源路径（相对路径，适应Tomcat部署）
-  publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
-  
-  // 开发服务器代理配置
-  devServer: {
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8080/apexflow',
-        changeOrigin: true,
-        pathRewrite: {
-          '^/api': ''
-        }
-      }
-    }
-  },
-  
-  // 生产环境配置
-  productionSourceMap: false,
-  css: {
-    extract: true,
-    sourceMap: false
-  }
-};
-```
-
-### Web应用配置 (`apexflow-server/src/main/webapp/WEB-INF/web.xml`)
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
-         http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
-         version="4.0">
-    
-    <display-name>ApexFlow</display-name>
-    
-    <!-- 字符编码过滤器 -->
-    <filter>
-        <filter-name>encodingFilter</filter-name>
-        <filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
-        <init-param>
-            <param-name>encoding</param-name>
-            <param-value>UTF-8</param-value>
-        </init-param>
-    </filter>
-    <filter-mapping>
-        <filter-name>encodingFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-    
-    <!-- CORS跨域过滤器 -->
-    <filter>
-        <filter-name>corsFilter</filter-name>
-        <filter-class>com.apex.config.CORSFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>corsFilter</filter-name>
-        <url-pattern>/api/*</url-pattern>
-    </filter-mapping>
-    
-    <!-- SPA应用过滤器 -->
-    <filter>
-        <filter-name>spaFilter</filter-name>
-        <filter-class>com.apex.config.SpaFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>spaFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-    
-    <!-- 默认首页 -->
-    <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
-        <welcome-file>index.html</welcome-file>
-    </welcome-file-list>
-    
-    <!-- 错误页面配置 -->
-    <error-page>
-        <error-code>404</error-code>
-        <location>/index.html</location>
-    </error-page>
-    
-    <session-config>
-        <session-timeout>30</session-timeout>
-    </session-config>
-</web-app>
-```
-
 ## 📊 数据库设计
 
 主要数据表示例：
 
 ```sql
--- 订单表
-CREATE TABLE `orders` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `order_no` VARCHAR(50) NOT NULL COMMENT '订单号',
-  `customer_id` BIGINT COMMENT '客户ID',
-  `total_amount` DECIMAL(10,2) NOT NULL COMMENT '订单总金额',
-  `status` TINYINT NOT NULL DEFAULT 1 COMMENT '订单状态(1:待付款,2:待发货,3:已发货,4:已完成,5:已取消)',
-  `payment_status` TINYINT COMMENT '支付状态',
-  `shipping_address` TEXT COMMENT '收货地址',
-  `created_at` DATETIME NOT NULL,
-  `updated_at` DATETIME,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_order_no` (`order_no`),
-  INDEX `idx_customer_id` (`customer_id`),
-  INDEX `idx_status` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单表';
+CREATE TABLE apexflow_order (
+    id VARCHAR(50) PRIMARY KEY COMMENT '订单号，格式如ORDER20231215001',
+    user_id INT NOT NULL COMMENT '下单用户ID',
+    total_amount DECIMAL(10,2) NOT NULL COMMENT '订单总金额',
+    status TINYINT NOT NULL COMMENT '状态：1-待支付，2-已支付，3-已发货，4-已完成，5-已取消',
+    payment_method VARCHAR(20) COMMENT '支付方式：alipay,wxpay等',
+    address_id INT COMMENT '收货地址ID',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '下单时间',
+    paid_at DATETIME COMMENT '支付时间',
+    shipped_at DATETIME COMMENT '发货时间',
+    completed_at DATETIME COMMENT '完成时间'
+) COMMENT='订单主表';
 
--- 商品表
-CREATE TABLE `products` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `product_no` VARCHAR(50) NOT NULL COMMENT '商品编号',
-  `name` VARCHAR(200) NOT NULL COMMENT '商品名称',
-  `category_id` BIGINT COMMENT '分类ID',
-  `price` DECIMAL(10,2) NOT NULL COMMENT '商品价格',
-  `stock` INT NOT NULL DEFAULT 0 COMMENT '库存数量',
-  `status` TINYINT NOT NULL DEFAULT 1 COMMENT '状态(1:上架,2:下架)',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_product_no` (`product_no`),
-  INDEX `idx_category_id` (`category_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品表';
+CREATE TABLE apexflow_order_item (
+    id INT PRIMARY KEY AUTO_INCREMENT COMMENT '订单项ID',
+    order_id VARCHAR(50) NOT NULL COMMENT '关联订单号',
+    product_id INT NOT NULL COMMENT '商品ID',
+    product_name VARCHAR(100) NOT NULL COMMENT '商品名称（下单时的快照）',
+    quantity INT NOT NULL COMMENT '购买数量',
+    price DECIMAL(10,2) NOT NULL COMMENT '下单时单价',
+    subtotal DECIMAL(10,2) NOT NULL COMMENT '小计金额',
+    FOREIGN KEY (order_id) REFERENCES apexflow_order(id),
+    FOREIGN KEY (product_id) REFERENCES apexflow_product(id)
+) COMMENT='订单商品明细表';
 ```
 
-完整数据库脚本请查看 `apexflow-server/src/main/resources/db/` 目录。
+完整数据库脚本请查看 `apexflow_db` 目录。
 
 ## 🔌 用户API接口文档（用户模块）
 
@@ -2827,100 +2782,270 @@ public class ProfileResponse {
 
 ### Maven依赖
 ```xml
-<dependencies>
-    <!-- JWT -->
-    <dependency>
-        <groupId>io.jsonwebtoken</groupId>
-        <artifactId>jjwt-api</artifactId>
-        <version>0.11.5</version>
-    </dependency>
-    <dependency>
-        <groupId>io.jsonwebtoken</groupId>
-        <artifactId>jjwt-impl</artifactId>
-        <version>0.11.5</version>
-        <scope>runtime</scope>
-    </dependency>
-    <dependency>
-        <groupId>io.jsonwebtoken</groupId>
-        <artifactId>jjwt-jackson</artifactId>
-        <version>0.11.5</version>
-        <scope>runtime</scope>
-    </dependency>
-    
-    <!-- 其他现有依赖 -->
-    <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>4.0.1</version>
-        <scope>provided</scope>
-    </dependency>
-    <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>2.13.3</version>
-    </dependency>
-</dependencies>
-```
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-## 🔒 安全配置
+    <!-- groupId：
+        注意：这是工程组的标识。它在一个组织或者项目中通常是唯一的。
+        需要在src/main/java/下创建对应软件包,这里是com.apex,
+        则所有源代码必须位于com.example包下。
+        可以自定义为其他包，比如com.myName,同样需要在src/main/java/下创建对应软件包
+     -->
+    <groupId>com.apex</groupId>
 
-### 1. 密码策略
-- 现有数据库：`password_hash = hash(password + salt)`
-- 盐值：32位随机字符串（已存在）
-- 哈希算法：SHA-256
+    <!-- 这是工程的标识。它通常是工程的名称。 -->
+    <artifactId>ApexFlow</artifactId>
 
-### 2. Token配置
-```properties
-# application.properties
-jwt.secret=your-strong-secret-key-change-in-production
-jwt.expiration=3600 # 1小时
-```
+    <!-- 这是工程的版本号。在 artifact 的仓库中，它用来区分不同的版本。 -->
+    <version>1.0-SNAPSHOT</version>
 
-### 3. HTTPS强制
-```nginx
-# Nginx配置
-server {
-    listen 80;
-    server_name api.example.com;
-    return 301 https://$server_name$request_uri;
-}
+    <!-- 打包类型：web项目为war -->
+    <packaging>war</packaging>
 
-server {
-    listen 443 ssl;
-    server_name api.example.com;
-    
-    ssl_certificate /path/to/cert.pem;
-    ssl_certificate_key /path/to/key.pem;
-    
-    location /api/ {
-        proxy_pass http://localhost:8080;
-    }
-}
-```
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <servlet.version>4.0.1</servlet.version>
+        <junit.version>5.9.2</junit.version>
+    </properties>
 
-## 📝 数据库验证
-确保现有表结构：
-```sql
-CREATE TABLE apexflow_system_user (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    salt VARCHAR(32) NOT NULL,
-    real_name VARCHAR(50),
-    email VARCHAR(100),
-    phone VARCHAR(20),
-    is_admin BOOLEAN DEFAULT FALSE,
-    can_manage_order BOOLEAN DEFAULT FALSE,
-    can_manage_logistics BOOLEAN DEFAULT FALSE,
-    can_manage_after_sales BOOLEAN DEFAULT FALSE,
-    can_manage_review BOOLEAN DEFAULT FALSE,
-    can_manage_inventory BOOLEAN DEFAULT FALSE,
-    can_manage_income BOOLEAN DEFAULT FALSE,
-    status TINYINT DEFAULT 1,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    last_login_at DATETIME
-);
+    <!-- 项目的依赖（下面几个是必须的依赖，如果自己用了其他库自行添加） -->
+    <dependencies>
+        <!-- Servlet API -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- JSP API -->
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>javax.servlet.jsp-api</artifactId>
+            <version>2.3.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- JSTL API (标准规范) -->
+        <dependency>
+            <groupId>org.apache.taglibs</groupId>
+            <artifactId>taglibs-standard-spec</artifactId>
+            <version>1.2.5</version>
+        </dependency>
+
+        <!-- JSTL 实现 (Apache Standard Taglibs) -->
+        <dependency>
+            <groupId>org.apache.taglibs</groupId>
+            <artifactId>taglibs-standard-impl</artifactId>
+            <version>1.2.5</version>
+        </dependency>
+
+        <!-- SLF4J API -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+
+        <!-- Logback 实现 -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.13</version>
+        </dependency>
+
+        <!-- 可选：Logback 配置文件 -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.5.19</version>
+        </dependency>
+
+        <!-- 测试 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- H2数据库（开发用） -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.2.220</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- MySQL数据库驱动 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version>
+        </dependency>
+
+        <!-- 连接池 -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>5.0.1</version>
+        </dependency>
+
+        <!-- 单元测试 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.9.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- json支持 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.15.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.15.2</version> <!-- 请使用与项目中 Jackson 版本兼容的版本 -->
+        </dependency>
+
+        <!-- jetbrains注解 -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Mockito -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.3.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.3.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JWT依赖 -->
+        <!-- JWT dependencies -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Gson依赖 -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>2.0.1.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>6.2.0.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <!-- 输出war文件名称，可以自定义 -->
+        <finalName>ApexFlow</finalName>
+        <plugins>
+            <!-- Maven 编译插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <!-- Maven War 插件 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <configuration>
+                    <argLine>-Xshare:off</argLine>  <!-- 禁用类数据共享 -->
+                </configuration>
+            </plugin>
+
+            <!-- Tomcat 7 插件（用于 Maven 运行） -->
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+
+                    <!-- 端口 -->
+                    <port>8080</port>
+
+                    <!--Maven 运行 Tomcat 服务器路径
+                    请改为 /artifactId的值-->
+                    <path>/ApexFlow</path>
+
+                    <uriEncoding>UTF-8</uriEncoding>
+
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
 ```
 
 ## 🚀 快速测试
@@ -2946,15 +3071,6 @@ curl -X PUT https://api.example.com/api/user/profile \
   -d '{"realName":"张三","email":"zhangsan@example.com"}'
 ```
 
-## 🎯 核心优势
-1. **简洁**：仅4个API，响应数据最小化
-2. **兼容**：完全基于现有数据库表
-3. **安全**：HTTPS传输 + 后端哈希验证
-4. **无状态**：JWT Token，无需额外存储
-5. **可扩展**：基础框架易于添加新功能
-
-这个实现删除了所有非必要功能，专注于四个核心API的实现，代码量减少60%以上，同时保持生产级安全性。
-
 ## 🧪 测试
 
 ### 单元测试
@@ -2971,7 +3087,7 @@ npm run test:unit
 ### 集成测试
 ```bash
 # 运行端到端测试
-cd apexflow-web
+cd apexflow_web
 npm run test:e2e
 ```
 
@@ -2980,7 +3096,7 @@ npm run test:e2e
 我们欢迎所有形式的贡献！参与项目步骤如下：
 
 1. **Fork 项目**：点击右上角的Fork按钮
-2. **克隆仓库**：`git clone https://github.com/yourusername/apexflow.git`
+2. **克隆仓库**：`git clone https://github.com/Yuriltlef/ApexFlow`
 3. **创建分支**：`git checkout -b feature/your-feature-name`
 4. **提交更改**：`git commit -m 'Add some feature'`
 5. **推送到分支**：`git push origin feature/your-feature-name`
@@ -2989,7 +3105,6 @@ npm run test:e2e
 ### 开发规范
 - Java代码遵循阿里巴巴Java开发手册
 - Vue组件使用组合式API编写
-- 提交信息使用英文描述，格式为：`type(scope): message`
 - 新增功能需包含相应的单元测试
 
 ### 代码提交类型
@@ -3025,10 +3140,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## 📞 支持与联系
 
-- **项目主页**: [https://github.com/yourusername/apexflow](https://github.com/yourusername/apexflow)
-- **问题反馈**: [GitHub Issues](https://github.com/yourusername/apexflow/issues)
-- **讨论区**: [GitHub Discussions](https://github.com/yourusername/apexflow/discussions)
-- **邮箱**: apexflow@example.com
+- **项目主页**: [https://github.com/Yuriltlef/ApexFlow](https://github.com/Yuriltlef/ApexFlow)
+- **问题反馈**: [GitHub Issues](https://github.com/Yuriltlef/ApexFlow/issues)
+- **讨论区**: [GitHub Discussions](https://github.com/Yuriltlef/ApexFlow/discussions)
+- **邮箱**: yurilt15312@outlook.com
 
 ## 🙏 致谢
 
@@ -3037,6 +3152,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 - [Element Plus](https://element-plus.org/)
 - [Apache Tomcat](https://tomcat.apache.org/)
 - [MySQL](https://www.mysql.com/)
+
+致谢本组开发人员！！！
 
 ---
 
