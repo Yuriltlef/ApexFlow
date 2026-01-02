@@ -585,4 +585,8 @@ public class OrderService {
             return result; // 返回空列表而不是null / Return empty list instead of null
         }
     }
+
+    public long getCount() {
+        return orderInfoDAO.count();
+    }
 }

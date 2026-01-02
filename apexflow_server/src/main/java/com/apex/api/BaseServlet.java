@@ -4,6 +4,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import com.apex.core.dto.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -145,39 +147,5 @@ public abstract class BaseServlet extends HttpServlet {
      */
     protected String extractRequestBody(HttpServletRequest request) throws IOException {
         return request.getReader().lines().reduce("", (accumulator, actual) -> accumulator + actual);
-    }
-
-    /**
-     * Error response DTO
-     */
-    public static class ErrorResponse {
-        private long timestamp;
-        private int status;
-        private String message;
-        private String errorCode;
-        private String path;
-
-        public ErrorResponse(int status, String message, String errorCode) {
-            this.timestamp = System.currentTimeMillis();
-            this.status = status;
-            this.message = message;
-            this.errorCode = errorCode;
-        }
-
-        // Getters and setters
-        public long getTimestamp() { return timestamp; }
-        public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
-
-        public int getStatus() { return status; }
-        public void setStatus(int status) { this.status = status; }
-
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
-
-        public String getErrorCode() { return errorCode; }
-        public void setErrorCode(String errorCode) { this.errorCode = errorCode; }
-
-        public String getPath() { return path; }
-        public void setPath(String path) { this.path = path; }
     }
 }

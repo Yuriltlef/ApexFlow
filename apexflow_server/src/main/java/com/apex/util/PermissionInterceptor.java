@@ -1,9 +1,6 @@
 package com.apex.util;
 
-import com.apex.util.RequirePermission;
-import com.apex.util.Permission;
 import com.apex.core.service.PermissionService;
-import com.apex.util.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +54,7 @@ public class PermissionInterceptor {
         }
 
         // 4. 检查方法上的权限注解
-        if (handler instanceof Method) {
-            Method method = (Method) handler;
+        if (handler instanceof Method method) {
             RequirePermission requirePermission = method.getAnnotation(RequirePermission.class);
 
             if (requirePermission != null) {

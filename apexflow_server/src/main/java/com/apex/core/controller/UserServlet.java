@@ -39,13 +39,11 @@ public class UserServlet extends BaseServlet {
                 return;
             }
 
-            switch (pathInfo) {
-                case "/permissions":
-                    handleGetPermissions(req, resp);
-                    break;
-                default:
-                    sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND,
-                            "API不存在", "API_NOT_FOUND");
+            if (pathInfo.equals("/permissions")) {
+                handleGetPermissions(req, resp);
+            } else {
+                sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND,
+                        "API不存在", "API_NOT_FOUND");
             }
 
             logResponse(req, resp, startTime, resp.getStatus());
@@ -72,13 +70,11 @@ public class UserServlet extends BaseServlet {
                 return;
             }
 
-            switch (pathInfo) {
-                case "/profile":
-                    handleUpdateProfile(req, resp);
-                    break;
-                default:
-                    sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND,
-                            "API不存在", "API_NOT_FOUND");
+            if (pathInfo.equals("/profile")) {
+                handleUpdateProfile(req, resp);
+            } else {
+                sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND,
+                        "API不存在", "API_NOT_FOUND");
             }
 
             logResponse(req, resp, startTime, resp.getStatus());

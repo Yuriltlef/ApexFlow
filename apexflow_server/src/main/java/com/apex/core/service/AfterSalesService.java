@@ -102,7 +102,7 @@ public class AfterSalesService {
         result.setData(afterSalesList);
         result.setCurrentPage(page);
         result.setPageSize(pageSize);
-        result.setTotalCount(totalCount);
+        result.setTotalCount((int) totalCount);
 
         logger.info("After sales list retrieved. Total: {}, Current page: {}", totalCount, page);
         return result;
@@ -127,7 +127,7 @@ public class AfterSalesService {
         result.setData(afterSalesList);
         result.setCurrentPage(page);
         result.setPageSize(pageSize);
-        result.setTotalCount(totalCount);
+        result.setTotalCount((int) totalCount);
 
         logger.info("After sales list by status retrieved. Status: {}, Count: {}", status, afterSalesList.size());
         return result;
