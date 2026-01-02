@@ -3071,6 +3071,310 @@ curl -X PUT https://api.example.com/api/user/profile \
   -d '{"realName":"张三","email":"zhangsan@example.com"}'
 ```
 
+### 🔧 PasswordHashGenerator 工具使用文档
+
+#### 📋 工具概述
+
+`PasswordHashGenerator` 是一个用于生成密码盐值和哈希值的命令行工具，专门为 `apexflow_system_user` 数据库表设计。它可以帮助你：
+- 为管理员账户生成安全的密码哈希
+- 批量创建测试用户数据
+- 验证密码哈希的正确性
+- 生成可直接执行的SQL语句
+
+---
+
+#### 🚀 开始
+
+使用IDEA打开apexflow_server文件夹，导航到 `/src/main/java/com/apex/util/PasswordHashGenerator.java`直接执行
+
+#### 📖 功能示例
+
+#### 📝 示例1：生成单个密码哈希（快速测试）
+
+**场景**：为管理员账户 "admin" 生成密码 "admin123" 的哈希值
+
+```bash
+# 运行工具后选择选项1
+请选择操作：1
+
+请输入用户名: admin
+请输入密码: admin123
+
+========== 生成结果 ==========
+用户名: admin
+原始密码: admin123
+盐值 (32位): a1b2c3d4e5f678901234567890123456
+哈希值: Lp7mN9vQ2xK4pZ8w1R3yU5iJ0oA6sDfGh7jM0OqA==
+================================
+
+===== SQL 插入语句示例 =====
+INSERT INTO apexflow_system_user (username, password_hash, salt)
+VALUES ('admin', 'Lp7mN9vQ2xK4pZ8w1R3yU5iJ0oA6sDfGh7jM0OqA==', 'a1b2c3d4e5f678901234567890123456');
+==============================
+```
+
+#### 🔐 示例2：生成随机强密码
+
+**场景**：为物流管理员生成随机强密码
+
+```bash
+# 运行工具后选择选项2
+请选择操作：2
+
+请输入用户名: logistics_admin
+请输入要生成的密码长度 (默认12位): 16
+生成强密码？(y/N): y
+
+========== 随机密码生成 ==========
+已生成随机密码，请妥善保管！
+
+========== 生成结果 ==========
+用户名: logistics_admin
+原始密码: K8$gT2xLp9mNq6zA!B3#c
+盐值 (32位): w3XkP7tM1vQ8rZ5yA9bC2dE4fG6hJ8k
+哈希值: tL4mN8vQ2xK7pZ9w1R3yU5iJ0oA6sDfGh7jM0OqA==
+================================
+```
+
+#### 📊 示例3：批量生成测试用户
+
+**场景**：为测试环境批量生成3个测试用户
+
+```bash
+# 运行工具后选择选项3
+请选择操作：3
+
+请输入要生成的密码数量 (1-10): 3
+生成强密码？(y/N): n
+
+请输入用户名1: test_user1
+请输入用户名2: test_user2
+请输入用户名3: test_user3
+
+--- 用户 #1 ---
+用户名: test_user1
+密码: AbC123!@#
+盐值: x1Y2z3A4b5C6d7E8f9G0h1I2j3K4l5
+哈希值: mN8pQ9rS2tU3vW4xY5z6A7B8C9D0E1
+
+--- 用户 #2 ---
+用户名: test_user2
+密码: XyZ456$%^
+盐值: M6n7O8p9Q0r1S2t3U4v5W6x7Y8z9A0
+哈希值: B1C2D3E4F5G6H7I8J9K0L1M2N3O4
+
+--- 用户 #3 ---
+用户名: test_user3
+密码: LmN789&*(
+盐值: B1c2D3e4F5g6H7i8J9k0L1m2N3o4P5
+哈希值: Q6R7S8T9U0V1W2X3Y4Z5a6b7c8d9
+```
+
+#### 🗃️ 示例4：生成完整用户SQL语句
+
+**场景**：创建具有特定权限的运营人员账户
+
+```bash
+# 运行工具后选择选项4
+请选择操作：4
+
+请输入用户名: operations
+请输入真实姓名: 运营专员
+请输入邮箱: operations@apexflow.com
+请输入手机号: 13900139001
+请输入密码: Ops@123456
+
+请设置权限 (输入y表示启用，n表示禁用):
+超级管理员 (is_admin): n
+订单管理权限 (can_manage_order): y
+物流管理权限 (can_manage_logistics): y
+售后管理权限 (can_manage_after_sales): y
+评价管理权限 (can_manage_review): y
+库存管理权限 (can_manage_inventory): n
+收入管理权限 (can_manage_income): n
+状态 (1-正常, 0-禁用): 1
+
+========== 生成的SQL语句 ==========
+INSERT INTO apexflow_system_user (username, password_hash, salt, real_name, email, phone, 
+is_admin, can_manage_order, can_manage_logistics, can_manage_after_sales, 
+can_manage_review, can_manage_inventory, can_manage_income, status) VALUES
+('operations', 'T7mN9vQ2xK4pZ8w1R3yU5iJ0oA6sDfGh7jM0OqA==', 'q1w2e3r4t5y6u7i8o9p0a1s2d3f4g5', 
+'运营专员', 'operations@apexflow.com', '13900139001', 
+FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, 1);
+```
+
+#### ⚡ 示例5：快速生成管理员账户SQL
+
+**场景**：快速创建超级管理员和物流管理员
+
+```bash
+# 运行工具后选择选项5
+请选择操作：5
+
+请输入管理员用户名 (默认admin): admin
+请输入管理员密码 (默认admin123): Admin@2024
+请输入真实姓名 (默认系统管理员): 超级管理员
+请输入邮箱 (默认admin@apexflow.com): 
+请输入手机号 (默认13800138000): 
+
+========== 管理员账户SQL语句 ==========
+-- 创建超级管理员账户
+INSERT INTO apexflow_system_user (username, password_hash, salt, real_name, email, phone, 
+is_admin, can_manage_order, can_manage_logistics, can_manage_after_sales, 
+can_manage_review, can_manage_inventory, can_manage_income, status) VALUES
+('admin', 'X5y6z7A8B9C0D1E2F3G4H5I6J7K8L9M0N1O2P3Q4', 'z1x2c3v4b5n6m7a8s9d0f1g2h3j4k5l6', 
+'超级管理员', 'admin@apexflow.com', '13800138000', 
+TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 1);
+
+-- 测试用的普通物流管理员
+INSERT INTO apexflow_system_user (username, password_hash, salt, real_name, email, phone, 
+is_admin, can_manage_order, can_manage_logistics, can_manage_after_sales, 
+can_manage_review, can_manage_inventory, can_manage_income, status) VALUES
+('logistics_admin', 'X5y6z7A8B9C0D1E2F3G4H5I6J7K8L9M0N1O2P3Q4', 'z1x2c3v4b5n6m7a8s9d0f1g2h3j4k5l6', 
+'物流管理员', 'logistics@apexflow.com', '13900139000', 
+FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, 1);
+```
+
+#### ✅ 示例6：验证密码哈希
+
+**场景**：验证数据库中的密码是否正确
+
+```bash
+# 运行工具后选择选项6
+请选择操作：6
+
+请输入密码: admin123
+请输入盐值: a1b2c3d4e5f678901234567890123456
+请输入期望的哈希值: Lp7mN9vQ2xK4pZ8w1R3yU5iJ0oA6sDfGh7jM0OqA==
+
+========== 验证结果 ==========
+输入密码: admin123
+盐值: a1b2c3d4e5f678901234567890123456
+期望哈希: Lp7mN9vQ2xK4pZ8w1R3yU5iJ0oA6sDfGh7jM0OqA==
+实际哈希: Lp7mN9vQ2xK4pZ8w1R3yU5iJ0oA6sDfGh7jM0OqA==
+验证结果: ✓ 匹配成功
+密码验证通过！
+```
+
+---
+
+#### 🔧 高级用法
+
+#### 非交互式批量生成
+
+创建一个输入文件 `input.txt`：
+
+```
+4
+test_user1
+测试用户1
+test1@example.com
+13800000001
+Test@123
+y
+y
+y
+y
+y
+y
+y
+1
+0
+```
+
+然后运行：
+```bash
+java -cp . com.apex.util.PasswordHashGenerator < input.txt
+```
+
+#### 生成H2数据库测试数据
+
+```sql
+-- 使用工具生成的SQL可以直接插入到H2内存数据库
+INSERT INTO apexflow_system_user (username, password_hash, salt, is_admin, status) VALUES
+('test_admin', 'Lp7mN9vQ2xK4pZ8w1R3yU5iJ0oA6sDfGh7jM0OqA==', 'a1b2c3d4e5f678901234567890123456', TRUE, 1);
+```
+
+---
+
+#### ⚠️ 注意事项
+
+1. **安全提醒**
+   - 生成的密码和盐值请妥善保管
+   - 生产环境请勿使用示例密码
+   - 定期更换管理员密码
+
+2. **数据库兼容性**
+   - 生成的SQL适用于MySQL、PostgreSQL、H2等数据库
+   - 确保数据库表结构与 `apexflow_system_user` 一致
+   - 盐值必须是32位字符串
+
+3. **测试建议**
+   ```bash
+   # 在集成测试中使用
+   @BeforeAll
+   static void setupTestUsers() {
+       // 使用工具生成的哈希值初始化测试数据库
+   }
+   ```
+
+---
+
+#### 🎯 常见使用场景
+
+#### 场景1：初始化新系统
+```bash
+# 生成管理员账户
+echo "初始化管理员账户..."
+java -cp . com.apex.util.PasswordHashGenerator <<EOF > init_admin.sql
+5
+admin
+ChangeMe@2024
+系统管理员
+admin@company.com
+13800138000
+0
+EOF
+```
+
+#### 场景2：创建测试数据
+```bash
+# 批量创建测试用户
+for i in {1..5}; do
+  echo "生成测试用户$i..."
+  # 使用工具生成并保存到文件
+done
+```
+
+#### 场景3：密码迁移
+```bash
+# 验证现有用户密码
+echo "验证用户密码哈希..."
+java -cp . com.apex.util.PasswordHashGenerator <<EOF
+6
+old_password
+existing_salt_from_db
+existing_hash_from_db
+0
+EOF
+```
+
+---
+
+#### 📊 输出格式说明
+
+工具输出的格式如下：
+
+1. **生成结果**：显示用户名、密码、盐值和哈希值
+2. **SQL语句**：可直接执行的INSERT语句
+3. **验证结果**：显示匹配状态和详细信息
+
+所有生成的盐值均为32位字符串，符合 `apexflow_system_user` 表的设计要求。
+
+---
+
+**提示**：此工具主要用于开发、测试和数据库初始化阶段。生产环境建议使用更安全的密码管理策略。
+
 ## 🧪 测试
 
 ### 单元测试
