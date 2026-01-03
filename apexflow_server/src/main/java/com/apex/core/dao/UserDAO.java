@@ -2,7 +2,6 @@ package com.apex.core.dao;
 
 import com.apex.core.model.SystemUser;
 import com.apex.util.ConnectionPool;
-import com.apex.util.DatabaseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -683,7 +682,7 @@ public class UserDAO implements IUserDAO {
 
         logger.debug("Getting permissions for user ID: {}", userId);
 
-        try (Connection conn = DatabaseUtil.getConnection();
+        try (Connection conn = ConnectionPool.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, userId);

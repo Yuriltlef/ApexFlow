@@ -1,214 +1,279 @@
 <template>
   <div class="dashboard-page">
-    <!-- 统计卡片 -->
-    <el-row :gutter="16" class="stats-row">
-      <el-col :span="6">
-        <el-card class="stat-card" shadow="never">
-          <div class="stat-content">
-            <div class="stat-icon" style="background: #e8f4ff; color: #0366d6;">
-              <el-icon><ShoppingCart /></el-icon>
-            </div>
-            <div class="stat-info">
-              <div class="stat-value">1,256</div>
-              <div class="stat-label">今日订单</div>
-            </div>
-            <div class="stat-trend" style="color: #52c41a;">
-              +12.5%
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card class="stat-card" shadow="never">
-          <div class="stat-content">
-            <div class="stat-icon" style="background: #f0f9eb; color: #67c23a;">
-              <el-icon><Van /></el-icon>
-            </div>
-            <div class="stat-info">
-              <div class="stat-value">89%</div>
-              <div class="stat-label">发货率</div>
-            </div>
-            <div class="stat-trend" style="color: #67c23a;">
-              +3.2%
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card class="stat-card" shadow="never">
-          <div class="stat-content">
-            <div class="stat-icon" style="background: #fef0f0; color: #f56c6c;">
-              <el-icon><Refresh /></el-icon>
-            </div>
-            <div class="stat-info">
-              <div class="stat-value">24</div>
-              <div class="stat-label">售后申请</div>
-            </div>
-            <div class="stat-trend" style="color: #f56c6c;">
-              -5.1%
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card class="stat-card" shadow="never">
-          <div class="stat-content">
-            <div class="stat-icon" style="background: #f4f4f5; color: #909399;">
-              <el-icon><Money /></el-icon>
-            </div>
-            <div class="stat-info">
-              <div class="stat-value">¥85,600</div>
-              <div class="stat-label">今日销售额</div>
-            </div>
-            <div class="stat-trend" style="color: #67c23a;">
-              +18.3%
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
+    
+    <div v-if="isGuestMode" class="guest-overlay">
+      <div class="guest-alert">
+        <el-icon class="guest-icon"><Lock /></el-icon>
+        <h3>访客模式限制</h3>
+        <p>当前用户为游客模式，数据仅供演示预览。</p>
+        <p>若要正常使用所有功能，请联系管理员获取账户。</p>
+        <el-button type="primary" @click="contactAdmin">联系管理员</el-button>
+      </div>
+    </div>
 
-    <!-- 主要图表区域 -->
-    <el-row :gutter="16" class="charts-row">
-      <el-col :span="16">
-        <el-card class="chart-card" shadow="never">
-          <template #header>
-            <div class="card-header">
-              <span>销售趋势</span>
-              <el-select size="small" v-model="timeRange" style="width: 120px;">
-                <el-option label="最近7天" value="7d" />
-                <el-option label="最近30天" value="30d" />
-                <el-option label="最近90天" value="90d" />
-              </el-select>
-            </div>
-          </template>
-          <div class="chart-placeholder">
-            <div class="placeholder-content">
-              <el-icon :size="48" color="#e1e4e8"><TrendCharts /></el-icon>
-              <p>这里是销售趋势图表</p>
-              <p class="placeholder-hint">接入ECharts或Chart.js后可显示真实数据</p>
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :span="8">
-        <el-card class="chart-card" shadow="never">
-          <template #header>
-            <div class="card-header">
-              <span>订单状态分布</span>
-            </div>
-          </template>
-          <div class="distribution-chart">
-            <div class="distribution-item" v-for="item in orderDistribution" :key="item.status">
-              <div class="distribution-label">
-                <span class="status-dot" :style="{background: item.color}"></span>
-                {{ item.status }}
+    <div :class="['dashboard-content', { 'content-blur': isGuestMode }]">
+      <el-row :gutter="16" class="stats-row">
+        <el-col :span="6">
+          <el-card class="stat-card" shadow="never">
+            <div class="stat-content">
+              <div class="stat-icon" style="background: #e8f4ff; color: #0366d6;">
+                <el-icon><ShoppingCart /></el-icon>
               </div>
-              <div class="distribution-value">{{ item.value }}%</div>
+              <div class="stat-info">
+                <div class="stat-value">1,256</div>
+                <div class="stat-label">今日订单</div>
+              </div>
+              <div class="stat-trend" style="color: #52c41a;">
+                +12.5%
+              </div>
             </div>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
+          </el-card>
+        </el-col>
+        <el-col :span="6">
+          <el-card class="stat-card" shadow="never">
+            <div class="stat-content">
+              <div class="stat-icon" style="background: #f0f9eb; color: #67c23a;">
+                <el-icon><Van /></el-icon>
+              </div>
+              <div class="stat-info">
+                <div class="stat-value">89%</div>
+                <div class="stat-label">发货率</div>
+              </div>
+              <div class="stat-trend" style="color: #67c23a;">
+                +3.2%
+              </div>
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="6">
+          <el-card class="stat-card" shadow="never">
+            <div class="stat-content">
+              <div class="stat-icon" style="background: #fff0f6; color: #eb2f96;">
+                <el-icon><Refresh /></el-icon>
+              </div>
+              <div class="stat-info">
+                <div class="stat-value">12</div>
+                <div class="stat-label">待处理退款</div>
+              </div>
+              <div class="stat-trend" style="color: #f5222d;">
+                -5.0%
+              </div>
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="6">
+          <el-card class="stat-card" shadow="never">
+            <div class="stat-content">
+              <div class="stat-icon" style="background: #fff7e6; color: #fa8c16;">
+                <el-icon><Money /></el-icon>
+              </div>
+              <div class="stat-info">
+                <div class="stat-value">¥128k</div>
+                <div class="stat-label">本月营收</div>
+              </div>
+              <div class="stat-trend" style="color: #52c41a;">
+                +24.0%
+              </div>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
 
-    <!-- 最近订单表格 -->
-    <el-card class="recent-orders" shadow="never">
-      <template #header>
-        <div class="card-header">
-          <span>最近订单</span>
-          <el-button type="primary" link>查看全部</el-button>
-        </div>
-      </template>
-      <el-table :data="recentOrders" style="width: 100%" size="small">
-        <el-table-column prop="orderNo" label="订单号" width="180">
-          <template #default="{ row }">
-            <span class="order-link">{{ row.orderNo }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="customer" label="客户" width="120" />
-        <el-table-column prop="amount" label="金额" width="100">
-          <template #default="{ row }">
-            <span class="amount">¥{{ row.amount.toLocaleString() }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="{ row }">
-            <el-tag :type="getStatusType(row.status)" size="small">
-              {{ row.status }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="180" />
-        <el-table-column label="操作" width="120">
-          <template #default>
-            <el-button type="primary" link size="small">查看</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+      <el-row :gutter="16" class="charts-row">
+        <el-col :span="16">
+          <el-card class="chart-card" shadow="never">
+            <template #header>
+              <div class="card-header">
+                <span>销售趋势 (近7天)</span>
+                <el-radio-group v-model="timeRange" size="small">
+                  <el-radio-button label="7d">7天</el-radio-button>
+                  <el-radio-button label="30d">30天</el-radio-button>
+                </el-radio-group>
+              </div>
+            </template>
+            <div class="chart-placeholder">
+              <div class="placeholder-content">
+                <el-icon :size="48" color="#e1e4e8"><TrendCharts /></el-icon>
+                <p>销售趋势图表区域</p>
+                <span class="placeholder-hint">集成 ECharts 后此处显示折线图</span>
+              </div>
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card class="chart-card" shadow="never">
+            <template #header>
+              <div class="card-header">
+                <span>订单分布</span>
+              </div>
+            </template>
+            <div class="chart-placeholder distribution-chart">
+              <div class="pie-placeholder"></div>
+              <ul class="legend-list">
+                <li v-for="(item, index) in orderDistribution" :key="index">
+                  <span class="dot" :style="{ background: item.color }"></span>
+                  <span class="name">{{ item.name }}</span>
+                  <span class="value">{{ item.value }}%</span>
+                </li>
+              </ul>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+
+      <el-card class="recent-orders" shadow="never">
+        <template #header>
+          <div class="card-header">
+            <span>最近订单</span>
+            <el-button link type="primary">查看全部</el-button>
+          </div>
+        </template>
+        <el-table :data="recentOrders" style="width: 100%">
+          <el-table-column prop="id" label="订单号" width="120" />
+          <el-table-column prop="product" label="商品" />
+          <el-table-column prop="customer" label="客户" width="120" />
+          <el-table-column prop="status" label="状态" width="100">
+            <template #default="scope">
+              <el-tag :type="scope.row.statusType" size="small">{{ scope.row.status }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="amount" label="金额" width="100" />
+        </el-table>
+      </el-card>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import userDataManager from '@/utils/userData'
+import { ElMessage } from 'element-plus'
 import {
-  ShoppingCart, Van, Refresh, Money,
-  TrendCharts
+  ShoppingCart,
+  Van,
+  Refresh,
+  Money,
+  TrendCharts,
+  Lock // [新增] 引入锁图标
 } from '@element-plus/icons-vue'
 
+// [新增] 游客模式状态管理
+const isGuestMode = ref(false)
+
+onMounted(() => {
+  // 组件挂载时检查用户状态
+  isGuestMode.value = userDataManager.isGuest()
+})
+
+const contactAdmin = () => {
+  ElMessage.info('请联系系统管理员: admin@apexflow.com')
+}
+
+// 原有数据逻辑保持不变
 const timeRange = ref('7d')
 
 const orderDistribution = ref([
-  { status: '待付款', value: 15, color: '#ff9900' },
-  { status: '待发货', value: 45, color: '#1890ff' },
-  { status: '已发货', value: 30, color: '#52c41a' },
-  { status: '已完成', value: 8, color: '#909399' },
-  { status: '已取消', value: 2, color: '#ff4d4f' }
+  { name: '待付款', value: 15, color: '#fa8c16' },
+  { name: '待发货', value: 25, color: '#1890ff' },
+  { name: '已发货', value: 40, color: '#52c41a' },
+  { name: '已完成', value: 20, color: '#13c2c2' }
 ])
 
 const recentOrders = ref([
-  { orderNo: '202312150001', customer: '张三', amount: 299.00, status: '待发货', createTime: '2023-12-15 10:30:00' },
-  { orderNo: '202312150002', customer: '李四', amount: 599.00, status: '已发货', createTime: '2023-12-15 11:15:00' },
-  { orderNo: '202312150003', customer: '王五', amount: 129.00, status: '待付款', createTime: '2023-12-15 13:45:00' },
-  { orderNo: '202312150004', customer: '赵六', amount: 899.00, status: '待发货', createTime: '2023-12-15 14:20:00' },
-  { orderNo: '202312150005', customer: '钱七', amount: 459.00, status: '已完成', createTime: '2023-12-15 15:10:00' }
+  { id: 'ORD-001', product: '无线降噪耳机 Pro', customer: '张三', status: '已完成', statusType: 'success', amount: '¥1,299' },
+  { id: 'ORD-002', product: '智能手表 S7', customer: '李四', status: '待发货', statusType: 'primary', amount: '¥2,499' },
+  { id: 'ORD-003', product: '机械键盘 K8', customer: '王五', status: '待付款', statusType: 'warning', amount: '¥499' },
+  { id: 'ORD-004', product: '4K 显示器 27寸', customer: '赵六', status: '处理中', statusType: 'info', amount: '¥1,899' },
 ])
-
-const getStatusType = (status: string) => {
-  const typeMap: Record<string, string> = {
-    '待付款': 'warning',
-    '待发货': 'primary',
-    '已发货': 'success',
-    '已完成': 'info',
-    '已取消': 'danger'
-  }
-  return typeMap[status] || ''
-}
 </script>
 
 <style scoped>
 .dashboard-page {
-  padding: 0;
+  /* [修改] 确保容器可以相对定位遮罩层 */
+  position: relative;
+  min-height: 80vh;
 }
 
+/* [新增] 模糊与遮罩样式 */
+.content-blur {
+  filter: blur(8px);
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.guest-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.guest-alert {
+  background: #ffffff;
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+  padding: 32px 48px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(149, 157, 165, 0.2);
+  max-width: 400px;
+}
+
+.guest-icon {
+  font-size: 48px;
+  color: #586069;
+  margin-bottom: 16px;
+  background: #f6f8fa;
+  padding: 16px;
+  border-radius: 50%;
+}
+
+.guest-alert h3 {
+  margin: 0 0 8px 0;
+  color: #24292e;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.guest-alert p {
+  color: #586069;
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* 以下保持原有样式不变 */
 .stats-row {
   margin-bottom: 16px;
 }
 
 .stat-card {
+  height: 100%;
   border: 1px solid #e1e4e8;
+  transition: all 0.3s;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
 }
 
 .stat-content {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
 }
 
 .stat-icon {
   width: 48px;
   height: 48px;
-  border-radius: 8px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -275,55 +340,52 @@ const getStatusType = (status: string) => {
 }
 
 .distribution-chart {
-  padding: 20px;
+  padding: 0 20px;
+  justify-content: space-around;
 }
 
-.distribution-item {
+.pie-placeholder {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: conic-gradient(
+    #fa8c16 0% 15%,
+    #1890ff 15% 40%,
+    #52c41a 40% 80%,
+    #13c2c2 80% 100%
+  );
+}
+
+.legend-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.legend-list li {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.distribution-item:last-child {
-  border-bottom: none;
-}
-
-.distribution-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
   color: #24292e;
 }
 
-.status-dot {
+.legend-list .dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
+  margin-right: 8px;
 }
 
-.distribution-value {
-  font-weight: 600;
-  color: #24292e;
+.legend-list .name {
+  width: 60px;
+}
+
+.legend-list .value {
+  color: #586069;
 }
 
 .recent-orders {
   border: 1px solid #e1e4e8;
-}
-
-.order-link {
-  color: #0366d6;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.order-link:hover {
-  text-decoration: underline;
-}
-
-.amount {
-  font-weight: 600;
-  color: #24292e;
 }
 </style>

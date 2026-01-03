@@ -23,7 +23,7 @@
         />
       </div>
 
-      <!-- 导航菜单 -->
+      <!-- 动态导航菜单 -->
       <el-menu
         :default-active="activeMenu"
         :collapse="collapsed"
@@ -31,7 +31,7 @@
         class="sidebar-menu"
         @select="handleSelect"
       >
-        <!-- 仪表盘 -->
+        <!-- 仪表盘（始终显示） -->
         <el-menu-item index="/dashboard">
           <el-icon><DataBoard /></el-icon>
           <template #title>
@@ -43,21 +43,23 @@
         </el-menu-item>
 
         <!-- 订单管理 -->
-        <el-sub-menu index="order">
+        <el-sub-menu 
+          v-if="hasPermission('canManageOrder') || isAdmin"
+          index="order"
+        >
           <template #title>
             <el-icon><ShoppingCart /></el-icon>
             <span>订单管理</span>
           </template>
-          <div class="badge-wrapper">
-            <el-badge :value="12" class="menu-badge" type="warning" />
-          </div>
           <el-menu-item index="/orders/list">订单列表</el-menu-item>
           <el-menu-item index="/orders/analysis">订单分析</el-menu-item>
-          <el-menu-item index="/orders/refund">退款管理</el-menu-item>
         </el-sub-menu>
 
         <!-- 物流管理 -->
-        <el-sub-menu index="logistics">
+        <el-sub-menu 
+          v-if="hasPermission('canManageLogistics') || isAdmin"
+          index="logistics"
+        >
           <template #title>
             <el-icon><Van /></el-icon>
             <span>物流管理</span>
@@ -67,7 +69,10 @@
         </el-sub-menu>
 
         <!-- 售后管理 -->
-        <el-menu-item index="/after-sales">
+        <el-menu-item 
+          v-if="hasPermission('canManageAfterSales') || isAdmin"
+          index="/after-sales"
+        >
           <el-icon><Refresh /></el-icon>
           <template #title>
             <span>售后管理</span>
@@ -78,7 +83,10 @@
         </el-menu-item>
 
         <!-- 评价管理 -->
-        <el-menu-item index="/evaluation">
+        <el-menu-item 
+          v-if="hasPermission('canManageReview') || isAdmin"
+          index="/evaluation"
+        >
           <el-icon><Star /></el-icon>
           <template #title>
             <span>评价管理</span>
@@ -86,7 +94,10 @@
         </el-menu-item>
 
         <!-- 仓库管理 -->
-        <el-sub-menu index="warehouse">
+        <el-sub-menu 
+          v-if="hasPermission('canManageInventory') || isAdmin"
+          index="warehouse"
+        >
           <template #title>
             <el-icon><Box /></el-icon>
             <span>仓库管理</span>
@@ -97,7 +108,10 @@
         </el-sub-menu>
 
         <!-- 财务管理 -->
-        <el-sub-menu index="finance">
+        <el-sub-menu 
+          v-if="hasPermission('canManageIncome') || isAdmin"
+          index="finance"
+        >
           <template #title>
             <el-icon><Money /></el-icon>
             <span>财务管理</span>
@@ -107,8 +121,11 @@
           <el-menu-item index="/finance/report">财务报表</el-menu-item>
         </el-sub-menu>
 
-        <!-- 系统设置 -->
-        <el-menu-item index="/system">
+        <!-- 系统设置（仅管理员可见） -->
+        <el-menu-item 
+          v-if="isAdmin"
+          index="/system"
+        >
           <el-icon><Setting /></el-icon>
           <template #title>
             <span>系统设置</span>
@@ -141,8 +158,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import userDataManager from '@/utils/userData'
 import {
   Search, Fold, Expand, DataBoard, ShoppingCart,
   Van, Refresh, Star, Box, Money, Setting,
@@ -157,20 +175,53 @@ const emit = defineEmits(['toggle-collapse'])
 const route = useRoute()
 const router = useRouter()
 
+// 响应式权限状态
+const userInfo = ref(userDataManager.getUserInfo())
+const permissions = ref(userDataManager.getPermissions())
+
+// 检查是否有特定权限
+const hasPermission = (permissionKey: string) => {
+  return userDataManager.hasPermission(permissionKey)
+}
+
+// 检查是否是管理员
+const isAdmin = computed(() => {
+  return userDataManager.isAdmin()
+})
+
+// 获取当前激活的菜单
 const activeMenu = computed(() => {
   return route.path
 })
 
+// 切换侧边栏折叠
 const toggleCollapse = () => {
   emit('toggle-collapse')
 }
 
+// 菜单选择处理
 const handleSelect = (index: string) => {
   router.push(index)
 }
+
+// 监听用户数据变化（可选）
+onMounted(() => {
+  console.log('Sidebar权限检查:', {
+    userInfo: userInfo.value,
+    permissions: permissions.value,
+    isAdmin: isAdmin.value,
+    canManageOrder: hasPermission('canManageOrder'),
+    canManageLogistics: hasPermission('canManageLogistics'),
+    canManageAfterSales: hasPermission('canManageAfterSales'),
+    canManageReview: hasPermission('canManageReview'),
+    canManageInventory: hasPermission('canManageInventory'),
+    canManageIncome: hasPermission('canManageIncome'),
+  })
+})
 </script>
 
 <style scoped>
+/* 样式部分保持不变 */
 .sidebar-container {
   position: relative;
   height: 100vh;

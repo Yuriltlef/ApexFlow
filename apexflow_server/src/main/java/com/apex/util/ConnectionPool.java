@@ -28,6 +28,23 @@ public class ConnectionPool {
             try {
                 logger.info("Initializing HikariCP connection pool...");
 
+                // ========== 关键修复：显式加载MySQL驱动 ==========
+                try {
+                    // 对于MySQL 8.x
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    logger.info("MySQL JDBC Driver loaded successfully.");
+                } catch (ClassNotFoundException e) {
+                    // 如果MySQL 8.x驱动不存在，尝试加载旧版驱动
+                    try {
+                        Class.forName("com.mysql.jdbc.Driver");
+                        logger.info("MySQL legacy JDBC Driver loaded.");
+                    } catch (ClassNotFoundException e2) {
+                        logger.error("MySQL JDBC Driver not found in classpath", e2);
+                        throw new RuntimeException("MySQL JDBC Driver not found", e2);
+                    }
+                }
+                // ========== 修复结束 ==========
+
                 HikariConfig config = getConfig();
 
                 // Create data source

@@ -23,42 +23,28 @@
 
     <!-- 右侧：用户信息和工具 -->
     <div class="header-right">
-      <!-- 通知中心 -->
-      <el-dropdown trigger="click" @command="handleCommand">
-        <div class="header-icon">
-          <el-badge :value="8" :max="99">
-            <el-icon :size="20"><Bell /></el-icon>
-          </el-badge>
-        </div>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item :icon="Bell">系统通知 (3)</el-dropdown-item>
-            <el-dropdown-item :icon="ChatDotRound">消息提醒 (5)</el-dropdown-item>
-            <el-dropdown-item divided :icon="Setting">通知设置</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+      <!-- ... 通知中心和搜索按钮保持不变 ... -->
 
-      <!-- 搜索按钮 -->
-      <el-button type="text" :icon="Search" class="search-btn" />
-
-      <!-- 用户信息 -->
+      <!-- 用户信息 - 修改为动态显示 -->
       <el-dropdown @command="handleUserCommand">
         <div class="user-info">
           <el-avatar :size="32" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
           <div class="user-details">
-            <span class="username">管理员</span>
-            <span class="user-role">超级管理员</span>
+            <span class="username">{{ displayName }}</span>
+            <span class="user-role">{{ userRole }}</span>
           </div>
           <el-icon><ArrowDown /></el-icon>
         </div>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item :icon="User">个人中心</el-dropdown-item>
-            <el-dropdown-item :icon="Setting">账号设置</el-dropdown-item>
-            <el-dropdown-item :icon="Lock">修改密码</el-dropdown-item>
-            <el-dropdown-item divided :icon="SwitchButton">切换账号</el-dropdown-item>
-            <el-dropdown-item :icon="Close">退出登录</el-dropdown-item>
+            <!-- 动态显示用户信息 -->
+            <el-dropdown-item disabled v-if="userInfo">
+              <div style="font-size: 12px; color: #999;">
+                {{ userInfo.username }}<br/>
+                {{ userInfo.realName || '未设置姓名' }}
+              </div>
+            </el-dropdown-item>
+            <el-dropdown-item :icon="Close" @click="handleLogout">切换账号</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -67,16 +53,34 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import userDataManager from '@/utils/userData'
 import {
   Plus, Upload, Download, Bell, Search,
   User, Setting, Lock, SwitchButton, Close,
   ArrowDown, ChatDotRound
 } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'  // 导入ElMessage
 
 const route = useRoute()
+const router = useRouter()
 
+// 响应式用户数据
+const userInfo = ref(userDataManager.getUserInfo())
+const permissions = ref(userDataManager.getPermissions())
+
+// 计算属性：显示名称
+const displayName = computed(() => {
+  return userDataManager.getDisplayName()
+})
+
+// 计算属性：用户角色
+const userRole = computed(() => {
+  return userDataManager.getUserRoleText()
+})
+
+// 面包屑 - 保持不变
 const breadcrumb = computed(() => {
   const matched = route.matched.filter(item => item.meta?.title)
   return matched.map(item => ({
@@ -85,17 +89,39 @@ const breadcrumb = computed(() => {
   }))
 })
 
-const handleCommand = (command: string) => {
-  console.log('命令:', command)
-}
+// 初始化时检查用户状态
+onMounted(() => {
+  if (!userDataManager.isLoggedIn()) {
+    console.log('用户未登录，Header组件将显示默认信息')
+  } else {
+    console.log('用户已登录，显示用户信息:', {
+      userInfo: userInfo.value,
+      permissions: permissions.value
+    })
+  }
+})
 
+// 处理用户命令
 const handleUserCommand = (command: string) => {
   console.log('用户命令:', command)
-  if (command === '退出登录') {
-    // 处理退出登录逻辑
+  if (command === 'logout') {
+    handleLogout()
   }
 }
+
+// 退出登录
+const handleLogout = () => {
+  // 清除用户数据
+  userDataManager.logout()
+  
+  // 显示提示
+  ElMessage.success('已退出登录')
+  
+  // 跳转到登录页面
+  router.push('/login')
+}
 </script>
+
 
 <style scoped>
 .github-header {

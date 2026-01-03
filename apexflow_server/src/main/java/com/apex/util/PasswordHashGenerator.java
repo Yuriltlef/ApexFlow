@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class PasswordHashGenerator {
 
     public static void main(String[] args) {
-        System.out.println("========================================");
+        System.out.println("=======================================");
         System.out.println("     密码哈希生成工具 v1.1");
         System.out.println("    适配 apexflow_system_user 表");
         System.out.println("========================================");

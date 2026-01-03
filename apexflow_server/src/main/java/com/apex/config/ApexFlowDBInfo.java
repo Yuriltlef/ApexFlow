@@ -6,7 +6,7 @@ package com.apex.config;
  */
 public class ApexFlowDBInfo {
     // 默认使用H2内存数据库进行测试
-    private static final boolean USE_H2 = Boolean.parseBoolean(System.getProperty("apexflow.test.h2", "true"));
+    private static final boolean USE_H2 = Boolean.parseBoolean(System.getProperty("apexflow.test.h2", "false"));
 
     // H2内存数据库配置
     private static final String H2_URL = "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL";
@@ -14,9 +14,9 @@ public class ApexFlowDBInfo {
     private static final String H2_PASSWORD = "";
 
     // MySQL数据库配置
-    private static final String MYSQL_URL = "jdbc:mysql://localhost:3306/apex_flow_root";
+    private static final String MYSQL_URL = "jdbc:mysql://localhost:3306/apexflow";
     private static final String MYSQL_NAME = "root";
-    private static final String MYSQL_PASSWORD = "fuckumysql";
+    private static final String MYSQL_PASSWORD = "20050823Yzj";
 
     /**
      * 根据配置返回数据库URL

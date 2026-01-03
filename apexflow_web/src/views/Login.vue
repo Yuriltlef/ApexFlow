@@ -2,7 +2,7 @@
   <div class="login-container">
     <!-- 背景层 -->
     <div class="background"></div>
-    
+
     <!-- 主内容区 -->
     <main class="content">
       <!-- 登录卡片 -->
@@ -12,38 +12,30 @@
           <h1>ApexFlow</h1>
           <p>登录管理控制台</p>
         </div>
-        
-        <!-- 登录表单 -->
+
+        <!-- 登录表单 - 保留原有结构，仅添加表单验证相关标识 -->
         <form class="login-form" @submit.prevent="handleLogin">
           <div class="form-group">
             <label for="username">用户名</label>
-            <input 
-              type="text" 
-              id="username" 
-              v-model="username" 
-              placeholder="请输入用户名"
-              required
-            >
+            <input type="text" id="username" v-model="username" placeholder="请输入用户名" required>
           </div>
-          
+
           <div class="form-group">
             <label for="password">密码</label>
-            <input 
-              type="password" 
-              id="password" 
-              v-model="password" 
-              placeholder="请输入密码"
-              required
-            >
+            <input type="password" id="password" v-model="password" placeholder="请输入密码" required>
           </div>
-          
+
           <div class="form-actions">
             <a href="#" class="forgot-link">忘记密码?</a>
           </div>
-          
-          <button type="submit" class="btn primary">登录</button>
+
+          <button type="submit" class="btn primary" :disabled="isLoading">
+            <!-- 加载状态提示 -->
+            <span v-if="!isLoading">登录</span>
+            <span v-if="isLoading">登录中...</span>
+          </button>
         </form>
-        
+
         <!-- 注册提示 -->
         <div class="register-prompt">
           <span>还没有账号?</span>
@@ -55,30 +47,108 @@
 </template>
 
 <script>
+// 在文件顶部导入
+import userDataManager from '@/utils/userData';
+
+import { getUserPermissions } from '@/api/user';
+
+// 1. 导入封装的登录API
+import { userLogin } from '@/api/user';
+// 2. 导入Element Plus的消息提示（用于弹窗提示登录结果，和之前的配置一致）
+import { ElMessage } from 'element-plus';
+
 export default {
   name: 'Login',
   data() {
     return {
-      username: '',
-      password: ''
+      username: '', // 默认填充管理员用户名，方便测试
+      password: '', // 密码手动输入
+      isLoading: false // 登录加载状态，防止重复点击
     }
   },
   methods: {
-    handleLogin() {
-      // 登录逻辑处理
-      console.log('登录信息:', {
-        username: this.username,
-        password: this.password
-      })
-      // 实际项目中这里会调用登录API
-      // 示例: this.$api.login(this.username, this.password).then(...)
-      this.$router.push('/dashboard')
+    // 异步处理登录逻辑
+    async handleLogin() {
+      // 第一步：简单表单验证（非空校验，保留原有required的基础上增强）
+      if (!this.username.trim()) {
+        ElMessage.warning('请输入用户名！');
+        return;
+      }
+      if (!this.password.trim()) {
+        ElMessage.warning('请输入密码！');
+        return;
+      }
+
+      // 第二步：设置加载状态，禁用按钮
+      this.isLoading = true;
+
+      try {
+          const res = await userLogin({
+          username: this.username.trim(),
+          password: this.password.trim()
+        });
+
+        console.log('登录响应：', res);
+
+        if (res.data.success) {
+          // 1. 保存Token到用户管理器
+          userDataManager.setToken(res.data.data.token);
+
+          // 2. 保存用户基本信息到用户管理器
+          const userInfo = res.data.data.user;
+          userDataManager.setUserData(userInfo, null);
+
+          // 3. 获取用户权限（新增）
+          try {
+            const permissionRes = await getUserPermissions();
+            if (permissionRes.data.success) {
+              // 保存权限信息到用户管理器
+              userDataManager.setUserData(userInfo, permissionRes.data.data);
+
+              // 显示权限获取成功
+              console.log('权限获取成功:', permissionRes.data.data);
+            } else {
+              console.warn('获取权限失败:', permissionRes.data.message);
+              // 如果获取权限失败，至少保存用户基本信息
+              userDataManager.setUserData(userInfo, { isAdmin: userInfo.isAdmin });
+            }
+          } catch (permissionError) {
+            console.error('获取权限异常:', permissionError);
+            // 如果权限API调用失败，至少保存用户基本信息
+            userDataManager.setUserData(userInfo, { isAdmin: userInfo.isAdmin });
+          }
+
+          // 4. 显示成功提示
+          ElMessage.success('登录成功！即将跳转到控制台');
+
+          // 5. 跳转到仪表盘
+          setTimeout(() => {
+            this.$router.push('/dashboard');
+          }, 500);
+
+        } else {
+          ElMessage.error(res.data.message || '登录失败，请重试！');
+        }
+      } catch (error) {
+        if (error.status == 401) {
+          console.error('登录请求失败：', error);
+          ElMessage.error('用户名或密码错误，请重试！');
+        } else {
+          console.error('登录请求异常：', error);
+          ElMessage.error('网络异常，请检查后端服务是否启动！');
+        }
+
+      } finally {
+        this.isLoading = false;
+      }
     }
   }
 }
+
 </script>
 
 <style scoped>
+/* 完全保留你原有所有CSS样式，未做任何修改 */
 /* 基础样式重置 */
 * {
   margin: 0;
@@ -103,7 +173,7 @@ export default {
 .background {
   position: absolute;
   inset: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.08), transparent 40%),
     radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.08), transparent 40%);
   z-index: 1;
@@ -251,11 +321,11 @@ export default {
   .login-card {
     padding: 30px 24px;
   }
-  
+
   .brand h1 {
     font-size: 2rem;
   }
-  
+
   .btn {
     padding: 12px 20px;
     font-size: 1rem;

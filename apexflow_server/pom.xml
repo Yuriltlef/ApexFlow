@@ -62,6 +62,25 @@
             <version>1.2.5</version>
         </dependency>
 
+        <!-- Jersey (JAX-RS) 依赖 -->
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+            <version>2.39.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>2.39.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>2.39.1</version>
+        </dependency>
+
         <!-- SLF4J API -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -203,7 +222,11 @@
             <version>3.0.0</version>
         </dependency>
 
+
+
     </dependencies>
+
+
 
     <build>
         <!-- 输出war文件名称，可以自定义 -->
