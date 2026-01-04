@@ -1,60 +1,133 @@
 // src/api/user.js
 import axios from 'axios';
-import { ElMessage } from 'element-plus';
-import userDataManager from '@/utils/userData';  // 导入用户数据管理器
+import userDataManager from '@/utils/userData';
 
-// 登录接口：直接写完整正确的URL，无重复/api
+const BASE_URL = 'http://localhost:8080/ApexFlow/api';
+
+function getAuthHeaders() {
+  const token = userDataManager.getToken();
+  return {
+    'Content-Type': 'application/json;charset=utf-8',
+    'Authorization': token ? `Bearer ${token}` : ''
+  };
+}
+
+// --- 认证与个人信息 ---
 export function userLogin(data) {
   return axios({
-    url: 'http://localhost:8080/ApexFlow/api/auth/login',
+    url: `${BASE_URL}/auth/login`,
     method: 'post',
     data: data,
-    headers: {
-      'Content-Type': 'application/json;charset=utf-8'
-    },
+    headers: { 'Content-Type': 'application/json;charset=utf-8' },
     timeout: 10000
   });
 }
 
-// 获取用户权限 - 修正：添加Token到请求头
 export function getUserPermissions() {
-  // 从用户数据管理器获取Token
   const token = userDataManager.getToken();
-  
-  if (!token) {
-    console.error('获取权限时Token为空');
-    return Promise.reject(new Error('用户未登录'));
-  }
-  
+  if (!token) return Promise.reject(new Error('未登录'));
   return axios({
-    url: 'http://localhost:8080/ApexFlow/api/user/permissions',
+    url: `${BASE_URL}/user/permissions`,
     method: 'get',
-    headers: {
-      'Content-Type': 'application/json;charset=utf-8',
-      'Authorization': `Bearer ${token}`
-    },
-    timeout: 10000
+    headers: { 'Authorization': `Bearer ${token}` }
   });
 }
 
-// 更新用户信息
 export function updateUserProfile(data) {
-  // 从用户数据管理器获取Token
-  const token = userDataManager.getToken();
-  
-  if (!token) {
-    console.error('更新用户信息时Token为空');
-    return Promise.reject(new Error('用户未登录'));
-  }
-  
   return axios({
-    url: 'http://localhost:8080/ApexFlow/api/user/profile',
+    url: `${BASE_URL}/user/profile`,
     method: 'put',
-    data: data,
-    headers: {
-      'Content-Type': 'application/json;charset=utf-8',
-      'Authorization': `Bearer ${token}`
-    },
-    timeout: 10000
+    headers: getAuthHeaders(),
+    data: data
+  });
+}
+
+// --- 管理员用户管理 ---
+
+/**
+ * 1. 获取用户列表
+ */
+export function getUserList(params) {
+  return axios({
+    url: `${BASE_URL}/admin/users`,
+    method: 'get',
+    headers: getAuthHeaders(),
+    params: params
+  });
+}
+
+/**
+ * 2. 创建新用户
+ * 接收完整对象，包含所有权限字段
+ */
+export function createUser(data) {
+  return axios({
+    url: `${BASE_URL}/admin/users`,
+    method: 'post',
+    headers: getAuthHeaders(),
+    data: data
+  });
+}
+
+/**
+ * 3. 更新基本信息 (不含权限，不含密码)
+ */
+export function updateUser(data) {
+  return axios({
+    url: `${BASE_URL}/admin/users/${data.id}`,
+    method: 'put',
+    headers: getAuthHeaders(),
+    data: {
+      realName: data.username,
+      email: data.email,
+      phone: data.phone,
+      status: data.status
+    }
+  });
+}
+
+/**
+ * 4. 更新用户权限 (独立接口)
+ * 接收 isAdmin 和所有细分权限
+ */
+export function updateUserPermissions(data) {
+  return axios({
+    url: `${BASE_URL}/admin/users/${data.id}/permissions`,
+    method: 'put',
+    headers: getAuthHeaders(),
+    data: {
+      isAdmin: data.isAdmin,
+      canManageOrder: data.canManageOrder,
+      canManageLogistics: data.canManageLogistics,
+      canManageAfterSales: data.canManageAfterSales,
+      canManageReview: data.canManageReview,
+      canManageInventory: data.canManageInventory,
+      canManageIncome: data.canManageIncome
+    }
+  });
+}
+
+/**
+ * 5. 重置/修改用户密码
+ */
+export function resetUserPassword(id, password) {
+  return axios({
+    url: `${BASE_URL}/admin/users/${id}/password`,
+    method: 'put',
+    headers: getAuthHeaders(),
+    data: {
+      password: password
+    }
+  });
+}
+
+/**
+ * 6. 删除用户
+ */
+export function deleteUser(userId) {
+  return axios({
+    url: `${BASE_URL}/admin/users/${userId}`,
+    method: 'delete',
+    headers: getAuthHeaders()
   });
 }

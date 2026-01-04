@@ -95,4 +95,18 @@ public interface ILogisticsDAO {
      * @return 包含待发货、运输中、已送达数量的统计对象
      */
     LogisticsStats getLogisticsStats();
+
+    /**
+     * 统计订单总数
+     * @return 订单总数
+     */
+    long count();
+
+    /**
+     * 查询所有物流（分页）
+     * @param page 页码（从1开始）
+     * @param pageSize 每页记录数
+     * @return 分页后的订单列表
+     */
+    List<Logistics> findAll(int page, int pageSize);
 }

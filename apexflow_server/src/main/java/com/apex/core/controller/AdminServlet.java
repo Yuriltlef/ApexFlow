@@ -122,22 +122,56 @@ public class AdminServlet extends BaseServlet {
         }
     }
 
+    // --- [新增] POST (创建) ---
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        long startTime = System.currentTimeMillis();
-        logRequest(req);
-        sendErrorResponse(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED,
-                "不支持的HTTP方法", "METHOD_NOT_ALLOWED");
-        logResponse(req, resp, startTime, HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        String pathInfo = req.getPathInfo();
+        try {
+            logRequest(req);
+
+            // POST /api/admin/users
+            if (pathInfo != null && pathInfo.equals("/users")) {
+                CreateUserRequest request = parseJsonBody(req, CreateUserRequest.class);
+                adminService.createUser(request);
+                sendJsonResponse(resp, HttpServletResponse.SC_CREATED, ApiResponse.success("用户创建成功"));
+            } else {
+                sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND, "接口不存在", "API_PATH_INVALID");
+            }
+        } catch (IllegalArgumentException e) {
+            sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), "INVALID_ARGS");
+        } catch (Exception e) {
+            logger.error("Create user failed", e);
+            sendErrorResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "创建用户失败: " + e.getMessage(), "CREATE_USER_FAILED");
+        }
     }
 
+    // --- [新增] DELETE (删除) ---
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        long startTime = System.currentTimeMillis();
-        logRequest(req);
-        sendErrorResponse(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED,
-                "不支持的HTTP方法", "METHOD_NOT_ALLOWED");
-        logResponse(req, resp, startTime, HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        String pathInfo = req.getPathInfo(); // Expect: /users/{id}
+
+        try {
+            logRequest(req);
+
+            if (pathInfo != null) {
+                String[] parts = pathInfo.split("/");
+                // parts[0] is empty, parts[1] is users, parts[2] is id
+                if (parts.length == 3 && "users".equals(parts[1])) {
+                    Integer userId = parseUserId(parts[2]);
+                    if (userId == null) {
+                        sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "无效的用户ID", "INVALID_USER_ID");
+                        return;
+                    }
+                    adminService.deleteUser(userId);
+                    sendJsonResponse(resp, HttpServletResponse.SC_OK, ApiResponse.success("用户删除成功"));
+                    return;
+                }
+            }
+            sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND, "接口不存在", "API_PATH_INVALID");
+        } catch (Exception e) {
+            logger.error("Delete user failed", e);
+            sendErrorResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "删除失败: " + e.getMessage(), "DELETE_USER_FAILED");
+        }
     }
 
     /**

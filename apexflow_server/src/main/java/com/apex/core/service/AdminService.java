@@ -391,6 +391,69 @@ public class AdminService {
         }
     }
 
+    // --- [新增] 创建用户 ---
+    public void createUser(CreateUserRequest request) {
+        logger.info("[ADMIN_SERVICE] Creating user: {}", request.getUsername());
+
+        // 1. 基础校验 (DAO层可能还有唯一性约束校验)
+        if (userDAO.findByUsername(request.getUsername()) != null) {
+            throw new IllegalArgumentException("用户名已存在");
+        }
+
+        // 2. 映射 DTO 到 Entity
+        SystemUser user = new SystemUser();
+        user.setUsername(request.getUsername());
+        user.setRealName(request.getRealName());
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
+        user.setStatus(1); // 默认启用
+
+        // 3. 处理密码 (生成盐 + 哈希)
+        String salt = PasswordUtil.generateSalt();
+        String hash = PasswordUtil.hashPassword(request.getPassword(), salt);
+        user.setSalt(salt);
+        user.setPasswordHash(hash);
+
+        // 4. 处理权限
+        user.setAdmin(Boolean.TRUE.equals(request.getIsAdmin()));
+        // 如果是 Admin，通常赋予所有权限，或者按照前端传来的细分权限
+        if (user.getAdmin()) {
+            user.setCanManageOrder(true);
+            user.setCanManageLogistics(true);
+            user.setCanManageAfterSales(true);
+            user.setCanManageReview(true);
+            user.setCanManageInventory(true);
+            user.setCanManageIncome(true);
+        } else {
+            // 普通用户，使用请求中的具体权限
+            user.setCanManageOrder(Boolean.TRUE.equals(request.getCanManageOrder()));
+            user.setCanManageLogistics(Boolean.TRUE.equals(request.getCanManageLogistics()));
+            user.setCanManageAfterSales(Boolean.TRUE.equals(request.getCanManageAfterSales()));
+            user.setCanManageReview(Boolean.TRUE.equals(request.getCanManageReview()));
+            user.setCanManageInventory(Boolean.TRUE.equals(request.getCanManageInventory()));
+            user.setCanManageIncome(Boolean.TRUE.equals(request.getCanManageIncome()));
+        }
+
+        // 5. 保存
+        boolean success = userDAO.create(user);
+        if (!success) {
+            throw new RuntimeException("数据库写入失败");
+        }
+    }
+
+    // --- [新增] 删除用户 ---
+    public void deleteUser(Integer userId) {
+        logger.info("[ADMIN_SERVICE] Deleting user ID: {}", userId);
+
+        // 防止删除自己 (可选逻辑，需要获取当前登录用户ID，此处略过)
+        // SystemUser user = userDAO.findUserById(userId);
+
+        boolean success = userDAO.delete(userId);
+        if (!success) {
+            throw new IllegalArgumentException("用户不存在或删除失败");
+        }
+    }
+
     /**
      * 将SystemUser转换为AdminUserDTO
      */

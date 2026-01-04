@@ -5,9 +5,14 @@ import com.apex.core.dto.OrderDetail;
 import com.apex.core.dto.OrderWithItemsResponse;
 import com.apex.core.model.*;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
+
+import com.apex.util.ConnectionPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,6 +108,21 @@ public class OrderService {
 
             // 4. 批量保存订单项
             logger.debug("[{}] Saving order items (count: {})", operation, orderItems.size());
+
+            for (OrderItem orderItem : orderItems) {
+                // [修复关键点]：查询商品详情，补充 productName
+                Product product = productDAO.findById(orderItem.getProductId());
+                if (product != null) {
+                    orderItem.setProductName(product.getName()); // 设置商品名称
+                    orderItem.setSubtotal(
+                            product.getPrice().multiply(new BigDecimal(orderItem.getQuantity()))
+                    );
+                } else {
+                    // 如果找不到商品，可以报错或设置默认值
+                    throw new RuntimeException("商品不存在，ID: " + orderItem.getProductId());
+                }
+            }
+
             boolean itemsCreated = orderItemDAO.createBatch(orderItems);
             if (!itemsCreated) {
                 throw new RuntimeException("Failed to create order items");
@@ -270,6 +290,7 @@ public class OrderService {
             // 4. 删除订单项
             List<OrderItem> orderItems = orderItemDAO.findByOrderId(orderId);
             logger.debug("[{}] Deleting {} order items", operation, orderItems.size());
+
             for (OrderItem item : orderItems) {
                 orderItemDAO.delete(item.getId());
             }
@@ -304,8 +325,25 @@ public class OrderService {
 
             // 9. 删除订单主记录
             logger.debug("[{}] Deleting main order record", operation);
-            boolean result = orderInfoDAO.delete(orderId);
 
+            String sql = "DELETE FROM apexflow_order WHERE id = ?";
+
+            logger.warn("Deleting review ID: {}", orderId);
+
+            boolean result;
+
+            try (Connection conn = ConnectionPool.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+                pstmt.setString(1, orderId);
+                int rowsAffected = pstmt.executeUpdate();
+                logger.warn("Review deleted. Rows affected: {}", rowsAffected);
+                result = true;
+
+            } catch (SQLException e) {
+                logger.error("Failed to delete review ID: {}", orderId, e);
+                result = false;
+            }
             if (result) {
                 logger.info("[{}] Order deleted successfully. Order ID: {}", operation, orderId);
             } else {

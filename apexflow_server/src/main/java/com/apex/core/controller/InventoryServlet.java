@@ -441,7 +441,7 @@ public class InventoryServlet extends BaseServlet {
                     data, "商品列表获取成功"
             );
             sendJsonResponse(resp, HttpServletResponse.SC_OK, response);
-            logger.info("[INVENTORY_LIST] Product list retrieved successfully. Count: {}", productList.size());
+            logger.info("[INVENTORY_LIST] Product list retrieved successfully. Count: {}", totalCount);
 
         } catch (Exception e) {
             logger.error("[INVENTORY_LIST] Unexpected error: {}", e.getMessage(), e);
@@ -769,7 +769,6 @@ public class InventoryServlet extends BaseServlet {
             // 设置默认值
             if (page == null || page < 1) page = 1;
             if (pageSize == null || pageSize < 1) pageSize = 20;
-            if (pageSize > 100) pageSize = 100;
 
             // 调用服务层获取库存日志
             List<InventoryLog> logs = inventoryService.getInventoryLogs(productId, changeType, page, pageSize);
@@ -793,17 +792,19 @@ public class InventoryServlet extends BaseServlet {
                 logResponses.add(logResponse);
             }
 
+            long totalCount = inventoryService.countLogs();
+
             Map<String, Object> data = new HashMap<>();
             data.put("logs", logResponses);
             data.put("currentPage", page);
             data.put("pageSize", pageSize);
-            data.put("totalCount", logResponses.size()); // 注意：这里应该查询总数，简化处理
+            data.put("totalCount", totalCount); // 注意：这里应该查询总数，简化处理
 
             ApiResponse<Map<String, Object>> response = ApiResponse.success(
                     data, "库存变更日志获取成功"
             );
             sendJsonResponse(resp, HttpServletResponse.SC_OK, response);
-            logger.info("[INVENTORY_LOGS] Inventory logs retrieved successfully. Count: {}", logResponses.size());
+            logger.info("[INVENTORY_LOGS] Inventory logs retrieved successfully. Count: {}", totalCount);
 
         } catch (Exception e) {
             logger.error("[INVENTORY_LOGS] Unexpected error: {}", e.getMessage(), e);

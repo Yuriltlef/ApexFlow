@@ -1,4 +1,8 @@
-{
+{ 
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false  // 如果你不想检查 JS 文件的类型
+  },
   "files": [],
   "references": [
     {
@@ -8,4 +12,4 @@
       "path": "./tsconfig.app.json"
     }
   ]
-}
+}S

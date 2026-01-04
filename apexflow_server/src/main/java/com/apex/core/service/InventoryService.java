@@ -417,4 +417,8 @@ public class InventoryService {
             return null;
         }
     }
+
+    public long countLogs() {
+        return inventoryLogDAO.count();
+    }
 }

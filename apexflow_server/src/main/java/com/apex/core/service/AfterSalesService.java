@@ -222,8 +222,8 @@ public class AfterSalesService {
         if (page < 1) {
             throw new IllegalArgumentException("页码必须大于0");
         }
-        if (pageSize < 1 || pageSize > 100) {
-            throw new IllegalArgumentException("每页大小必须在1-100之间");
+        if (pageSize < 1 || pageSize > 10000) {
+            throw new IllegalArgumentException("每页大小必须在1-10000之间");
         }
     }
 

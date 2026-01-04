@@ -62,26 +62,38 @@ public class AfterSalesServlet extends BaseServlet {
         try {
             logRequest(req);
 
-            if (pathInfo == null) {
+            if (pathInfo != null && pathInfo.startsWith("/list")) {
                 // GET /api/after-sales - 获取列表
                 handleGetAfterSalesList(req, resp);
-            } else if (pathInfo.startsWith("/stats")) {
-                // GET /api/after-sales/stats - 获取统计
+                return;
+            }
+            // 2. 处理 /stats (获取统计)
+            if (pathInfo != null && pathInfo.startsWith("/stats")) {
                 handleGetStats(req, resp);
-            } else {
+                return;
+            }
+            if (pathInfo == null) {
+                sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND,
+                        "API不存在", "API_NOT_FOUND");
+                return;
+            }
+            else {
                 // 解析路径参数
                 String[] pathParts = pathInfo.substring(1).split("/");
 
                 if (pathParts.length == 1) {
                     // GET /api/after-sales/{id} - 获取详情
                     handleGetAfterSalesDetail(req, resp, pathParts[0]);
+                    return;
                 } else if (pathParts.length == 2) {
                     if ("order".equals(pathParts[0])) {
                         // GET /api/after-sales/order/{orderId} - 获取订单售后记录
                         handleGetAfterSalesByOrder(req, resp, pathParts[1]);
+                        return;
                     } else if ("status".equals(pathParts[0])) {
                         // GET /api/after-sales/status/{status} - 根据状态获取列表
                         handleGetAfterSalesByStatus(req, resp, pathParts[1]);
+                        return;
                     } else {
                         sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND,
                                 "API不存在", "API_NOT_FOUND");
@@ -118,6 +130,8 @@ public class AfterSalesServlet extends BaseServlet {
 
             // 解析路径参数
             String[] pathParts = pathInfo.substring(1).split("/");
+
+            logger.info("pathParts: {}", (Object) pathParts);
 
             if (pathParts.length == 2 && "status".equals(pathParts[1])) {
                 // PUT /api/after-sales/{id}/status - 更新状态
@@ -187,7 +201,7 @@ public class AfterSalesServlet extends BaseServlet {
             // 验证Content-Type
             String contentType = req.getContentType();
             if (contentType == null || !contentType.contains("application/json")) {
-                logger.warn("[AFTER_SALES_API] Invalid Content-Type: {}", contentType);
+                logger.warn("[AFTER_SALES_API_CREATE] Invalid Content-Type: {}", contentType);
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST,
                         "请求必须是JSON格式", "INVALID_CONTENT_TYPE");
                 return;
@@ -218,7 +232,7 @@ public class AfterSalesServlet extends BaseServlet {
                     afterSales.getId(), afterSales.getOrderId());
 
         } catch (IllegalArgumentException e) {
-            logger.warn("[AFTER_SALES_API] Invalid request: {}", e.getMessage());
+            logger.warn("[AFTER_SALES_API_CREATE] Invalid request: {}", e.getMessage());
             ApiResponse<Void> errorResponse = ApiResponse.error(e.getMessage());
             sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, errorResponse);
         } catch (Exception e) {
@@ -255,11 +269,11 @@ public class AfterSalesServlet extends BaseServlet {
             logger.info("[AFTER_SALES_API] After sales detail retrieved successfully. ID: {}", id);
 
         } catch (NumberFormatException e) {
-            logger.warn("[AFTER_SALES_API] Invalid ID format: {}", idStr);
+            logger.warn("[AFTER_SALES_API_DETAIL] Invalid ID format: {}", idStr);
             ApiResponse<Void> errorResponse = ApiResponse.error("售后ID格式不正确");
             sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, errorResponse);
         } catch (IllegalArgumentException e) {
-            logger.warn("[AFTER_SALES_API] Invalid request: {}", e.getMessage());
+            logger.warn("[AFTER_SALES_API_DETAIL] Invalid request: {}", e.getMessage());
             ApiResponse<Void> errorResponse = ApiResponse.error(e.getMessage());
             sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, errorResponse);
         } catch (Exception e) {
@@ -295,15 +309,15 @@ public class AfterSalesServlet extends BaseServlet {
             ApiResponse<PagedResult<com.apex.core.model.AfterSales>> apiResponse =
                     ApiResponse.success(result, "获取售后列表成功");
             sendJsonResponse(resp, HttpServletResponse.SC_OK, apiResponse);
-            logger.info("[AFTER_SALES_API] After sales list retrieved successfully. Total: {}, Page: {}",
+            logger.info("[AFTER_SALES_API_LIST] After sales list retrieved successfully. Total: {}, Page: {}",
                     result.getTotalCount(), page);
 
         } catch (IllegalArgumentException e) {
-            logger.warn("[AFTER_SALES_API] Invalid parameters: {}", e.getMessage());
+            logger.warn("[AFTER_SALES_API_LIST] Invalid parameters: {}", e.getMessage());
             ApiResponse<Void> errorResponse = ApiResponse.error(e.getMessage());
             sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, errorResponse);
         } catch (Exception e) {
-            logger.error("[AFTER_SALES_API] Failed to get after sales list: {}", e.getMessage(), e);
+            logger.error("[AFTER_SALES_API_LIST] Failed to get after sales list: {}", e.getMessage(), e);
             ApiResponse<Void> errorResponse = ApiResponse.error("获取售后列表失败");
             sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorResponse);
         }
@@ -335,7 +349,7 @@ public class AfterSalesServlet extends BaseServlet {
                     orderId, afterSalesList.size());
 
         } catch (Exception e) {
-            logger.error("[AFTER_SALES_API] Failed to get order after sales. Order: {}, Error: {}",
+            logger.error("[AFTER_SALES_API_GET_ORDER] Failed to get order after sales. Order: {}, Error: {}",
                     orderId, e.getMessage(), e);
             ApiResponse<Void> errorResponse = ApiResponse.error("获取订单售后记录失败");
             sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorResponse);
@@ -371,19 +385,19 @@ public class AfterSalesServlet extends BaseServlet {
             ApiResponse<PagedResult<com.apex.core.model.AfterSales>> apiResponse =
                     ApiResponse.success(result, "获取状态售后列表成功");
             sendJsonResponse(resp, HttpServletResponse.SC_OK, apiResponse);
-            logger.info("[AFTER_SALES_API] Status after sales retrieved successfully. Status: {}, Count: {}",
+            logger.info("[AFTER_SALES_API_STATUS] Status after sales retrieved successfully. Status: {}, Count: {}",
                     status, result.getData().size());
 
         } catch (NumberFormatException e) {
-            logger.warn("[AFTER_SALES_API] Invalid status format: {}", statusStr);
+            logger.warn("[AFTER_SALES_API_STATUS] Invalid status format: {}", statusStr);
             ApiResponse<Void> errorResponse = ApiResponse.error("状态格式不正确");
             sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, errorResponse);
         } catch (IllegalArgumentException e) {
-            logger.warn("[AFTER_SALES_API] Invalid parameters: {}", e.getMessage());
+            logger.warn("[AFTER_SALES_API_STATUS] Invalid parameters: {}", e.getMessage());
             ApiResponse<Void> errorResponse = ApiResponse.error(e.getMessage());
             sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, errorResponse);
         } catch (Exception e) {
-            logger.error("[AFTER_SALES_API] Failed to get status after sales. Status: {}, Error: {}",
+            logger.error("[AFTER_SALES_API_STATUS] Failed to get status after sales. Status: {}, Error: {}",
                     statusStr, e.getMessage(), e);
             ApiResponse<Void> errorResponse = ApiResponse.error("获取状态售后列表失败");
             sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorResponse);
@@ -400,14 +414,14 @@ public class AfterSalesServlet extends BaseServlet {
     )
     private void handleUpdateAfterSalesStatus(HttpServletRequest req, HttpServletResponse resp, String idStr)
             throws IOException {
-        logger.info("[AFTER_SALES_API] Updating after sales status. ID: {}, Client IP: {}",
+        logger.info("[AFTER_SALES_API_UPDATE_STATUS] Updating after sales status. ID: {}, Client IP: {}",
                 idStr, getClientIp(req));
 
         try {
             // 验证Content-Type
             String contentType = req.getContentType();
             if (contentType == null || !contentType.contains("application/json")) {
-                logger.warn("[AFTER_SALES_API] Invalid Content-Type: {}", contentType);
+                logger.warn("[AFTER_SALES_API_UPDATE_STATUS] Invalid Content-Type: {}", contentType);
                 sendErrorResponse(resp, HttpServletResponse.SC_BAD_REQUEST,
                         "请求必须是JSON格式", "INVALID_CONTENT_TYPE");
                 return;
@@ -432,15 +446,15 @@ public class AfterSalesServlet extends BaseServlet {
             ApiResponse<com.apex.core.model.AfterSales> apiResponse =
                     ApiResponse.success(afterSales, "更新售后状态成功");
             sendJsonResponse(resp, HttpServletResponse.SC_OK, apiResponse);
-            logger.info("[AFTER_SALES_API] After sales status updated successfully. ID: {}, New status: {}",
+            logger.info("[AFTER_SALES_API_UPDATE_STATUS] After sales status updated successfully. ID: {}, New status: {}",
                     id, updateRequest.getStatus());
 
         } catch (NumberFormatException e) {
-            logger.warn("[AFTER_SALES_API] Invalid ID format: {}", idStr);
+            logger.warn("[AFTER_SALES_API_UPDATE_STATUS] Invalid ID format: {}", idStr);
             ApiResponse<Void> errorResponse = ApiResponse.error("售后ID格式不正确");
             sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, errorResponse);
         } catch (IllegalArgumentException e) {
-            logger.warn("[AFTER_SALES_API] Invalid request: {}", e.getMessage());
+            logger.warn("[AFTER_SALES_API_UPDATE_STATUS] Invalid request: {}", e.getMessage());
             ApiResponse<Void> errorResponse = ApiResponse.error(e.getMessage());
             sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, errorResponse);
         } catch (Exception e) {
@@ -461,7 +475,7 @@ public class AfterSalesServlet extends BaseServlet {
     )
     private void handleDeleteAfterSales(HttpServletRequest req, HttpServletResponse resp, String idStr)
             throws IOException {
-        logger.info("[AFTER_SALES_API] Deleting after sales. ID: {}, Client IP: {}",
+        logger.info("[AFTER_SALES_API_DEL] Deleting after sales. ID: {}, Client IP: {}",
                 idStr, getClientIp(req));
 
         try {
@@ -474,22 +488,22 @@ public class AfterSalesServlet extends BaseServlet {
             if (success) {
                 ApiResponse<Void> apiResponse = ApiResponse.success(null, "删除售后记录成功");
                 sendJsonResponse(resp, HttpServletResponse.SC_OK, apiResponse);
-                logger.info("[AFTER_SALES_API] After sales deleted successfully. ID: {}", id);
+                logger.info("[AFTER_SALES_API_DEL] After sales deleted successfully. ID: {}", id);
             } else {
                 ApiResponse<Void> errorResponse = ApiResponse.error("删除售后记录失败");
                 sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorResponse);
             }
 
         } catch (NumberFormatException e) {
-            logger.warn("[AFTER_SALES_API] Invalid ID format: {}", idStr);
+            logger.warn("[AFTER_SALES_API_DEL] Invalid ID format: {}", idStr);
             ApiResponse<Void> errorResponse = ApiResponse.error("售后ID格式不正确");
             sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, errorResponse);
         } catch (IllegalArgumentException e) {
-            logger.warn("[AFTER_SALES_API] Invalid request: {}", e.getMessage());
+            logger.warn("[AFTER_SALES_API_DEL] Invalid request: {}", e.getMessage());
             ApiResponse<Void> errorResponse = ApiResponse.error(e.getMessage());
             sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, errorResponse);
         } catch (Exception e) {
-            logger.error("[AFTER_SALES_API] Failed to delete after sales. ID: {}, Error: {}",
+            logger.error("[AFTER_SALES_API_DEL] Failed to delete after sales. ID: {}, Error: {}",
                     idStr, e.getMessage(), e);
             ApiResponse<Void> errorResponse = ApiResponse.error("删除售后记录失败");
             sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorResponse);

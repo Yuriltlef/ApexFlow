@@ -1,6 +1,7 @@
 package com.apex.core.dao;
 
 import com.apex.core.model.InventoryLog;
+import com.apex.core.model.Logistics;
 
 import java.util.List;
 
@@ -90,4 +91,10 @@ public interface IInventoryLogDAO {
      * @return 批量创建成功返回true，失败返回false
      */
     boolean createBatch(List<InventoryLog> inventoryLogs);
+
+    /**
+     * 统计日志总数
+     * @return 日志总数
+     */
+    long count();
 }

@@ -142,7 +142,6 @@ public class IncomeService {
         // 设置默认值
         if (page == null || page < 1) page = 1;
         if (pageSize == null || pageSize < 1) pageSize = 20;
-        if (pageSize > 100) pageSize = 100; // 限制每页最大记录数
 
         try {
             List<Income> incomes;
@@ -169,10 +168,14 @@ public class IncomeService {
             listData.put("totalRefund", totalRefund);
             listData.put("netIncome", totalIncome.subtract(totalRefund));
 
+            long totalCount = incomeDAO.count();
+
+            listData.put("totalCount", totalCount);
+
             result.put("success", true);
             result.put("data", listData);
 
-            logger.info("Income list retrieved. Count: {}", incomes.size());
+            logger.info("Income list retrieved. Count: {}", totalCount);
         } catch (Exception e) {
             // 修复：确保错误消息不为null
             result.put("success", false);

@@ -331,7 +331,7 @@ public class LogisticsServlet extends BaseServlet {
             // 调用服务层获取所有物流（简化处理）
             // 实际应根据需要实现按状态筛选等功能
             PagedResult<com.apex.core.model.Logistics> result =
-                    logisticsService.getPendingShipping(page, pageSize);
+                    logisticsService.getAllShipping(page, pageSize);
 
             // 发送成功响应
             ApiResponse<PagedResult<com.apex.core.model.Logistics>> apiResponse =

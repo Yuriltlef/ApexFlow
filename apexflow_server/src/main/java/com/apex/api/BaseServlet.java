@@ -5,6 +5,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 import com.apex.core.dto.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +20,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public abstract class BaseServlet extends HttpServlet {
 
     protected static final Logger logger = LoggerFactory.getLogger(BaseServlet.class);
-    protected final ObjectMapper objectMapper = new ObjectMapper();
+    // 修改这里：使用方法初始化，或者在构造函数中初始化
+    protected final ObjectMapper objectMapper = createObjectMapper();
+
+    /**
+     * 创建并配置 ObjectMapper
+     */
+    private ObjectMapper createObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+
+        // 【关键修复】必须在这里显式注册 Java 8 时间模块
+        mapper.registerModule(new JavaTimeModule());
+
+        // 建议配置：忽略前端传来的未知字段，防止报错
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        return mapper;
+    }
 
     /**
      * Get request client IP address
@@ -97,6 +117,8 @@ public abstract class BaseServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.setStatus(statusCode);
+
+        objectMapper.registerModule(new JavaTimeModule());
 
         String jsonResponse;
         if (data instanceof String) {

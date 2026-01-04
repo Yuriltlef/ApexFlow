@@ -1,45 +1,35 @@
 <template>
   <div class="login-container">
-    <!-- 背景层 -->
-    <div class="background"></div>
+    <div class="background-anim"></div>
 
-    <!-- 主内容区 -->
     <main class="content">
-      <!-- 登录卡片 -->
       <div class="login-card">
-        <!-- 品牌标识 -->
         <div class="brand">
-          <h1>ApexFlow</h1>
+          <h1 class="animate-title">ApexFlow</h1>
           <p>登录管理控制台</p>
         </div>
 
-        <!-- 登录表单 - 保留原有结构，仅添加表单验证相关标识 -->
         <form class="login-form" @submit.prevent="handleLogin">
           <div class="form-group">
             <label for="username">用户名</label>
-            <input type="text" id="username" v-model="username" placeholder="请输入用户名" required>
+            <input type="text" id="username" v-model="username" placeholder="请输入用户名" required autocomplete="username">
           </div>
 
           <div class="form-group">
             <label for="password">密码</label>
-            <input type="password" id="password" v-model="password" placeholder="请输入密码" required>
-          </div>
-
-          <div class="form-actions">
-            <a href="#" class="forgot-link">忘记密码?</a>
+            <input type="password" id="password" v-model="password" placeholder="请输入密码" required
+              autocomplete="current-password">
           </div>
 
           <button type="submit" class="btn primary" :disabled="isLoading">
-            <!-- 加载状态提示 -->
-            <span v-if="!isLoading">登录</span>
+            <span v-if="!isLoading">立即登录</span>
             <span v-if="isLoading">登录中...</span>
           </button>
         </form>
 
-        <!-- 注册提示 -->
-        <div class="register-prompt">
-          <span>还没有账号?</span>
-          <a href="/register" class="register-link">立即注册</a>
+        <div class="card-footer">
+          <span class="prompt">还没有账号?</span>
+          <a href="https://github.com/Yuriltlef" target="_blank" class="register-link">联系管理员</a>
         </div>
       </div>
     </main>
@@ -47,268 +37,281 @@
 </template>
 
 <script>
-// 在文件顶部导入
-import userDataManager from '@/utils/userData';
-
-import { getUserPermissions } from '@/api/user';
-
-// 1. 导入封装的登录API
-import { userLogin } from '@/api/user';
-// 2. 导入Element Plus的消息提示（用于弹窗提示登录结果，和之前的配置一致）
-import { ElMessage } from 'element-plus';
+// [修复] 引入 getUserPermissions 用于获取角色权限
+import { userLogin, getUserPermissions } from '@/api/user'
+import userDataManager from '@/utils/userData'
+import { ElMessage } from 'element-plus'
 
 export default {
   name: 'Login',
   data() {
     return {
-      username: '', // 默认填充管理员用户名，方便测试
-      password: '', // 密码手动输入
-      isLoading: false // 登录加载状态，防止重复点击
+      username: '',
+      password: '',
+      isLoading: false
     }
   },
   methods: {
-    // 异步处理登录逻辑
     async handleLogin() {
-      // 第一步：简单表单验证（非空校验，保留原有required的基础上增强）
-      if (!this.username.trim()) {
-        ElMessage.warning('请输入用户名！');
-        return;
-      }
-      if (!this.password.trim()) {
-        ElMessage.warning('请输入密码！');
-        return;
+      if (!this.username || !this.password) {
+        ElMessage.warning('请输入用户名和密码')
+        return
       }
 
-      // 第二步：设置加载状态，禁用按钮
-      this.isLoading = true;
-
+      this.isLoading = true
       try {
-          const res = await userLogin({
-          username: this.username.trim(),
-          password: this.password.trim()
-        });
-
-        console.log('登录响应：', res);
+        // 1. 发起登录请求
+        const res = await userLogin({
+          username: this.username,
+          password: this.password
+        })
 
         if (res.data.success) {
-          // 1. 保存Token到用户管理器
-          userDataManager.setToken(res.data.data.token);
+          // 注意：通常登录接口只返回 token 和基本 user 信息，不包含完整权限
+          const { token, user } = res.data.data
 
-          // 2. 保存用户基本信息到用户管理器
-          const userInfo = res.data.data.user;
-          userDataManager.setUserData(userInfo, null);
+          // [关键修复] 先保存 Token，因为后续的 getUserPermissions 需要用到它
+          userDataManager.setToken(token)
 
-          // 3. 获取用户权限（新增）
+          // 2. [关键修复] 单独获取用户权限信息
+          // 很多后端设计将权限接口分离，必须单独调用才能获取 isAdmin 等字段
           try {
-            const permissionRes = await getUserPermissions();
-            if (permissionRes.data.success) {
-              // 保存权限信息到用户管理器
-              userDataManager.setUserData(userInfo, permissionRes.data.data);
+            const permRes = await getUserPermissions()
 
-              // 显示权限获取成功
-              console.log('权限获取成功:', permissionRes.data.data);
+            if (permRes.data.success) {
+              const permissions = permRes.data.data
+
+              // 3. 保存完整的 用户信息 + 权限信息
+              if (userDataManager.setUserData(user, permissions)) {
+                ElMessage.success('登录成功')
+                this.$router.push('/dashboard')
+              } else {
+                ElMessage.error('用户数据保存失败')
+              }
             } else {
-              console.warn('获取权限失败:', permissionRes.data.message);
-              // 如果获取权限失败，至少保存用户基本信息
-              userDataManager.setUserData(userInfo, { isAdmin: userInfo.isAdmin });
+              // 降级处理：如果获取权限失败，但登录成功了，可能无法进入某些页面
+              console.warn('获取权限失败，仅保存基本信息')
+              userDataManager.setUserData(user, {})
+              this.$router.push('/dashboard')
             }
-          } catch (permissionError) {
-            console.error('获取权限异常:', permissionError);
-            // 如果权限API调用失败，至少保存用户基本信息
-            userDataManager.setUserData(userInfo, { isAdmin: userInfo.isAdmin });
+          } catch (permError) {
+            console.error('权限接口调用异常', permError)
+            // 即使权限获取失败，也允许登录，只是角色可能显示未知
+            userDataManager.setUserData(user, {})
+            this.$router.push('/dashboard')
           }
-
-          // 4. 显示成功提示
-          ElMessage.success('登录成功！即将跳转到控制台');
-
-          // 5. 跳转到仪表盘
-          setTimeout(() => {
-            this.$router.push('/dashboard');
-          }, 500);
-
         } else {
-          ElMessage.error(res.data.message || '登录失败，请重试！');
+          ElMessage.error(res.data.message || '登录失败')
         }
       } catch (error) {
         if (error.status == 401) {
-          console.error('登录请求失败：', error);
-          ElMessage.error('用户名或密码错误，请重试！');
+          ElMessage.error('用户名或密码错误')
         } else {
-          console.error('登录请求异常：', error);
-          ElMessage.error('网络异常，请检查后端服务是否启动！');
+          console.error(error)
+          ElMessage.error('登录请求异常')
         }
-
       } finally {
-        this.isLoading = false;
+        this.isLoading = false
       }
     }
   }
 }
-
 </script>
 
 <style scoped>
-/* 完全保留你原有所有CSS样式，未做任何修改 */
-/* 基础样式重置 */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-}
-
-/* 容器样式 - 保持浅色主题 */
+/* 容器布局 */
 .login-container {
-  min-height: 100vh;
   position: relative;
+  width: 100vw;
+  height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 20px;
-  background-color: #f8fafc;
+  align-items: center;
   overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* 背景效果 - 与首页保持一致 */
-.background {
+/* 动态浅色渐变背景 */
+.background-anim {
   position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.08), transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.08), transparent 40%);
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg,
+      #fdfbfb,
+      #ebedee,
+      #f3e7e9,
+      #e3eeff,
+      #e9f3e7,
+      #fff5e3);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
   z-index: 1;
 }
 
-/* 主内容区 */
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* 内容层级 */
 .content {
   position: relative;
   z-index: 2;
   width: 100%;
   max-width: 420px;
+  padding: 20px;
 }
 
-/* 登录卡片 */
+/* 登录卡片 (Glassmorphism 磨砂质感) */
 .login-card {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 24px;
   padding: 40px;
-  width: 100%;
+  box-shadow:
+    0 20px 40px -10px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* 品牌标识 - 保持与首页一致的风格 */
+/* 品牌区域 */
 .brand {
   text-align: center;
-  margin-bottom: 36px;
+  margin-bottom: 32px;
 }
 
 .brand h1 {
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: 800;
-  background: linear-gradient(90deg, #2563eb, #7c3aed);
+  margin: 0 0 8px 0;
+  /* 蓝紫渐变文字 */
+  background: linear-gradient(135deg, #2563eb 0%, #9333ea 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  margin-bottom: 8px;
+  letter-spacing: -0.5px;
 }
 
 .brand p {
-  color: #475569;
-  font-size: 1.1rem;
+  color: #64748b;
+  font-size: 0.95rem;
+  margin: 0;
+  font-weight: 500;
 }
 
-/* 表单样式 */
+/* 表单布局 */
 .login-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  margin-bottom: 24px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  text-align: left;
 }
 
 .form-group label {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #1e293b;
+  color: #334155;
+  margin-left: 2px;
 }
 
+/* 输入框样式优化 */
 .form-group input {
-  padding: 14px 16px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background-color: #f1f5f9;
+  /* 浅灰背景 */
   font-size: 1rem;
+  color: #1e293b;
   transition: all 0.2s ease;
-  background-color: #f8fafc;
+  box-sizing: border-box;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #93c5fd;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   background-color: #ffffff;
+  border-color: #3b82f6;
+  /* 聚焦变蓝 */
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
-/* 表单操作区 */
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
+.form-group input::placeholder {
+  color: #94a3b8;
 }
 
-.forgot-link {
-  color: #2563eb;
-  font-size: 0.9rem;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.forgot-link:hover {
-  color: #1d4ed8;
-  text-decoration: underline;
-}
-
-/* 按钮样式 - 保持与首页一致 */
+/* 按钮样式 */
 .btn {
-  padding: 14px 24px;
+  margin-top: 8px;
+  width: 100%;
+  padding: 14px;
   border-radius: 12px;
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
   border: none;
-  outline: none;
-  width: 100%;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .primary {
+  /* 蓝紫渐变背景 */
   background: linear-gradient(90deg, #2563eb, #7c3aed);
-  color: #ffffff;
-  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.25);
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
 }
 
 .primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 15px 30px -8px rgba(59, 130, 246, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
 }
 
-/* 注册提示 */
-.register-prompt {
+.primary:active {
+  transform: translateY(0);
+}
+
+.primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 底部区域 */
+.card-footer {
+  margin-top: 24px;
   text-align: center;
+  font-size: 0.9rem;
   color: #64748b;
-  font-size: 0.95rem;
-  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
 }
 
 .register-link {
   color: #2563eb;
-  font-weight: 600;
   text-decoration: none;
-  margin-left: 4px;
-  transition: color 0.2s ease;
+  font-weight: 600;
+  transition: color 0.2s;
 }
 
 .register-link:hover {
@@ -316,19 +319,28 @@ export default {
   text-decoration: underline;
 }
 
-/* 响应式调整 */
-@media (max-width: 768px) {
+/* 入场动画 */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 移动端适配 */
+@media (max-width: 480px) {
   .login-card {
     padding: 30px 24px;
+    border-radius: 20px;
   }
 
   .brand h1 {
-    font-size: 2rem;
-  }
-
-  .btn {
-    padding: 12px 20px;
-    font-size: 1rem;
+    font-size: 1.8rem;
   }
 }
 </style>

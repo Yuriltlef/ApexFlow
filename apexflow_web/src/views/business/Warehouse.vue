@@ -4,9 +4,9 @@
 
     <el-row :gutter="16" class="warehouse-stats">
       <el-col :span="8">
-        <el-card>
+        <el-card shadow="hover">
           <div class="stat-item">
-            <div class="stat-icon" style="color: #1890ff;">
+            <div class="stat-icon" style="color: #1890ff; background: #e6f7ff;">
               <el-icon size="24"><Box /></el-icon>
             </div>
             <div class="stat-content">
@@ -17,124 +17,370 @@
         </el-card>
       </el-col>
       <el-col :span="8">
-        <el-card>
+        <el-card shadow="hover">
           <div class="stat-item">
-            <div class="stat-icon" style="color: #52c41a;">
+            <div class="stat-icon" style="color: #52c41a; background: #f6ffed;">
               <el-icon size="24"><Goods /></el-icon>
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ totalStock }}</div>
-              <div class="stat-label">库存总量</div>
+              <div class="stat-label">当前库存总量</div>
             </div>
           </div>
         </el-card>
       </el-col>
       <el-col :span="8">
-        <el-card>
+        <el-card shadow="hover">
           <div class="stat-item">
-            <div class="stat-icon" style="color: #faad14;">
+            <div class="stat-icon" style="color: #faad14; background: #fffbe6;">
               <el-icon size="24"><Warning /></el-icon>
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ lowStockCount }}</div>
-              <div class="stat-label">低库存商品</div>
+              <div class="stat-label">低库存预警</div>
             </div>
           </div>
         </el-card>
       </el-col>
     </el-row>
 
-    <el-card class="inventory-table">
+    <el-card shadow="never">
       <template #header>
-        <div class="card-header">
-          <span>库存列表</span>
-          <div class="header-actions">
-            <el-button type="primary" icon="Plus" size="small">入库</el-button>
-            <el-button type="success" icon="Minus" size="small">出库</el-button>
-            <el-button type="warning" icon="Edit" size="small">盘点</el-button>
-          </div>
+        <div class="table-actions">
+          <el-input 
+            v-model="productQuery.keyword" 
+            placeholder="搜索商品名称/类别" 
+            style="width: 250px; margin-right: 10px;" 
+            clearable
+            @clear="fetchProductList"
+            @keyup.enter="fetchProductList"
+          >
+            <template #prefix><el-icon><Search /></el-icon></template>
+          </el-input>
+          
+          <el-select v-model="productQuery.status" placeholder="状态" clearable style="width: 120px; margin-right: 10px;" @change="fetchProductList">
+            <el-option label="上架" :value="1" />
+            <el-option label="下架" :value="0" />
+          </el-select>
+
+          <el-button type="primary" @click="fetchProductList">搜索</el-button>
+          <el-button type="success" :icon="Plus" @click="openProductDialog()">新增商品</el-button>
         </div>
       </template>
 
-      <el-table :data="inventoryList" stripe style="width: 100%">
-        <el-table-column prop="sku" label="SKU" width="150" />
-        <el-table-column prop="productName" label="商品名称" width="200" />
-        <el-table-column prop="category" label="分类" width="120">
+      <el-table v-loading="loading" :data="inventoryList" stripe style="width: 100%;">
+        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column label="商品图片" width="100">
           <template #default="{ row }">
-            <el-tag size="small">{{ row.category }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="currentStock" label="当前库存" width="120">
-          <template #default="{ row }">
-            <span :class="row.currentStock <= row.minStock ? 'low-stock' : ''">
-              {{ row.currentStock }}
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="minStock" label="最低库存" width="120" />
-        <el-table-column prop="maxStock" label="最高库存" width="120" />
-        <el-table-column prop="warehouse" label="仓库位置" width="150" />
-        <el-table-column label="状态" width="100">
-          <template #default="{ row }">
-            <el-tag
-              :type="row.currentStock <= row.minStock ? 'danger' : 'success'"
-              size="small"
+            <el-image 
+              style="width: 50px; height: 50px; border-radius: 4px;"
+              :src="row.image" 
+              fit="cover"
+              :preview-src-list="[row.image]" 
+              preview-teleported
             >
-              {{ row.currentStock <= row.minStock ? '需补货' : '正常' }}
+              <template #error>
+                <div class="image-slot"><el-icon><Picture /></el-icon></div>
+              </template>
+            </el-image>
+          </template>
+        </el-table-column>
+        <el-table-column prop="name" label="商品名称" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="category" label="分类" width="100" />
+        <el-table-column prop="price" label="价格" width="120">
+          <template #default="{ row }">¥{{ formatAmount(row.price) }}</template>
+        </el-table-column>
+        
+        <el-table-column prop="stock" label="当前库存" width="120">
+          <template #default="{ row }">
+            <span :style="row.stock <= 10 ? 'color: #f56c6c; font-weight: bold;' : ''">
+              {{ row.stock }}
+            </span>
+            <el-tag v-if="row.stock <= 10" size="small" type="danger" style="margin-left: 5px;">紧缺</el-tag>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="status" label="状态" width="100">
+          <template #default="{ row }">
+            <el-tag :type="row.status === 1 ? 'success' : 'info'">
+              {{ row.status === 1 ? '上架' : '下架' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150">
+
+        <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" size="small" link @click="adjustStock(row)">调拨</el-button>
-            <el-button type="warning" size="small" link @click="showDetail(row)">详情</el-button>
+            <el-button type="primary" link size="small" @click="openProductDialog(row)">编辑</el-button>
+            <el-button type="warning" link size="small" @click="openStockDialog(row)">库存调整</el-button>
+            <el-button type="danger" link size="small" @click="handleDelete(row)">下架</el-button>
           </template>
         </el-table-column>
       </el-table>
+
+      <div class="pagination-container">
+        <el-pagination
+          v-model:current-page="productQuery.page"
+          v-model:page-size="productQuery.pageSize"
+          :page-sizes="[10, 20, 50]"
+          layout="total, sizes, prev, pager, next"
+          :total="productTotal"
+          @size-change="fetchProductList"
+          @current-change="fetchProductList"
+        />
+      </div>
     </el-card>
 
-    <div class="page-info">
-      <p>这是一个库存管理页面，用于管理商品库存信息。</p>
-      <p>演示了库存监控、预警和基本操作功能。</p>
-    </div>
+    <el-dialog
+      v-model="productDialogVisible"
+      :title="isEdit ? '编辑商品' : '新增商品'"
+      width="500px"
+    >
+      <el-form ref="productFormRef" :model="productForm" :rules="productRules" label-width="100px">
+        <el-form-item label="商品名称" prop="name">
+          <el-input v-model="productForm.name" />
+        </el-form-item>
+        <el-form-item label="分类" prop="category">
+          <el-input v-model="productForm.category" placeholder="如：手机、数码" />
+        </el-form-item>
+        <el-form-item label="价格" prop="price">
+          <el-input-number v-model="productForm.price" :precision="2" :step="0.1" :min="0" style="width: 100%;" />
+        </el-form-item>
+        <el-form-item label="初始库存" prop="stock" v-if="!isEdit">
+          <el-input-number v-model="productForm.stock" :min="0" style="width: 100%;" />
+        </el-form-item>
+        <el-form-item label="商品图片" prop="image">
+          <el-input v-model="productForm.image" placeholder="请输入图片URL" />
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-radio-group v-model="productForm.status">
+            <el-radio :label="1">上架</el-radio>
+            <el-radio :label="0">下架</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="productDialogVisible = false">取消</el-button>
+          <el-button type="primary" :loading="submitLoading" @click="submitProduct">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <el-dialog
+      v-model="stockDialogVisible"
+      title="库存盘点调整"
+      width="400px"
+    >
+      <el-form ref="stockFormRef" :model="stockForm" label-width="100px">
+        <el-form-item label="商品名称">
+          <span>{{ currentStockRow?.name }}</span>
+        </el-form-item>
+        <el-form-item label="当前库存">
+          <span>{{ currentStockRow?.stock }}</span>
+        </el-form-item>
+        <el-form-item label="调整后库存" prop="newStock">
+          <el-input-number v-model="stockForm.newStock" :min="0" style="width: 100%;" />
+        </el-form-item>
+        <el-form-item label="调整原因" prop="reason">
+          <el-input v-model="stockForm.reason" type="textarea" placeholder="如：盘点差异、损耗" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="stockDialogVisible = false">取消</el-button>
+          <el-button type="primary" :loading="submitLoading" @click="submitStockAdjustment">确定调整</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-import { Box, Goods, Warning, Plus, Minus, Edit } from '@element-plus/icons-vue'
+<script setup>
+import { ref, reactive, onMounted } from 'vue'
+import { Box, Goods, Warning, Search, Plus, Picture } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { 
+  getProductList, 
+  createProduct, 
+  updateProduct, 
+  deleteProduct, 
+  adjustStock, 
+  getLowStockList
+} from '@/api/warehouse'
 
-const inventoryList = ref([
-  { sku: 'SKU001', productName: 'iPhone 15 Pro', category: '手机', currentStock: 45, minStock: 10, maxStock: 100, warehouse: 'A区-1排-3架' },
-  { sku: 'SKU002', productName: '小米智能手表', category: '数码', currentStock: 82, minStock: 20, maxStock: 150, warehouse: 'B区-2排-1架' },
-  { sku: 'SKU003', productName: '戴森吹风机', category: '家电', currentStock: 8, minStock: 5, maxStock: 50, warehouse: 'C区-1排-4架' },
-  { sku: 'SKU004', productName: '华为MateBook', category: '电脑', currentStock: 23, minStock: 15, maxStock: 80, warehouse: 'A区-3排-2架' },
-  { sku: 'SKU005', productName: '索尼耳机', category: '数码', currentStock: 56, minStock: 10, maxStock: 100, warehouse: 'B区-1排-5架' },
-  { sku: 'SKU006', productName: '格力空调', category: '家电', currentStock: 12, minStock: 5, maxStock: 30, warehouse: 'D区-2排-3架' },
-  { sku: 'SKU007', productName: '联想平板', category: '数码', currentStock: 34, minStock: 20, maxStock: 120, warehouse: 'C区-2排-1架' },
-  { sku: 'SKU008', productName: '佳能相机', category: '数码', currentStock: 67, minStock: 15, maxStock: 100, warehouse: 'A区-2排-4架' }
-])
+// --- 状态数据 ---
+const loading = ref(false)
 
-const totalProducts = computed(() => inventoryList.value.length)
-const totalStock = computed(() => {
-  return inventoryList.value.reduce((sum, item) => sum + item.currentStock, 0)
+// 统计数据
+const totalProducts = ref(0)
+const totalStock = ref(0)
+const lowStockCount = ref(0)
+
+// 库存列表相关
+const inventoryList = ref([])
+const productTotal = ref(0)
+const productQuery = reactive({
+  page: 1,
+  pageSize: 10,
+  keyword: '',
+  status: null
 })
-const lowStockCount = computed(() => {
-  return inventoryList.value.filter(item => item.currentStock <= item.minStock).length
-})
 
-const adjustStock = (row: any) => {
-  console.log('调拨商品:', row.productName)
+// --- 方法：数据获取 ---
+
+// 获取商品列表
+const fetchProductList = async () => {
+  loading.value = true
+  try {
+    const res = await getProductList(productQuery)
+    if (res && res.success) {
+      console.log('获取商品列表数据', res.data)
+      inventoryList.value = res.data.products || []
+      productTotal.value = res.data.totalCount || 0
+      
+      // 更新统计数据 (列表接口通常返回总数)
+      totalProducts.value = res.data.totalCount || 0
+      // 简单累加当前页库存作为示例，实际应由后端返回总库存
+      totalStock.value = inventoryList.value.reduce((sum, item) => sum + item.stock, 0)
+    }
+  } catch (error) {
+    console.error(error)
+    ElMessage.error('获取商品列表失败')
+  } finally {
+    loading.value = false
+  }
 }
 
-const showDetail = (row: any) => {
-  console.log('查看商品详情:', row.productName)
+// 获取低库存统计
+const fetchLowStockStats = async () => {
+  try {
+    const res = await getLowStockList(10) // 阈值10
+    if (res && res.success) {
+      lowStockCount.value = res.data.count || 0
+    }
+  } catch (e) {
+    console.error('获取低库存统计失败', e)
+  }
 }
+
+// --- 商品增删改 ---
+const productDialogVisible = ref(false)
+const isEdit = ref(false)
+const submitLoading = ref(false)
+const productFormRef = ref(null)
+const productForm = reactive({
+  id: null,
+  name: '',
+  category: '',
+  price: 0,
+  stock: 0,
+  image: '',
+  status: 1
+})
+const productRules = {
+  name: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
+  category: [{ required: true, message: '请输入分类', trigger: 'blur' }],
+  price: [{ required: true, message: '请输入价格', trigger: 'blur' }]
+}
+
+const openProductDialog = (row = null) => {
+  if (row) {
+    isEdit.value = true
+    Object.assign(productForm, row)
+  } else {
+    isEdit.value = false
+    Object.assign(productForm, { id: null, name: '', category: '', price: 0, stock: 0, image: '', status: 1 })
+  }
+  productDialogVisible.value = true
+}
+
+const submitProduct = async () => {
+  await productFormRef.value.validate(async (valid) => {
+    if (valid) {
+      submitLoading.value = true
+      try {
+        if (isEdit.value) {
+          await updateProduct(productForm)
+          ElMessage.success('更新成功')
+        } else {
+          await createProduct(productForm)
+          ElMessage.success('创建成功')
+        }
+        productDialogVisible.value = false
+        fetchProductList()
+      } catch (error) {
+        ElMessage.error('操作失败')
+      } finally {
+        submitLoading.value = false
+      }
+    }
+  })
+}
+
+const handleDelete = (row) => {
+  ElMessageBox.confirm(`确定下架商品 "${row.name}" 吗？`, '提示', {
+    type: 'warning'
+  }).then(async () => {
+    try {
+      await deleteProduct(row.id)
+      ElMessage.success('已下架')
+      fetchProductList()
+    } catch (e) {
+      ElMessage.error('操作失败')
+    }
+  }).catch(() => {})
+}
+
+// --- 库存调整 ---
+const stockDialogVisible = ref(false)
+const currentStockRow = ref(null)
+const stockForm = reactive({
+  newStock: 0,
+  reason: ''
+})
+
+const openStockDialog = (row) => {
+  currentStockRow.value = row
+  stockForm.newStock = row.stock
+  stockForm.reason = ''
+  stockDialogVisible.value = true
+}
+
+const submitStockAdjustment = async () => {
+  if (!stockForm.reason) {
+    ElMessage.warning('请输入调整原因')
+    return
+  }
+  submitLoading.value = true
+  try {
+    await adjustStock(currentStockRow.value.id, {
+      newStock: stockForm.newStock,
+      reason: stockForm.reason
+    })
+    ElMessage.success('库存调整成功')
+    stockDialogVisible.value = false
+    fetchProductList()
+    fetchLowStockStats()
+  } catch (error) {
+    ElMessage.error('调整失败')
+  } finally {
+    submitLoading.value = false
+  }
+}
+
+// --- 格式化工具 ---
+const formatAmount = (val) => Number(val || 0).toFixed(2)
+
+onMounted(() => {
+  fetchProductList()
+  fetchLowStockStats()
+})
 </script>
 
 <style scoped>
 .warehouse-page {
-  padding: 20px;
+  /* padding: 20px; */
 }
 
 h2 {
@@ -159,7 +405,6 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.02);
 }
 
 .stat-content {
@@ -169,45 +414,33 @@ h2 {
 .stat-value {
   font-size: 24px;
   font-weight: 600;
-  color: #24292e;
-  line-height: 1.2;
+  color: #303133;
 }
 
 .stat-label {
-  font-size: 14px;
-  color: #586069;
-  margin-top: 4px;
+  font-size: 12px;
+  color: #909399;
 }
 
-.inventory-table {
-  margin-bottom: 20px;
-}
-
-.card-header {
+.table-actions {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  /* margin-bottom: 15px; */
 }
 
-.header-actions {
+.image-slot {
   display: flex;
-  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background: #f5f7fa;
+  color: #909399;
 }
 
-.low-stock {
-  color: #ff4d4f;
-  font-weight: 600;
-}
-
-.page-info {
-  padding: 15px;
-  background: #f6f8fa;
-  border-radius: 8px;
-  border-left: 4px solid #52c41a;
-}
-
-.page-info p {
-  color: #586069;
-  margin: 5px 0;
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

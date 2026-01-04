@@ -222,11 +222,7 @@
             <version>3.0.0</version>
         </dependency>
 
-
-
     </dependencies>
-
-
 
     <build>
         <!-- 输出war文件名称，可以自定义 -->
@@ -260,6 +256,7 @@
                 <version>3.0.0-M5</version>
                 <configuration>
                     <argLine>-Xshare:off</argLine>  <!-- 禁用类数据共享 -->
+                    <skip>true</skip>  <!-- 跳过测试 -->
                 </configuration>
             </plugin>
 

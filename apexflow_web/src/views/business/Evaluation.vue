@@ -2,208 +2,250 @@
   <div class="evaluation-page">
     <h2>⭐ 评价管理</h2>
 
-    <el-card>
+    <el-card shadow="never">
       <template #header>
         <div class="card-header">
-          <span>商品评价</span>
           <div class="filter-controls">
-            <el-select v-model="filterRating" placeholder="评分筛选" size="small" style="width: 100px;">
-              <el-option label="全部" value="all" />
-              <el-option label="5星" value="5" />
-              <el-option label="4星" value="4" />
-              <el-option label="3星" value="3" />
-              <el-option label="2星" value="2" />
-              <el-option label="1星" value="1" />
+            <el-select 
+              v-model="queryParams.rating" 
+              placeholder="评分筛选" 
+              size="default" 
+              style="width: 120px;"
+              clearable
+              @change="handleFilter"
+            >
+              <el-option label="全部评分" value="" />
+              <el-option label="5星" :value="5" />
+              <el-option label="4星" :value="4" />
+              <el-option label="3星" :value="3" />
+              <el-option label="2星" :value="2" />
+              <el-option label="1星" :value="1" />
             </el-select>
-            <el-select v-model="filterStatus" placeholder="状态筛选" size="small" style="width: 100px; margin-left: 10px;">
-              <el-option label="全部" value="all" />
-              <el-option label="已展示" value="shown" />
-              <el-option label="已隐藏" value="hidden" />
-            </el-select>
-            <el-button type="primary" size="small" style="margin-left: 10px;">筛选</el-button>
+
+            <el-input 
+              v-model="queryParams.productId" 
+              placeholder="输入商品ID搜索" 
+              size="default" 
+              style="width: 200px; margin-left: 10px;"
+              clearable
+              @clear="handleFilter"
+              @keyup.enter="handleFilter"
+            >
+              <template #prefix>
+                <el-icon><Search /></el-icon>
+              </template>
+            </el-input>
+
+            <el-button type="primary" @click="handleFilter" style="margin-left: 10px;">搜索</el-button>
+            <el-button :icon="Refresh" @click="resetQuery">重置</el-button>
           </div>
         </div>
       </template>
 
-      <div class="evaluation-list">
-        <div v-for="item in evaluationList" :key="item.id" class="evaluation-item">
+      <div v-loading="loading" class="evaluation-list">
+        <el-empty v-if="reviewList.length === 0" description="暂无评价数据" />
+
+        <div v-for="item in reviewList" :key="item.id" class="evaluation-item">
           <div class="evaluation-header">
             <div class="evaluation-info">
-              <span class="customer-name">{{ item.customer }}</span>
-              <el-rate
-                v-model="item.rating"
-                disabled
-                show-score
-                text-color="#ff9900"
-                score-template="{value} 分"
-              />
-              <span class="product-name">商品: {{ item.productName }}</span>
+              <el-avatar :size="36" icon="UserFilled" class="user-avatar" />
+              <div class="user-meta">
+                <div class="customer-name">
+                  用户ID: {{ item.userId }} 
+                  <el-tag v-if="item.anonymous" size="small" type="info" effect="plain">匿名</el-tag>
+                </div>
+                <div class="meta-sub">
+                  <span class="product-name">商品ID: {{ item.productId }}</span>
+                  <span class="separator">|</span>
+                  <span class="order-no">订单号: {{ item.orderId }}</span>
+                </div>
+              </div>
             </div>
-            <div class="evaluation-time">{{ item.createTime }}</div>
+            <div class="evaluation-right">
+              <span class="evaluation-time">{{ formatTime(item.createdAt) }}</span>
+              <el-button 
+                type="danger" 
+                icon="Delete" 
+                circle 
+                size="small" 
+                plain 
+                @click="handleDelete(item)" 
+                style="margin-left: 15px;"
+              />
+            </div>
+          </div>
+
+          <div class="rating-bar">
+            <el-rate
+              v-model="item.rating"
+              disabled
+              show-score
+              text-color="#ff9900"
+              score-template="{value} 分"
+            />
           </div>
 
           <div class="evaluation-content">
-            {{ item.content }}
+            {{ item.content || '此用户没有填写评价内容。' }}
           </div>
 
-          <div class="evaluation-actions">
-            <el-tag size="small" :type="item.status === '已展示' ? 'success' : 'info'">
-              {{ item.status }}
-            </el-tag>
-            <div class="action-buttons">
-              <el-button
-                v-if="item.status === '已展示'"
-                type="warning"
-                size="small"
-                @click="hideEvaluation(item.id)"
-              >
-                隐藏
-              </el-button>
-              <el-button
-                v-if="item.status === '已隐藏'"
-                type="success"
-                size="small"
-                @click="showEvaluation(item.id)"
-              >
-                展示
-              </el-button>
-              <el-button type="info" size="small" @click="replyToEvaluation(item.id)">回复</el-button>
-              <el-button type="danger" size="small" @click="deleteEvaluation(item.id)">删除</el-button>
-            </div>
+          <div v-if="item.imageList && item.imageList.length > 0" class="evaluation-images">
+            <el-image 
+              v-for="(img, index) in item.imageList" 
+              :key="index"
+              :src="img" 
+              :preview-src-list="item.imageList"
+              fit="cover"
+              class="eval-image"
+            />
           </div>
         </div>
       </div>
+
+      <div class="pagination-container">
+        <el-pagination
+          v-model:current-page="queryParams.page"
+          v-model:page-size="queryParams.pageSize"
+          :page-sizes="[10, 20, 50]"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+          @size-change="fetchData"
+          @current-change="fetchData"
+        />
+      </div>
     </el-card>
-
-    <div class="statistics">
-      <el-row :gutter="16">
-        <el-col :span="6">
-          <div class="stat-card">
-            <div class="stat-value">{{ totalEvaluations }}</div>
-            <div class="stat-label">总评价数</div>
-          </div>
-        </el-col>
-        <el-col :span="6">
-          <div class="stat-card">
-            <div class="stat-value">{{ averageRating.toFixed(1) }}</div>
-            <div class="stat-label">平均评分</div>
-          </div>
-        </el-col>
-        <el-col :span="6">
-          <div class="stat-card">
-            <div class="stat-value">{{ recentEvaluations }}</div>
-            <div class="stat-label">近7天评价</div>
-          </div>
-        </el-col>
-        <el-col :span="6">
-          <div class="stat-card">
-            <div class="stat-value">{{ replyRate }}%</div>
-            <div class="stat-label">回复率</div>
-          </div>
-        </el-col>
-      </el-row>
-    </div>
-
-    <div class="page-info">
-      <p>这是一个评价管理页面，用于管理用户对商品的评价。</p>
-      <p>演示了评分组件（Rate）、标签（Tag）和筛选功能的使用。</p>
-    </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed } from 'vue'
+<script setup>
+import { ref, reactive, onMounted } from 'vue'
+import { Search, Refresh, UserFilled, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { getReviewList, deleteReview } from '@/api/review'
 
-const filterRating = ref('all')
-const filterStatus = ref('all')
+// --- 状态数据 ---
+const loading = ref(false)
+const reviewList = ref([])
+const total = ref(0)
 
-const evaluationList = ref([
-  {
-    id: 1,
-    customer: '张三',
-    rating: 5,
-    productName: 'iPhone 15 Pro',
-    content: '手机非常棒，运行流畅，拍照效果出色，续航也很给力！',
-    createTime: '2023-12-15 10:30:00',
-    status: '已展示'
-  },
-  {
-    id: 2,
-    customer: '李四',
-    rating: 4,
-    productName: '小米智能手表',
-    content: '功能齐全，外观漂亮，就是续航稍微有点短。',
-    createTime: '2023-12-14 16:20:00',
-    status: '已展示'
-  },
-  {
-    id: 3,
-    customer: '王五',
-    rating: 2,
-    productName: '戴森吹风机',
-    content: '风力确实很大，但价格太贵了，性价比不高。',
-    createTime: '2023-12-13 14:15:00',
-    status: '已隐藏'
-  },
-  {
-    id: 4,
-    customer: '赵六',
-    rating: 5,
-    productName: '华为MateBook',
-    content: '电脑轻薄，性能强大，屏幕显示效果非常棒！',
-    createTime: '2023-12-12 09:45:00',
-    status: '已展示'
-  }
-])
-
-const totalEvaluations = computed(() => evaluationList.value.length)
-const averageRating = computed(() => {
-  const total = evaluationList.value.reduce((sum, item) => sum + item.rating, 0)
-  return total / evaluationList.value.length
+const queryParams = reactive({
+  page: 1,
+  pageSize: 10,
+  productId: '', // 用于搜索
+  userId: '',
+  rating: ''     // 前端筛选参数，如果后端API不支持rating筛选，可能需要在前端过滤，或者只需传给后端备用
 })
-const recentEvaluations = 12 // 假设数据
-const replyRate = 85 // 假设数据
 
-const hideEvaluation = (id: number) => {
-  const item = evaluationList.value.find(item => item.id === id)
-  if (item) {
-    item.status = '已隐藏'
-    ElMessage.success('评价已隐藏')
-  }
-}
+// --- 方法 ---
 
-const showEvaluation = (id: number) => {
-  const item = evaluationList.value.find(item => item.id === id)
-  if (item) {
-    item.status = '已展示'
-    ElMessage.success('评价已展示')
-  }
-}
-
-const replyToEvaluation = (id: number) => {
-  ElMessageBox.prompt('请输入回复内容', '回复评价', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    inputType: 'textarea',
-    inputPlaceholder: '请输入回复内容...'
-  }).then(({ value }) => {
-    if (value) {
-      ElMessage.success('回复已提交')
+// 获取数据
+const fetchData = async () => {
+  loading.value = true
+  try {
+    // 构造请求参数
+    // 注意：如果您的后端不支持 'rating' 参数，它会直接忽略，这没关系
+    const params = {
+      page: queryParams.page,
+      pageSize: queryParams.pageSize,
+      productId: queryParams.productId || null,
+      // userId: queryParams.userId || null 
     }
-  })
+
+    const res = await getReviewList(params)
+    if (res && res.success) {
+      const data = res.data
+      console.log('获取评价列表数据', data)
+      
+      // 处理列表数据
+      let list = data.reviews || []
+      
+      // 处理图片字符串转数组 (DB存的是 "a.jpg,b.jpg")
+      list = list.map(item => {
+        return {
+          ...item,
+          imageList: item.images ? item.images.split(',') : []
+        }
+      })
+
+      // 如果后端没有支持 Rating 筛选，我们在前端简单过滤一下（可选优化）
+      if (queryParams.rating) {
+        // 注意：这会导致分页不准，最佳实践是后端支持筛选。
+        // 这里仅做演示，如果不希望前端过滤，请注释下面三行
+        list = list.filter(item => item.rating === queryParams.rating)
+      }
+
+      reviewList.value = list
+      total.value = data.total || 0
+    } else {
+      reviewList.value = []
+      total.value = 0
+    }
+  } catch (error) {
+    console.error(error)
+    ElMessage.error('获取评价列表失败')
+  } finally {
+    loading.value = false
+  }
 }
 
-const deleteEvaluation = (id: number) => {
-  ElMessageBox.confirm('确定要删除这条评价吗？', '删除确认', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(() => {
-    evaluationList.value = evaluationList.value.filter(item => item.id !== id)
-    ElMessage.success('评价已删除')
-  })
+// 筛选操作
+const handleFilter = () => {
+  queryParams.page = 1
+  fetchData()
 }
+
+// 重置
+const resetQuery = () => {
+  queryParams.productId = ''
+  queryParams.rating = ''
+  handleFilter()
+}
+
+// 删除评价
+const handleDelete = (row) => {
+  ElMessageBox.confirm(
+    '确定要删除这条评价吗？此操作不可恢复。',
+    '警告',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(async () => {
+    try {
+      const res = await deleteReview(row.id)
+      if (res && res.success) {
+        ElMessage.success('删除成功')
+        // 如果当前页只有一条且不是第一页，页码减一
+        if (reviewList.value.length === 1 && queryParams.page > 1) {
+          queryParams.page--
+        }
+        fetchData()
+      } else {
+        ElMessage.error(res.message || '删除失败')
+      }
+    } catch (error) {
+      ElMessage.error('删除请求失败')
+    }
+  }).catch(() => {})
+}
+
+// 格式化时间
+const formatTime = (time) => {
+  if (!time) return '-'
+  // 处理 Java LocalDateTime 数组 [2023, 12, 1, 10, 30, 0]
+  if (Array.isArray(time)) {
+    const [y, m, d, h, min] = time
+    const pad = n => (n < 10 ? '0' + n : n)
+    return `${y}-${pad(m)}-${pad(d)} ${pad(h)}:${pad(min)}`
+  }
+  // 处理字符串 "2023-12-01T10:30:00"
+  return time.replace('T', ' ')
+}
+
+onMounted(() => {
+  fetchData()
+})
 </script>
 
 <style scoped>
@@ -218,7 +260,7 @@ h2 {
 
 .card-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
 }
 
@@ -234,6 +276,11 @@ h2 {
 .evaluation-item {
   padding: 20px;
   border-bottom: 1px solid #e1e4e8;
+  transition: background-color 0.2s;
+}
+
+.evaluation-item:hover {
+  background-color: #fafbfc;
 }
 
 .evaluation-item:last-child {
@@ -243,82 +290,74 @@ h2 {
 .evaluation-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
+  align-items: flex-start;
+  margin-bottom: 10px;
 }
 
 .evaluation-info {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
 }
 
 .customer-name {
-  font-weight: 500;
+  font-weight: 600;
   color: #24292e;
-}
-
-.product-name {
-  color: #586069;
   font-size: 14px;
 }
 
-.evaluation-time {
-  color: #a0a0a0;
+.meta-sub {
   font-size: 12px;
+  color: #6a737d;
+  margin-top: 4px;
+}
+
+.separator {
+  margin: 0 6px;
+  color: #d1d5da;
+}
+
+.evaluation-time {
+  color: #909399;
+  font-size: 12px;
+}
+
+.rating-bar {
+  margin-bottom: 12px;
 }
 
 .evaluation-content {
   margin-bottom: 15px;
   line-height: 1.6;
   color: #333;
-}
-
-.evaluation-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.statistics {
-  margin-top: 30px;
-}
-
-.stat-card {
-  text-align: center;
-  padding: 20px;
-  background: #f6f8fa;
-  border-radius: 8px;
-  border: 1px solid #e1e4e8;
-}
-
-.stat-value {
-  font-size: 32px;
-  font-weight: 600;
-  color: #0366d6;
-  margin-bottom: 5px;
-}
-
-.stat-label {
   font-size: 14px;
-  color: #586069;
-}
-
-.page-info {
-  margin-top: 20px;
-  padding: 15px;
   background: #f6f8fa;
-  border-radius: 8px;
-  border-left: 4px solid #ff9900;
+  padding: 10px;
+  border-radius: 6px;
 }
 
-.page-info p {
-  color: #586069;
-  margin: 5px 0;
+.evaluation-images {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.eval-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 4px;
+  border: 1px solid #e1e4e8;
+  cursor: pointer;
+}
+
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

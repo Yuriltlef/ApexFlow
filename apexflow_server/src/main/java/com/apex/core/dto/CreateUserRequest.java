@@ -1,9 +1,15 @@
 package com.apex.core.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+/**
+ * 创建用户请求DTO
+ * 增加 @JsonIgnoreProperties(ignoreUnknown = true) 以防止前端传多余字段导致报错
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateUserRequest {
 
     @NotBlank(message = "用户名不能为空")
@@ -26,6 +32,9 @@ public class CreateUserRequest {
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
     private String phone;
 
+    // [新增] 状态字段 (1:正常, 0:禁用)
+    private Integer status;
+
     private Boolean isAdmin = false;
     private Boolean canManageOrder = false;
     private Boolean canManageLogistics = false;
@@ -33,8 +42,6 @@ public class CreateUserRequest {
     private Boolean canManageReview = false;
     private Boolean canManageInventory = false;
     private Boolean canManageIncome = false;
-
-    public CreateUserRequest() {}
 
     // Getters and Setters
     public String getUsername() { return username; }
@@ -51,6 +58,9 @@ public class CreateUserRequest {
 
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
 
     public Boolean getIsAdmin() { return isAdmin; }
     public void setIsAdmin(Boolean admin) { isAdmin = admin; }
@@ -81,6 +91,7 @@ public class CreateUserRequest {
                 ", realName='" + realName + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
+                ", status=" + status +
                 ", isAdmin=" + isAdmin +
                 ", canManageOrder=" + canManageOrder +
                 ", canManageLogistics=" + canManageLogistics +

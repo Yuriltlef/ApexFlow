@@ -218,14 +218,14 @@ public class LogisticsService {
         List<Logistics> logisticsList = logisticsDAO.findPendingShipping(page, pageSize);
 
         // 获取总数（简化处理，实际可能需要单独查询总数）
-        int totalCount = logisticsList.size();
+        long totalCount = logisticsDAO.count();
         // 这里应该查询数据库获取准确的totalCount，但为简化，我们假设这是全部
 
         PagedResult<Logistics> result = new PagedResult<>();
         result.setData(logisticsList);
         result.setCurrentPage(page);
         result.setPageSize(pageSize);
-        result.setTotalCount(totalCount);
+        result.setTotalCount((int) totalCount);
 
         logger.info("Pending shipping list retrieved. Count: {}", logisticsList.size());
         return result;
@@ -241,12 +241,14 @@ public class LogisticsService {
         logger.debug("Getting in-transit list. Page: {}, PageSize: {}", page, pageSize);
 
         List<Logistics> logisticsList = logisticsDAO.findInTransit(page, pageSize);
+        // 获取总数（简化处理，实际可能需要单独查询总数）
+        long totalCount = logisticsDAO.count();
 
         PagedResult<Logistics> result = new PagedResult<>();
         result.setData(logisticsList);
         result.setCurrentPage(page);
         result.setPageSize(pageSize);
-        result.setTotalCount(logisticsList.size());
+        result.setTotalCount((int) totalCount);
 
         logger.info("In-transit list retrieved. Count: {}", logisticsList.size());
         return result;
@@ -273,5 +275,27 @@ public class LogisticsService {
      */
     private boolean isValidStatus(String status) {
         return "pending".equals(status) || "shipped".equals(status) || "delivered".equals(status);
+    }
+
+    /**
+     * 所有列表（分页）
+     * @param page 页码
+     * @param pageSize 每页大小
+     * @return 运输中物流列表
+     */
+    public PagedResult<Logistics> getAllShipping(int page, int pageSize) {
+        logger.debug("Getting all logistics");
+
+        List<Logistics> logisticsList = logisticsDAO.findAll(page, pageSize);
+        // 获取总数（简化处理，实际可能需要单独查询总数）
+        long totalCount = logisticsDAO.count();
+
+        PagedResult<Logistics> result = new PagedResult<>();
+        result.setData(logisticsList);
+        result.setCurrentPage(page);
+        result.setPageSize(pageSize);
+        result.setTotalCount((int) totalCount);
+
+        return result;
     }
 }

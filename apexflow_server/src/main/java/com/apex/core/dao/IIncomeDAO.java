@@ -91,4 +91,10 @@ public interface IIncomeDAO {
      * @return 更新成功返回true，失败返回false
      */
     boolean updateStatus(Integer id, Integer status);
+
+    /**
+     * 统计数据总数
+     * @return 日志总数
+     */
+    long count();
 }

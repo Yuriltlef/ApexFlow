@@ -99,4 +99,10 @@ public interface IReviewDAO {
      * @return 商品的评价总数
      */
     Integer countByProductId(Integer productId);
+
+    /**
+     * 统计评论总数
+     * @return 订单总数
+     */
+    long count();
 }

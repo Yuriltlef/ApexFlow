@@ -1,6 +1,5 @@
 <template>
   <el-header class="github-header">
-    <!-- 左侧：面包屑和快速操作 -->
     <div class="header-left">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item v-for="item in breadcrumb" :key="item.path">
@@ -9,9 +8,10 @@
       </el-breadcrumb>
 
       <div class="quick-actions">
-        <el-button type="primary" size="small" :icon="Plus">
+        <el-button v-if="canCreateOrder" type="primary" size="small" :icon="Plus" @click="openCreateDialog">
           新建订单
         </el-button>
+
         <el-button size="small" :icon="Upload">
           导入数据
         </el-button>
@@ -21,11 +21,7 @@
       </div>
     </div>
 
-    <!-- 右侧：用户信息和工具 -->
     <div class="header-right">
-      <!-- ... 通知中心和搜索按钮保持不变 ... -->
-
-      <!-- 用户信息 - 修改为动态显示 -->
       <el-dropdown @command="handleUserCommand">
         <div class="user-info">
           <el-avatar :size="32" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
@@ -33,95 +29,225 @@
             <span class="username">{{ displayName }}</span>
             <span class="user-role">{{ userRole }}</span>
           </div>
-          <el-icon><ArrowDown /></el-icon>
+          <el-icon>
+            <ArrowDown />
+          </el-icon>
         </div>
         <template #dropdown>
           <el-dropdown-menu>
-            <!-- 动态显示用户信息 -->
-            <el-dropdown-item disabled v-if="userInfo">
-              <div style="font-size: 12px; color: #999;">
-                {{ userInfo.username }}<br/>
-                {{ userInfo.realName || '未设置姓名' }}
-              </div>
-            </el-dropdown-item>
-            <el-dropdown-item :icon="Close" @click="handleLogout">切换账号</el-dropdown-item>
+            <el-dropdown-item command="logout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
     </div>
+
+    <el-dialog v-model="createDialogVisible" title="新建订单" width="600px">
+      <el-form ref="createFormRef" :model="createForm" :rules="createRules" label-width="100px">
+        <el-form-item label="客户ID" prop="userId">
+          <el-input v-model.number="createForm.userId" placeholder="请输入客户ID" />
+        </el-form-item>
+
+        <el-form-item label="支付方式" prop="paymentMethod">
+          <el-select v-model="createForm.paymentMethod" placeholder="请选择支付方式" style="width: 100%;">
+            <el-option label="微信支付" value="wxpay" />
+            <el-option label="支付宝" value="alipay" />
+            <el-option label="信用卡" value="credit_card" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="订单状态" prop="status">
+          <el-select v-model="createForm.status" placeholder="请选择状态" style="width: 100%;">
+            <el-option label="待付款" :value="1" />
+            <el-option label="已支付" :value="2" />
+            <el-option label="已发货" :value="3" />
+            <el-option label="已完成" :value="4" />
+          </el-select>
+        </el-form-item>
+
+        <el-divider content-position="left">订单明细</el-divider>
+
+        <div v-for="(item, index) in createForm.items" :key="index" class="order-item-row"
+          style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center;">
+          <el-input v-model.number="item.productId" placeholder="商品ID" style="width: 120px;" />
+          <el-input v-model="item.productName" placeholder="商品名称" style="width: 150px;" />
+          <el-input-number v-model="item.price" placeholder="单价" :min="0" :precision="2" style="width: 120px;"
+            @change="calculateTotal" />
+          <el-input-number v-model="item.quantity" placeholder="数量" :min="1" style="width: 100px;"
+            @change="calculateTotal" />
+          <el-button type="danger" :icon="Delete" circle size="small" @click="removeItem(index)" />
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <el-button type="primary" plain size="small" :icon="Plus" @click="addItem">添加商品</el-button>
+        </div>
+
+        <el-form-item label="订单总额" prop="totalAmount">
+          <el-input-number v-model="createForm.totalAmount" :min="0" :precision="2" style="width: 100%;" disabled />
+          <div style="font-size: 12px; color: #909399;">(根据明细自动计算)</div>
+        </el-form-item>
+
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="createDialogVisible = false">取消</el-button>
+          <el-button type="primary" :loading="submitLoading" @click="submitCreate">确认创建</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
   </el-header>
 </template>
 
-<script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+<script setup>
+import { ref, computed, reactive, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { Bell, Search, ArrowDown, Plus, Upload, Download, Delete } from '@element-plus/icons-vue'
 import userDataManager from '@/utils/userData'
-import {
-  Plus, Upload, Download, Bell, Search,
-  User, Setting, Lock, SwitchButton, Close,
-  ArrowDown, ChatDotRound
-} from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'  // 导入ElMessage
+import { ElMessage } from 'element-plus'
+import { createOrder } from '@/api/order'
 
-const route = useRoute()
 const router = useRouter()
+const route = useRoute()
 
-// 响应式用户数据
-const userInfo = ref(userDataManager.getUserInfo())
-const permissions = ref(userDataManager.getPermissions())
+// --- 面包屑逻辑 ---
+const breadcrumb = ref([])
 
-// 计算属性：显示名称
-const displayName = computed(() => {
-  return userDataManager.getDisplayName()
-})
-
-// 计算属性：用户角色
-const userRole = computed(() => {
-  return userDataManager.getUserRoleText()
-})
-
-// 面包屑 - 保持不变
-const breadcrumb = computed(() => {
-  const matched = route.matched.filter(item => item.meta?.title)
-  return matched.map(item => ({
+const getBreadcrumb = () => {
+  let matched = route.matched.filter(item => item.meta && item.meta.title)
+  breadcrumb.value = matched.map(item => ({
     path: item.path,
-    title: item.meta?.title as string
+    title: item.meta.title
   }))
+}
+
+watch(() => route.path, getBreadcrumb, { immediate: true })
+
+// --- 用户信息逻辑 ---
+const displayName = computed(() => userDataManager.getDisplayName())
+const userRole = computed(() => userDataManager.getUserRoleText())
+
+// --- 权限判断 ---
+const canCreateOrder = computed(() => {
+  return userDataManager.isAdmin() || userDataManager.hasPermission('canManageOrder')
 })
 
-// 初始化时检查用户状态
-onMounted(() => {
-  if (!userDataManager.isLoggedIn()) {
-    console.log('用户未登录，Header组件将显示默认信息')
-  } else {
-    console.log('用户已登录，显示用户信息:', {
-      userInfo: userInfo.value,
-      permissions: permissions.value
-    })
-  }
-})
-
-// 处理用户命令
-const handleUserCommand = (command: string) => {
-  console.log('用户命令:', command)
+const handleUserCommand = (command) => {
   if (command === 'logout') {
     handleLogout()
+  } else if (command === 'profile') {
+    router.push('/user/profile')
+  } else {
+    ElMessage.info(`点击了: ${command}`)
   }
 }
 
-// 退出登录
 const handleLogout = () => {
-  // 清除用户数据
   userDataManager.logout()
-  
-  // 显示提示
   ElMessage.success('已退出登录')
-  
-  // 跳转到登录页面
   router.push('/login')
 }
-</script>
 
+// --- 新建订单逻辑 ---
+const createDialogVisible = ref(false)
+const submitLoading = ref(false)
+const createFormRef = ref(null)
+
+const createForm = reactive({
+  userId: null,
+  totalAmount: 0,
+  paymentMethod: 'wxpay',
+  status: 1,
+  items: [] // [新增] 订单项列表
+})
+
+const createRules = {
+  userId: [{ required: true, message: '请输入客户ID', trigger: 'blur' }],
+  // totalAmount 移除必填校验，因为是自动计算的
+  // paymentMethod: [{ required: true, message: '请选择支付方式', trigger: 'change' }]
+}
+
+const openCreateDialog = () => {
+  createForm.userId = null
+  createForm.totalAmount = 0
+  createForm.paymentMethod = 'wxpay'
+  createForm.status = 1
+  createForm.items = [{ productId: null, productName: '', price: 0, quantity: 1 }] // 默认添加一行
+  createDialogVisible.value = true
+}
+
+// 添加商品行
+const addItem = () => {
+  createForm.items.push({ productId: null, productName: '', price: 0, quantity: 1 })
+}
+
+// 删除商品行
+const removeItem = (index) => {
+  createForm.items.splice(index, 1)
+  calculateTotal()
+}
+
+// 计算总金额
+const calculateTotal = () => {
+  let sum = 0
+  createForm.items.forEach(item => {
+    sum += (item.price || 0) * (item.quantity || 0)
+  })
+  createForm.totalAmount = sum
+}
+
+const submitCreate = async () => {
+  if (!createFormRef.value) return
+
+  await createFormRef.value.validate(async (valid) => {
+    if (valid) {
+      // 校验是否有商品
+      if (createForm.items.length === 0) {
+        ElMessage.warning('请至少添加一个商品')
+        return
+      }
+      // 校验商品必填项
+      for (const item of createForm.items) {
+        if (!item.productId || !item.quantity) {
+          ElMessage.warning('请完善商品信息（ID和数量）')
+          return
+        }
+      }
+
+      submitLoading.value = true
+      try {
+        const payload = {
+          userId: Number(createForm.userId),
+          paymentMethod: createForm.paymentMethod,
+          totalAmount: createForm.totalAmount,
+          addressId: 1,
+          status: createForm.status,
+          orderItems: createForm.items.map(item => ({
+            productId: Number(item.productId),
+            quantity: Number(item.quantity),
+            price: Number(item.price)
+          }))
+        }
+        await createOrder(payload)
+        ElMessage.success('订单创建成功')
+        createDialogVisible.value = false
+
+        // 如果当前在订单页，刷新页面
+        if (route.path === '/business/order') {
+          setTimeout(() => {
+            window.location.reload()
+          }, 500)
+        }
+      } catch (error) {
+        console.error(error)
+        // 错误已经在 request.js 拦截器处理了，这里可以不写，或者写个性化提示
+        ElMessage.error('创建订单异常')
+      } finally {
+        submitLoading.value = false
+      }
+    }
+  })
+}
+</script>
 
 <style scoped>
 .github-header {
@@ -173,37 +299,34 @@ const handleLogout = () => {
   padding: 8px;
   border-radius: 6px;
   cursor: pointer;
-  color: #586069;
+  color: #24292e;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
 }
 
 .header-icon:hover {
-  background: #f6f8fa;
-  color: #0366d6;
+  background-color: #f6f8fa;
 }
 
-:deep(.el-badge__content) {
-  transform: scale(0.8) translate(50%, -50%);
-}
-
-.search-btn {
-  color: #586069;
-}
-
-.search-btn:hover {
-  color: #0366d6;
+.notification-badge :deep(.el-badge__content.is-fixed) {
+  top: 4px;
+  right: 4px;
+  transform: scale(0.8);
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  cursor: pointer;
   padding: 4px 8px;
   border-radius: 6px;
-  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .user-info:hover {
-  background: #f6f8fa;
+  background-color: #f6f8fa;
 }
 
 .user-details {
@@ -214,12 +337,19 @@ const handleLogout = () => {
 
 .username {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   color: #24292e;
 }
 
 .user-role {
   font-size: 12px;
   color: #586069;
+}
+
+/* 订单项样式 */
+.order-item-row {
+  background: #f8f9fa;
+  padding: 5px;
+  border-radius: 4px;
 }
 </style>

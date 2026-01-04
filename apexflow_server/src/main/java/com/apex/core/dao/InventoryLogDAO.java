@@ -391,4 +391,33 @@ public class InventoryLogDAO implements IInventoryLogDAO {
 
         return inventoryLog;
     }
+
+    /**
+     * 统计日志总数
+     * @return 日志总数
+     */
+    public long count() {
+        String operation = "COUNT_LOGS";
+        long startTime = System.currentTimeMillis();
+
+        String sql = "SELECT COUNT(*) FROM apexflow_inventory_log";
+
+        logger.debug("[{}] Counting total logs", operation);
+
+        try (Connection conn = ConnectionPool.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            long count = rs.next() ? rs.getLong(1) : 0;
+            long duration = System.currentTimeMillis() - startTime;
+
+            logger.info("[{}] Total logs: {} (counted in {} ms)", operation, count, duration);
+            return count;
+        } catch (SQLException e) {
+            long duration = System.currentTimeMillis() - startTime;
+            logger.error("[{}] Failed to count logs after {} ms. Error: {}",
+                    operation, duration, e.getMessage(), e);
+            return 0;
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.apex.core.dao;
 
 import com.apex.core.dto.LogisticsStats;
 import com.apex.core.model.Logistics;
+import com.apex.core.model.OrderInfo;
 import com.apex.util.ConnectionPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -440,5 +441,80 @@ public class LogisticsDAO implements ILogisticsDAO {
         }
 
         return logistics;
+    }
+
+    /**
+     * Count total number of orders
+     */
+    public long count() {
+        String operation = "COUNT_LOGISTICS";
+        long startTime = System.currentTimeMillis();
+
+        String sql = "SELECT COUNT(*) FROM apexflow_logistics";
+
+        logger.debug("[{}] Counting total logistics", operation);
+
+        try (Connection conn = ConnectionPool.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            long count = rs.next() ? rs.getLong(1) : 0;
+            long duration = System.currentTimeMillis() - startTime;
+
+            logger.info("[{}] Total logistics: {} (counted in {} ms)", operation, count, duration);
+            return count;
+        } catch (SQLException e) {
+            long duration = System.currentTimeMillis() - startTime;
+            logger.error("[{}] Failed to count orders after {} ms. Error: {}",
+                    operation, duration, e.getMessage(), e);
+            return 0;
+        }
+    }
+
+    /**
+     * Find all orders with pagination
+     */
+    public List<Logistics> findAll(int page, int pageSize) {
+        String operation = "SELECT_ALL_ORDERS_LOGS";
+        long startTime = System.currentTimeMillis();
+
+        List<Logistics> logistics = new ArrayList<>();
+        String sql = """
+            SELECT * FROM apexflow_logistics
+            ORDER BY created_at DESC
+            LIMIT ? OFFSET ?
+            """;
+
+        if (page < 1) page = 1;
+        int offset = (page - 1) * pageSize;
+
+        logger.info("[{}] Retrieving orders. Page: {}, PageSize: {}, Offset: {}",
+                operation, page, pageSize, offset);
+
+        try (Connection conn = ConnectionPool.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, pageSize);
+            pstmt.setInt(2, offset);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                int count = 0;
+                while (rs.next()) {
+                    logistics.add(mapToLogistics(rs));
+                    count++;
+                }
+
+                long duration = System.currentTimeMillis() - startTime;
+                logger.info("[{}] Retrieved {} Logistics in {} ms. Page: {}, PageSize: {}",
+                        operation, count, duration, page, pageSize);
+
+                return logistics;
+            }
+        } catch (SQLException e) {
+            long duration = System.currentTimeMillis() - startTime;
+            logger.error("[{}] Failed to retrieve Logistics after {} ms. Page: {}, Error: {}",
+                    operation, duration, page, e.getMessage(), e);
+            return logistics;
+        }
     }
 }

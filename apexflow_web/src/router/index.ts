@@ -33,7 +33,7 @@ const routes = [
         meta: { title: '订单分析' }
       },
       {
-        path: '/logistics/tracking',
+        path: '/logistics',
         name: 'LogisticsTracking',
         component: () => import('@/views/business/Logistics.vue'),
         meta: { title: '物流跟踪' }
@@ -57,10 +57,22 @@ const routes = [
         meta: { title: '库存管理' }
       },
       {
+        path: '/warehouse/in-out',
+        name: 'WarehouseInOut',
+        component: () => import('@/views/business/WarehouseInOut.vue'),
+        meta: { title: '出入库记录' }
+      },
+      {
         path: '/finance/income',
         name: 'FinanceIncome',
         component: () => import('@/views/business/Finance.vue'),
         meta: { title: '收入统计' }
+      },
+            {
+        path: '/finance/outcome',
+        name: 'FinanceOutcome',
+        component: () => import('@/views/business/FinanceOutcome.vue'),
+        meta: { title: '支出管理' }
       },
       {
         path: '/system',

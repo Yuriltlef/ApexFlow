@@ -46,6 +46,7 @@ public class ReviewServlet extends BaseServlet {
         String pathInfo = req.getPathInfo();
 
         if (pathInfo == null || pathInfo.equals("/")) {
+            logger.debug("[REVIEW] Get All list");
             handleList(req, resp);
         } else if (pathInfo.matches("/\\d+")) { // 数字ID
             handleGetDetail(req, resp);

@@ -422,4 +422,32 @@ public class ReviewDAO implements IReviewDAO {
 
         return review;
     }
+
+    /**
+     * Count total number of reviews
+     */
+    public long count() {
+        String operation = "COUNT_REVIEWS";
+        long startTime = System.currentTimeMillis();
+
+        String sql = "SELECT COUNT(*) FROM apexflow_review";
+
+        logger.debug("[{}] Counting total reviews", operation);
+
+        try (Connection conn = ConnectionPool.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            long count = rs.next() ? rs.getLong(1) : 0;
+            long duration = System.currentTimeMillis() - startTime;
+
+            logger.info("[{}] Total reviews: {} (counted in {} ms)", operation, count, duration);
+            return count;
+        } catch (SQLException e) {
+            long duration = System.currentTimeMillis() - startTime;
+            logger.error("[{}] Failed to count reviews after {} ms. Error: {}",
+                    operation, duration, e.getMessage(), e);
+            return 0;
+        }
+    }
 }

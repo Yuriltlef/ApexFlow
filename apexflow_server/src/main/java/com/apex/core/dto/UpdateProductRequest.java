@@ -1,8 +1,11 @@
 package com.apex.core.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.math.BigDecimal; /**
  * 商品更新请求DTO
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UpdateProductRequest {
     private String name;
     private String category;

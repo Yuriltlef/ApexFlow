@@ -1,186 +1,413 @@
 <template>
   <div class="finance-page">
-    <h2>💰 收入统计</h2>
+    <h2>💰 收入管理</h2>
 
     <el-row :gutter="16" class="finance-stats">
-      <el-col :span="6">
-        <el-card>
+      <el-col :span="8">
+        <el-card shadow="hover">
           <div class="stat-item">
-            <div class="stat-icon" style="color: #52c41a;">
-              <el-icon size="24"><Money /></el-icon>
+            <div class="stat-icon" style="color: #52c41a; background: #f6ffed;">
+              <el-icon size="24">
+                <Money />
+              </el-icon>
             </div>
             <div class="stat-content">
-              <div class="stat-value">¥{{ formatNumber(dailyIncome) }}</div>
-              <div class="stat-label">今日收入</div>
-              <div class="stat-trend" style="color: #52c41a;">+12.5%</div>
+              <div class="stat-value">¥{{ formatNumber(stats.totalIncome) }}</div>
+              <div class="stat-label">总收入</div>
             </div>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card>
-          <div class="stat-item">
-            <div class="stat-icon" style="color: #1890ff;">
-              <el-icon size="24"><PieChart /></el-icon>
-            </div>
-            <div class="stat-content">
-              <div class="stat-value">¥{{ formatNumber(weeklyIncome) }}</div>
-              <div class="stat-label">本周收入</div>
-              <div class="stat-trend" style="color: #52c41a;">+8.3%</div>
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card>
-          <div class="stat-item">
-            <div class="stat-icon" style="color: #722ed1;">
-              <el-icon size="24"><Histogram /></el-icon>
-            </div>
-            <div class="stat-content">
-              <div class="stat-value">¥{{ formatNumber(monthlyIncome) }}</div>
-              <div class="stat-label">本月收入</div>
-              <div class="stat-trend" style="color: #ff4d4f;">-2.1%</div>
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card>
-          <div class="stat-item">
-            <div class="stat-icon" style="color: #faad14;">
-              <el-icon size="24"><DataAnalysis /></el-icon>
-            </div>
-            <div class="stat-content">
-              <div class="stat-value">¥{{ formatNumber(yearlyIncome) }}</div>
-              <div class="stat-label">今年收入</div>
-              <div class="stat-trend" style="color: #52c41a;">+15.7%</div>
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
-
-    <el-row :gutter="16" class="finance-charts">
-      <el-col :span="16">
-        <el-card>
-          <template #header>
-            <div class="chart-header">
-              <span>收入趋势图</span>
-              <el-select v-model="incomeTimeRange" size="small" style="width: 120px;">
-                <el-option label="按月" value="monthly" />
-                <el-option label="按周" value="weekly" />
-                <el-option label="按日" value="daily" />
-              </el-select>
-            </div>
-          </template>
-
-          <div class="chart-placeholder">
-            <el-icon :size="48" color="#e1e4e8"><TrendCharts /></el-icon>
-            <p>收入趋势图表</p>
-            <p class="placeholder-hint">接入ECharts后可显示详细的收入趋势分析</p>
           </div>
         </el-card>
       </el-col>
       <el-col :span="8">
-        <el-card>
-          <template #header>
-            <div class="chart-header">
-              <span>收入来源分布</span>
+        <el-card shadow="hover">
+          <div class="stat-item">
+            <div class="stat-icon" style="color: #1890ff; background: #e6f7ff;">
+              <el-icon size="24">
+                <Wallet />
+              </el-icon>
             </div>
-          </template>
-
-          <div class="income-distribution">
-            <div v-for="item in incomeDistribution" :key="item.source" class="distribution-item">
-              <div class="distribution-info">
-                <span class="source-dot" :style="{ background: item.color }"></span>
-                <span class="source-name">{{ item.source }}</span>
-              </div>
-              <div class="distribution-value">
-                <span class="amount">¥{{ formatNumber(item.amount) }}</span>
-                <span class="percentage">({{ item.percentage }}%)</span>
-              </div>
+            <div class="stat-content">
+              <div class="stat-value">¥{{ formatNumber(stats.netIncome) }}</div>
+              <div class="stat-label">净收入 (扣除退款)</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="8">
+        <el-card shadow="hover">
+          <div class="stat-item">
+            <div class="stat-icon" style="color: #faad14; background: #fffbe6;">
+              <el-icon size="24">
+                <PieChart />
+              </el-icon>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">¥{{ formatNumber(stats.totalRefund) }}</div>
+              <div class="stat-label">总退款支出</div>
             </div>
           </div>
         </el-card>
       </el-col>
     </el-row>
 
-    <el-card class="recent-transactions">
+    <el-card shadow="never">
       <template #header>
-        <div class="card-header">
-          <span>最近交易记录</span>
-          <el-button type="primary" link size="small">查看全部</el-button>
+        <div class="table-header">
+          <div class="actions">
+            <el-input v-model="searchKeyword" placeholder="搜索关联订单号" style="width: 250px; margin-right: 10px;" clearable
+              @input="handleLocalSearch">
+              <template #prefix><el-icon>
+                  <Search />
+                </el-icon></template>
+            </el-input>
+
+            <el-select v-model="filterStatus" placeholder="入账状态" clearable style="width: 120px; margin-right: 10px;"
+              @change="handleLocalSearch">
+              <el-option label="待入账" :value="1" />
+              <el-option label="已入账" :value="2" />
+            </el-select>
+
+            <el-button type="primary" @click="fetchData">
+              <el-icon style="margin-right: 5px">
+                <RefreshRight />
+              </el-icon>
+              刷新数据
+            </el-button>
+
+            <div class="data-stat" v-if="allTableData.length > 0">
+              <span class="stat-item">总记录: <strong>{{ allTableData.length }}</strong></span>
+              <span class="stat-item" v-if="searchKeyword || filterStatus">
+                筛选结果: <strong class="highlight-text">{{ filteredTableData.length }}</strong>
+              </span>
+            </div>
+          </div>
+          <el-button type="success" :icon="Plus" @click="openDialog()">录入收入</el-button>
         </div>
       </template>
 
-      <el-table :data="recentTransactions" stripe style="width: 100%" size="small">
-        <el-table-column prop="transactionId" label="交易ID" width="180" />
-        <el-table-column prop="orderNo" label="订单号" width="150" />
-        <el-table-column prop="customer" label="客户" width="120" />
-        <el-table-column prop="amount" label="金额" width="120">
+      <el-table v-loading="loading" :data="pagedTableData" stripe style="width: 100%; margin-top: 10px;">
+        <el-table-column prop="id" label="ID" width="80" />
+
+        <el-table-column prop="orderId" label="关联订单" width="180">
           <template #default="{ row }">
-            <span class="amount">¥{{ formatNumber(row.amount) }}</span>
+            <span v-html="highlight(row.orderId)"></span>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="amount" label="金额" width="150">
+          <template #default="{ row }">
+            <span style="color: #f56c6c; font-weight: bold;">+¥{{ formatNumber(row.amount) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="paymentMethod" label="支付方式" width="120">
           <template #default="{ row }">
-            <el-tag size="small">{{ row.paymentMethod }}</el-tag>
+            <el-tag type="info">{{ formatPayment(row.paymentMethod) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column prop="status" label="状态" width="120">
           <template #default="{ row }">
-            <el-tag :type="row.status === '成功' ? 'success' : 'danger'" size="small">
-              {{ row.status }}
+            <el-tag :type="row.status === 2 ? 'success' : 'warning'">
+              {{ row.status === 2 ? '已入账' : '待入账' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="time" label="时间" width="180" />
+
+        <el-table-column prop="transactionTime" label="交易时间" width="180">
+          <template #default="{ row }">
+            {{ formatTime(row.transactionTime) }}
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="remark" label="备注" show-overflow-tooltip />
+        <el-table-column label="操作" width="200" fixed="right">
+          <template #default="{ row }">
+            <el-button v-if="row.status === 1" type="success" link size="small"
+              @click="handleConfirm(row)">确认入账</el-button>
+            <el-button type="primary" link size="small" @click="openDialog(row)">编辑</el-button>
+            <el-button type="danger" link size="small" @click="handleDelete(row)">删除</el-button>
+          </template>
+        </el-table-column>
       </el-table>
+
+      <div class="pagination-container">
+        <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[10, 20, 50, 100]"
+          layout="total, sizes, prev, pager, next" :total="filteredTableData.length" />
+      </div>
     </el-card>
 
-    <div class="page-info">
-      <p>这是一个收入统计页面，用于展示财务数据和收入分析。</p>
-      <p>演示了统计卡片、图表和交易记录表格的布局。</p>
-    </div>
+    <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑收入' : '录入收入'" width="500px">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="关联订单" prop="orderId">
+          <el-input v-model="form.orderId" placeholder="请输入订单号" :disabled="isEdit" />
+        </el-form-item>
+        <el-form-item label="收入金额" prop="amount">
+          <el-input-number v-model="form.amount" :precision="2" :step="100" :min="0" style="width: 100%;" />
+        </el-form-item>
+        <el-form-item label="支付方式" prop="paymentMethod">
+          <el-select v-model="form.paymentMethod" placeholder="请选择" style="width: 100%;">
+            <el-option label="支付宝" value="alipay" />
+            <el-option label="微信支付" value="wxpay" />
+            <el-option label="银行卡" value="card" />
+            <el-option label="现金" value="cash" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="form.status">
+            <el-radio :label="1">待入账</el-radio>
+            <el-radio :label="2">已入账</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="交易时间" prop="transactionTime">
+          <el-date-picker v-model="form.transactionTime" type="datetime" placeholder="选择日期时间" style="width: 100%;"
+            value-format="YYYY-MM-DD HH:mm:ss" />
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" type="textarea" rows="2" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" :loading="submitLoading" @click="submitForm">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
-import { Money, PieChart, Histogram, DataAnalysis, TrendCharts } from '@element-plus/icons-vue'
+<script setup>
+import { ref, reactive, computed, onMounted } from 'vue'
+import { Money, Wallet, PieChart, Search, RefreshRight, Plus } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { getFinanceList, getFinanceStats, createFinanceRecord, updateFinanceRecord, deleteFinanceRecord, updateFinanceStatus } from '@/api/finance'
 
-const incomeTimeRange = ref('monthly')
+// --- 状态 ---
+const loading = ref(false)
+const allTableData = ref([]) // 存储所有数据
+const currentPage = ref(1)
+const pageSize = ref(10)
+const searchKeyword = ref('')
+const filterStatus = ref(null)
 
-// 模拟数据
-const dailyIncome = 85600
-const weeklyIncome = 523800
-const monthlyIncome = 2456700
-const yearlyIncome = 28945600
+const stats = reactive({
+  totalIncome: 0,
+  totalRefund: 0,
+  netIncome: 0
+})
 
-const incomeDistribution = ref([
-  { source: '在线支付', amount: 156800, percentage: 65, color: '#1890ff' },
-  { source: '货到付款', amount: 45600, percentage: 19, color: '#52c41a' },
-  { source: '银行转账', amount: 23800, percentage: 10, color: '#722ed1' },
-  { source: '其他', amount: 19500, percentage: 8, color: '#faad14' }
-])
+// --- [核心] 数据获取逻辑 ---
+const fetchData = async () => {
+  loading.value = true
+  try {
+    // 1. 探测总数
+    const probeRes = await getFinanceList({ page: 1, pageSize: 1, type: 'income' })
+    if (probeRes && probeRes.success) {
+      const total = probeRes.data.totalCount || (probeRes.data.incomes ? probeRes.data.incomes.length : 0)
 
-const recentTransactions = ref([
-  { transactionId: 'TX20231215001', orderNo: '202312150001', customer: '张三', amount: 299.00, paymentMethod: '微信支付', status: '成功', time: '2023-12-15 10:30:00' },
-  { transactionId: 'TX20231215002', orderNo: '202312150002', customer: '李四', amount: 599.00, paymentMethod: '支付宝', status: '成功', time: '2023-12-15 11:15:00' },
-  { transactionId: 'TX20231215003', orderNo: '202312150003', customer: '王五', amount: 129.00, paymentMethod: '货到付款', status: '待收款', time: '2023-12-15 13:45:00' },
-  { transactionId: 'TX20231215004', orderNo: '202312150004', customer: '赵六', amount: 899.00, paymentMethod: '微信支付', status: '成功', time: '2023-12-15 14:20:00' },
-  { transactionId: 'TX20231215005', orderNo: '202312150005', customer: '钱七', amount: 459.00, paymentMethod: '支付宝', status: '成功', time: '2023-12-15 15:10:00' }
-])
+      // 2. 如果有数据，发起全量请求
+      if (total > 0) {
+        const fullRes = await getFinanceList({ page: 1, pageSize: total, type: 'income' })
+        // 兼容 incomes 或 list
+        if (fullRes && fullRes.success) {
+          allTableData.value = fullRes.data.incomes || fullRes.data.list || fullRes.data.data || []
 
-const formatNumber = (num: number) => {
-  return num.toLocaleString('zh-CN')
+          // 更新统计数据
+          if (fullRes.data.totalIncome !== undefined) {
+            stats.totalIncome = fullRes.data.totalIncome
+            stats.totalRefund = fullRes.data.totalRefund
+            stats.netIncome = fullRes.data.netIncome
+          }
+        }
+      } else {
+        allTableData.value = []
+      }
+    }
+
+    // 独立获取统计以确保准确（可选，如果列表接口没返回）
+    const statsRes = await getFinanceStats()
+    if (statsRes && statsRes.success && statsRes.data) {
+      stats.totalIncome = statsRes.data.totalIncome
+      stats.totalRefund = statsRes.data.totalRefund
+      stats.netIncome = statsRes.data.netIncome
+    }
+  } catch (error) {
+    console.error(error)
+    ElMessage.error('获取数据失败')
+    allTableData.value = []
+  } finally {
+    loading.value = false
+  }
 }
+
+// --- [核心] 本地筛选与分页 ---
+
+const filteredTableData = computed(() => {
+  let data = allTableData.value
+
+  // 1. 关键词搜索 (订单号)
+  if (searchKeyword.value) {
+    const kw = searchKeyword.value.trim().toLowerCase()
+    data = data.filter(item =>
+      String(item.orderId).toLowerCase().includes(kw)
+    )
+  }
+
+  // 2. 状态筛选
+  if (filterStatus.value) {
+    data = data.filter(item => item.status === filterStatus.value)
+  }
+
+  return data
+})
+
+const pagedTableData = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return filteredTableData.value.slice(start, end)
+})
+
+const handleLocalSearch = () => {
+  currentPage.value = 1
+}
+
+// 高亮工具
+const highlight = (text) => {
+  if (!text) return ''
+  const str = String(text)
+  const kw = searchKeyword.value.trim()
+  if (!kw) return str
+  const reg = new RegExp(`(${kw})`, 'gi')
+  return str.replace(reg, '<span style="color: red; font-weight: bold;">$1</span>')
+}
+
+// --- 增删改逻辑 ---
+const dialogVisible = ref(false)
+const isEdit = ref(false)
+const submitLoading = ref(false)
+const formRef = ref(null)
+const form = reactive({
+  id: null,
+  orderId: '',
+  amount: 0,
+  type: 'income',
+  paymentMethod: 'alipay',
+  status: 1,
+  transactionTime: '',
+  remark: ''
+})
+
+const rules = {
+  orderId: [{ required: true, message: '请输入订单号', trigger: 'blur' }],
+  amount: [{ required: true, message: '请输入金额', trigger: 'blur' }],
+  transactionTime: [{ required: true, message: '请选择时间', trigger: 'change' }]
+}
+
+const openDialog = (row = null) => {
+  if (row) {
+    isEdit.value = true
+    Object.assign(form, row)
+    // 修复编辑时时间回显问题：如果是数组或 Date，这里要转成字符串给表单组件
+    if (Array.isArray(row.transactionTime)) {
+      const [y, m, d, h, min, s] = row.transactionTime
+      const pad = n => (n || 0).toString().padStart(2, '0')
+      form.transactionTime = `${y}-${pad(m)}-${pad(d)} ${pad(h)}:${pad(min)}:${pad(s)}`
+    }
+  } else {
+    isEdit.value = false
+    Object.assign(form, {
+      id: null,
+      orderId: '',
+      amount: 0,
+      type: 'income',
+      paymentMethod: 'alipay',
+      status: 1,
+      transactionTime: getNowString(),
+      remark: ''
+    })
+  }
+  dialogVisible.value = true
+}
+
+const getNowString = () => {
+  const now = new Date()
+  const pad = n => n.toString().padStart(2, '0')
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
+}
+
+const submitForm = async () => {
+  await formRef.value.validate(async (valid) => {
+    if (valid) {
+      submitLoading.value = true
+      try {
+        if (isEdit.value) {
+          await updateFinanceRecord(form)
+          ElMessage.success('更新成功')
+        } else {
+          await createFinanceRecord(form)
+          ElMessage.success('创建成功')
+        }
+        dialogVisible.value = false
+        fetchData()
+      } catch (error) {
+        ElMessage.error('操作失败')
+      } finally {
+        submitLoading.value = false
+      }
+    }
+  })
+}
+
+const handleConfirm = async (row) => {
+  try {
+    await updateFinanceStatus(row.id, 2)
+    ElMessage.success('已确认为入账状态')
+    fetchData()
+  } catch (error) {
+    ElMessage.error('操作失败')
+  }
+}
+
+const handleDelete = (row) => {
+  ElMessageBox.confirm('确定删除该条记录吗?', '警告', { type: 'warning' })
+    .then(async () => {
+      try {
+        await deleteFinanceRecord(row.id)
+        ElMessage.success('删除成功')
+        fetchData()
+      } catch (e) {
+        ElMessage.error('删除失败')
+      }
+    }).catch(() => { })
+}
+
+// --- 格式化工具 ---
+const formatNumber = (val) => Number(val || 0).toFixed(2)
+
+// [修复] 强大的时间格式化，支持数组 [2023, 12, 1, 10, 0]
+const formatTime = (val) => {
+  if (!val) return '-'
+  if (Array.isArray(val)) {
+    // 兼容 [yyyy, MM, dd, HH, mm, ss]
+    const [y, m, d, h, min, s] = val
+    const pad = n => (n || 0).toString().padStart(2, '0')
+    return `${y}-${pad(m)}-${pad(d)} ${pad(h)}:${pad(min)}${s !== undefined ? ':' + pad(s) : ''}`
+  }
+  return String(val).replace('T', ' ')
+}
+
+const formatPayment = (val) => {
+  const map = { alipay: '支付宝', wxpay: '微信', card: '银行卡', cash: '现金' }
+  return map[val] || val
+}
+
+onMounted(() => {
+  fetchData()
+})
 </script>
 
 <style scoped>
 .finance-page {
-  padding: 20px;
+  /* padding: 20px; */
 }
 
 h2 {
@@ -205,7 +432,6 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.02);
 }
 
 .stat-content {
@@ -213,114 +439,44 @@ h2 {
 }
 
 .stat-value {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 600;
-  color: #24292e;
-  line-height: 1.2;
+  color: #303133;
 }
 
 .stat-label {
-  font-size: 14px;
-  color: #586069;
-  margin-top: 4px;
-}
-
-.stat-trend {
   font-size: 12px;
-  margin-top: 2px;
+  color: #909399;
 }
 
-.finance-charts {
-  margin-bottom: 20px;
-}
-
-.chart-header {
+.table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.chart-placeholder {
-  height: 250px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #586069;
-}
-
-.chart-placeholder p {
-  margin-top: 10px;
-}
-
-.placeholder-hint {
-  font-size: 12px;
-  color: #a0a0a0;
-  margin-top: 5px;
-}
-
-.income-distribution {
-  padding: 10px 0;
-}
-
-.distribution-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.distribution-item:last-child {
-  border-bottom: none;
-}
-
-.distribution-info {
+.actions {
   display: flex;
   align-items: center;
-  gap: 8px;
 }
 
-.source-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+.data-stat {
+  margin-left: 15px;
+  font-size: 13px;
+  color: #606266;
 }
 
-.source-name {
-  color: #24292e;
+.stat-item {
+  margin-left: 10px;
 }
 
-.distribution-value {
-  text-align: right;
+.highlight-text {
+  color: #f56c6c;
 }
 
-.amount {
-  font-weight: 600;
-  color: #24292e;
-}
-
-.percentage {
-  font-size: 12px;
-  color: #586069;
-  margin-left: 4px;
-}
-
-.recent-transactions .amount {
-  color: #52c41a;
-  font-weight: 600;
-}
-
-.page-info {
+.pagination-container {
   margin-top: 20px;
-  padding: 15px;
-  background: #f6f8fa;
-  border-radius: 8px;
-  border-left: 4px solid #722ed1;
-}
-
-.page-info p {
-  color: #586069;
-  margin: 5px 0;
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

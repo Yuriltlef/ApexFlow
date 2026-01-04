@@ -21,7 +21,3 @@ CREATE TABLE apexflow_system_user (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     last_login_at DATETIME COMMENT '最后登录时间'
 ) COMMENT='系统用户表（包含权限和盐值）';
-
--- 插入超级管理员（1条）
-INSERT INTO apexflow_system_user (username, password_hash, salt, real_name, email, phone, is_admin, can_manage_order, can_manage_logistics, can_manage_after_sales, can_manage_review, can_manage_inventory, can_manage_income, status) VALUES
-('admin', '$2a$10$AbCdEfGhIjKlMnOpQrStUvWxYz1234567890', 'a1b2c3d4e5f678901234567890123456', '系统管理员', 'admin@apexflow.com', '13800138000', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 1);

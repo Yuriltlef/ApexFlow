@@ -100,7 +100,9 @@ public class OrderServlet extends BaseServlet {
         try {
             logRequest(req);
 
-            if (pathInfo == null || !pathInfo.equals("")) {
+            // 修复后的逻辑：
+            // 只有当 pathInfo 存在，且不为空，且不仅仅是一个斜杠时，才视为路径错误
+            if (pathInfo != null && !pathInfo.isEmpty() && !pathInfo.equals("/")) {
                 sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND,
                         "API路径不正确", "API_PATH_INVALID");
                 logResponse(req, resp, startTime, HttpServletResponse.SC_NOT_FOUND);
@@ -220,7 +222,7 @@ public class OrderServlet extends BaseServlet {
 
             // 解析请求体
             CreateOrderRequest createRequest = parseJsonBody(req, CreateOrderRequest.class);
-            logger.debug("[ORDER_CREATE] Create order request data: {}", createRequest);
+            logger.info("[ORDER_CREATE] Create order request data: {}", req.getParameterMap());
 
             // 验证必填字段
             if (createRequest.getUserId() == null || createRequest.getTotalAmount() == null ||

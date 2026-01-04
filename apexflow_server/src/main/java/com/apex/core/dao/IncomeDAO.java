@@ -374,4 +374,33 @@ public class IncomeDAO implements IIncomeDAO{
 
         return income;
     }
+
+    /**
+     * 统计总数
+     * @return 总数
+     */
+    public long count() {
+        String operation = "COUNT_INCOME_LOG";
+        long startTime = System.currentTimeMillis();
+
+        String sql = "SELECT COUNT(*) FROM apexflow_income";
+
+        logger.debug("[{}] Counting total income logs", operation);
+
+        try (Connection conn = ConnectionPool.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            long count = rs.next() ? rs.getLong(1) : 0;
+            long duration = System.currentTimeMillis() - startTime;
+
+            logger.info("[{}] Total income logs: {} (counted in {} ms)", operation, count, duration);
+            return count;
+        } catch (SQLException e) {
+            long duration = System.currentTimeMillis() - startTime;
+            logger.error("[{}] Failed to count income logs after {} ms. Error: {}",
+                    operation, duration, e.getMessage(), e);
+            return 0;
+        }
+    }
 }

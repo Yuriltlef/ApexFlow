@@ -82,7 +82,7 @@ public class ReviewService {
                 total = reviews.size(); // 简化处理
             } else {
                 reviews = reviewDAO.findLatestReviews(query.getPageSize());
-                total = reviews.size();
+                total = Math.toIntExact(reviewDAO.count());
             }
 
             // 构建响应

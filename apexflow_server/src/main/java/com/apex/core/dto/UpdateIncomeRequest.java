@@ -1,6 +1,7 @@
 package com.apex.core.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 /**
  * 更新财务记录请求DTO
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UpdateIncomeRequest {
     private String orderId;
     private String type;

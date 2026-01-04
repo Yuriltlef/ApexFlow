@@ -84,7 +84,7 @@ public class IncomeServlet extends BaseServlet {
         try {
             logRequest(req);
 
-            if (pathInfo == null || !pathInfo.equals("")) {
+            if (pathInfo != null && !pathInfo.isEmpty() && !pathInfo.equals("/")) {
                 sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND,
                         "API路径不正确", "API_PATH_INVALID");
                 logResponse(req, resp, startTime, HttpServletResponse.SC_NOT_FOUND);

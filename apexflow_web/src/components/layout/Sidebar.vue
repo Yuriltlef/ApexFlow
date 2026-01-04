@@ -37,9 +37,6 @@
           <template #title>
             <span>仪表盘</span>
           </template>
-          <div class="badge-wrapper">
-            <el-badge :value="3" class="menu-badge" />
-          </div>
         </el-menu-item>
 
         <!-- 订单管理 -->
@@ -56,17 +53,15 @@
         </el-sub-menu>
 
         <!-- 物流管理 -->
-        <el-sub-menu 
+        <el-menu-item 
           v-if="hasPermission('canManageLogistics') || isAdmin"
-          index="logistics"
+          index="/logistics"
         >
+          <el-icon><Van /></el-icon>
           <template #title>
-            <el-icon><Van /></el-icon>
             <span>物流管理</span>
           </template>
-          <el-menu-item index="/logistics/tracking">物流跟踪</el-menu-item>
-          <el-menu-item index="/logistics/settings">物流设置</el-menu-item>
-        </el-sub-menu>
+        </el-menu-item>
 
         <!-- 售后管理 -->
         <el-menu-item 
@@ -77,9 +72,6 @@
           <template #title>
             <span>售后管理</span>
           </template>
-          <div class="badge-wrapper">
-            <el-badge :value="5" class="menu-badge" type="danger" />
-          </div>
         </el-menu-item>
 
         <!-- 评价管理 -->
@@ -104,7 +96,6 @@
           </template>
           <el-menu-item index="/warehouse/inventory">库存管理</el-menu-item>
           <el-menu-item index="/warehouse/in-out">出入库记录</el-menu-item>
-          <el-menu-item index="/warehouse/warning">库存预警</el-menu-item>
         </el-sub-menu>
 
         <!-- 财务管理 -->
@@ -117,8 +108,7 @@
             <span>财务管理</span>
           </template>
           <el-menu-item index="/finance/income">收入统计</el-menu-item>
-          <el-menu-item index="/finance/expense">支出管理</el-menu-item>
-          <el-menu-item index="/finance/report">财务报表</el-menu-item>
+          <el-menu-item index="/finance/outcome">支出管理</el-menu-item>
         </el-sub-menu>
 
         <!-- 系统设置（仅管理员可见） -->
