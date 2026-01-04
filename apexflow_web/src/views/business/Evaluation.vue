@@ -5,12 +5,23 @@
     <el-card shadow="never">
       <template #header>
         <div class="card-header">
-          <div class="filter-controls">
-            <el-select 
-              v-model="queryParams.rating" 
-              placeholder="评分筛选" 
-              size="default" 
-              style="width: 120px;"
+          <div class="header-actions">
+            <el-input
+              v-model="searchKeyword"
+              placeholder="搜索用户ID/商品ID/订单号/评价内容"
+              style="width: 300px; margin-right: 10px;"
+              clearable
+              @input="handleSearch"
+            >
+              <template #prefix>
+                <el-icon><Search /></el-icon>
+              </template>
+            </el-input>
+
+            <el-select
+              v-model="ratingFilter"
+              placeholder="评分筛选"
+              style="width: 120px; margin-right: 10px;"
               clearable
               @change="handleFilter"
             >
@@ -22,54 +33,61 @@
               <el-option label="1星" :value="1" />
             </el-select>
 
-            <el-input 
-              v-model="queryParams.productId" 
-              placeholder="输入商品ID搜索" 
-              size="default" 
-              style="width: 200px; margin-left: 10px;"
-              clearable
-              @clear="handleFilter"
-              @keyup.enter="handleFilter"
-            >
-              <template #prefix>
-                <el-icon><Search /></el-icon>
-              </template>
-            </el-input>
+            <el-button type="primary" @click="fetchData">
+              <el-icon style="margin-right: 5px"><RefreshRight /></el-icon>
+              刷新
+            </el-button>
 
-            <el-button type="primary" @click="handleFilter" style="margin-left: 10px;">搜索</el-button>
-            <el-button :icon="Refresh" @click="resetQuery">重置</el-button>
+            <div class="data-stat" v-if="allReviewList.length > 0">
+              <span class="stat-item">总记录: <strong>{{ allReviewList.length }}</strong></span>
+              <span class="stat-item" v-if="searchKeyword || ratingFilter">过滤后: <strong class="highlight-text">{{ filteredReviewList.length }}</strong></span>
+            </div>
           </div>
         </div>
       </template>
 
-      <div v-loading="loading" class="evaluation-list">
-        <el-empty v-if="reviewList.length === 0" description="暂无评价数据" />
+      <el-tabs v-model="activeTab" type="card" @tab-change="handleTabChange">
+        <el-tab-pane label="全部评价" name="all" />
+        <el-tab-pane label="含图片" name="withImages">
+          <template #label>
+            含图片 <el-badge :value="getCountWithImages()" type="success" v-if="getCountWithImages() > 0" />
+          </template>
+        </el-tab-pane>
+        <el-tab-pane label="匿名评价" name="anonymous">
+          <template #label>
+            匿名评价 <el-badge :value="getCountAnonymous()" type="info" v-if="getCountAnonymous() > 0" />
+          </template>
+        </el-tab-pane>
+      </el-tabs>
 
-        <div v-for="item in reviewList" :key="item.id" class="evaluation-item">
+      <div v-loading="loading" class="evaluation-list">
+        <el-empty v-if="pagedReviewList.length === 0" description="暂无评价数据" />
+
+        <div v-for="item in pagedReviewList" :key="item.id" class="evaluation-item">
           <div class="evaluation-header">
             <div class="evaluation-info">
               <el-avatar :size="36" icon="UserFilled" class="user-avatar" />
               <div class="user-meta">
                 <div class="customer-name">
-                  用户ID: {{ item.userId }} 
-                  <el-tag v-if="item.anonymous" size="small" type="info" effect="plain">匿名</el-tag>
+                  用户ID: <span v-html="highlight(item.userId)"></span>
+                  <el-tag v-if="item.anonymous" size="small" type="info" effect="plain" style="margin-left: 8px;">匿名</el-tag>
                 </div>
                 <div class="meta-sub">
-                  <span class="product-name">商品ID: {{ item.productId }}</span>
+                  <span class="product-name">商品ID: <span v-html="highlight(item.productId)"></span></span>
                   <span class="separator">|</span>
-                  <span class="order-no">订单号: {{ item.orderId }}</span>
+                  <span class="order-no">订单号: <span v-html="highlight(item.orderId)"></span></span>
                 </div>
               </div>
             </div>
             <div class="evaluation-right">
               <span class="evaluation-time">{{ formatTime(item.createdAt) }}</span>
-              <el-button 
-                type="danger" 
-                icon="Delete" 
-                circle 
-                size="small" 
-                plain 
-                @click="handleDelete(item)" 
+              <el-button
+                type="danger"
+                icon="Delete"
+                circle
+                size="small"
+                plain
+                @click="handleDelete(item)"
                 style="margin-left: 15px;"
               />
             </div>
@@ -85,15 +103,13 @@
             />
           </div>
 
-          <div class="evaluation-content">
-            {{ item.content || '此用户没有填写评价内容。' }}
-          </div>
+          <div class="evaluation-content" v-html="highlightContent(item.content)"></div>
 
           <div v-if="item.imageList && item.imageList.length > 0" class="evaluation-images">
-            <el-image 
-              v-for="(img, index) in item.imageList" 
+            <el-image
+              v-for="(img, index) in item.imageList"
               :key="index"
-              :src="img" 
+              :src="img"
               :preview-src-list="item.imageList"
               fit="cover"
               class="eval-image"
@@ -104,13 +120,13 @@
 
       <div class="pagination-container">
         <el-pagination
-          v-model:current-page="queryParams.page"
-          v-model:page-size="queryParams.pageSize"
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
           :page-sizes="[10, 20, 50]"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
-          @size-change="fetchData"
-          @current-change="fetchData"
+          :total="filteredReviewList.length"
+          @size-change="handlePageSizeChange"
+          @current-change="handlePageChange"
         />
       </div>
     </el-card>
@@ -118,67 +134,45 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { Search, Refresh, UserFilled, Delete } from '@element-plus/icons-vue'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { Search, RefreshRight, UserFilled, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getReviewList, deleteReview } from '@/api/review'
 
-// --- 状态数据 ---
+// --- 状态定义 ---
 const loading = ref(false)
-const reviewList = ref([])
-const total = ref(0)
+const activeTab = ref('all') // all, withImages, anonymous
+const searchKeyword = ref('')
+const ratingFilter = ref('')
+const currentPage = ref(1)
+const pageSize = ref(10)
 
-const queryParams = reactive({
-  page: 1,
-  pageSize: 10,
-  productId: '', // 用于搜索
-  userId: '',
-  rating: ''     // 前端筛选参数，如果后端API不支持rating筛选，可能需要在前端过滤，或者只需传给后端备用
-})
+const allReviewList = ref([])
 
-// --- 方法 ---
-
-// 获取数据
+// --- 数据获取 (全量获取) ---
 const fetchData = async () => {
   loading.value = true
   try {
-    // 构造请求参数
-    // 注意：如果您的后端不支持 'rating' 参数，它会直接忽略，这没关系
-    const params = {
-      page: queryParams.page,
-      pageSize: queryParams.pageSize,
-      productId: queryParams.productId || null,
-      // userId: queryParams.userId || null 
-    }
-
-    const res = await getReviewList(params)
-    if (res && res.success) {
-      const data = res.data
-      console.log('获取评价列表数据', data)
-      
-      // 处理列表数据
-      let list = data.reviews || []
-      
-      // 处理图片字符串转数组 (DB存的是 "a.jpg,b.jpg")
-      list = list.map(item => {
-        return {
-          ...item,
-          imageList: item.images ? item.images.split(',') : []
+    // 先探测总数
+    const initRes = await getReviewList({ page: 1, pageSize: 1 })
+    if (initRes && initRes.success && initRes.data) {
+      const total = initRes.data.total || 0
+      if (total > 0) {
+        // 全量拉取
+        const fullRes = await getReviewList({ page: 1, pageSize: total })
+        if (fullRes && fullRes.success && fullRes.data) {
+          const list = fullRes.data.reviews || []
+          // 处理图片字符串转数组
+          allReviewList.value = list.map(item => ({
+            ...item,
+            imageList: item.images ? item.images.split(',').filter(img => img.trim()) : []
+          }))
         }
-      })
-
-      // 如果后端没有支持 Rating 筛选，我们在前端简单过滤一下（可选优化）
-      if (queryParams.rating) {
-        // 注意：这会导致分页不准，最佳实践是后端支持筛选。
-        // 这里仅做演示，如果不希望前端过滤，请注释下面三行
-        list = list.filter(item => item.rating === queryParams.rating)
+      } else {
+        allReviewList.value = []
       }
-
-      reviewList.value = list
-      total.value = data.total || 0
     } else {
-      reviewList.value = []
-      total.value = 0
+      allReviewList.value = []
     }
   } catch (error) {
     console.error(error)
@@ -188,19 +182,99 @@ const fetchData = async () => {
   }
 }
 
-// 筛选操作
+// --- 计算属性：过滤与分页 ---
+const filteredReviewList = computed(() => {
+  let data = allReviewList.value
+
+  // 1. Tab 过滤
+  if (activeTab.value === 'withImages') {
+    data = data.filter(item => item.imageList && item.imageList.length > 0)
+  } else if (activeTab.value === 'anonymous') {
+    data = data.filter(item => item.anonymous)
+  }
+
+  // 2. 评分过滤
+  if (ratingFilter.value !== '') {
+    data = data.filter(item => item.rating === ratingFilter.value)
+  }
+
+  // 3. 关键词过滤
+  const kw = searchKeyword.value.trim().toLowerCase()
+  if (kw) {
+    data = data.filter(item => {
+      const userId = String(item.userId || '').toLowerCase()
+      const productId = String(item.productId || '').toLowerCase()
+      const orderId = String(item.orderId || '').toLowerCase()
+      const content = String(item.content || '').toLowerCase()
+      return userId.includes(kw) ||
+             productId.includes(kw) ||
+             orderId.includes(kw) ||
+             content.includes(kw)
+    })
+  }
+
+  return data
+})
+
+const pagedReviewList = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return filteredReviewList.value.slice(start, end)
+})
+
+// --- 辅助功能 ---
+const handleTabChange = () => {
+  currentPage.value = 1
+}
+
 const handleFilter = () => {
-  queryParams.page = 1
-  fetchData()
+  currentPage.value = 1
 }
 
-// 重置
-const resetQuery = () => {
-  queryParams.productId = ''
-  queryParams.rating = ''
-  handleFilter()
+const handleSearch = () => {
+  currentPage.value = 1
 }
 
+const handlePageChange = () => {
+  // 分页变化，不需要额外处理，计算属性会自动更新
+}
+
+const handlePageSizeChange = (newSize) => {
+  pageSize.value = newSize
+  currentPage.value = 1
+}
+
+const getCountWithImages = () => {
+  return allReviewList.value.filter(item => item.imageList && item.imageList.length > 0).length
+}
+
+const getCountAnonymous = () => {
+  return allReviewList.value.filter(item => item.anonymous).length
+}
+
+// 高亮显示搜索关键词
+const highlight = (text) => {
+  if (!text) return ''
+  const str = String(text)
+  const kw = searchKeyword.value.trim()
+  if (!kw) return str
+  const reg = new RegExp(`(${kw})`, 'gi')
+  return str.replace(reg, '<span style="color: red; font-weight: bold;">$1</span>')
+}
+
+// 高亮评价内容（处理空内容情况）
+const highlightContent = (content) => {
+  if (!content || content.trim() === '') {
+    return '<span style="color: #909399; font-style: italic;">此用户没有填写评价内容。</span>'
+  }
+  const kw = searchKeyword.value.trim()
+  if (!kw) return content
+
+  const reg = new RegExp(`(${kw})`, 'gi')
+  return content.replace(reg, '<span style="color: red; font-weight: bold;">$1</span>')
+}
+
+// --- 业务操作 ---
 // 删除评价
 const handleDelete = (row) => {
   ElMessageBox.confirm(
@@ -216,11 +290,15 @@ const handleDelete = (row) => {
       const res = await deleteReview(row.id)
       if (res && res.success) {
         ElMessage.success('删除成功')
-        // 如果当前页只有一条且不是第一页，页码减一
-        if (reviewList.value.length === 1 && queryParams.page > 1) {
-          queryParams.page--
+        // 从本地数据中移除
+        const index = allReviewList.value.findIndex(item => item.id === row.id)
+        if (index !== -1) {
+          allReviewList.value.splice(index, 1)
         }
-        fetchData()
+        // 如果当前页没有数据了且不是第一页，则返回上一页
+        if (pagedReviewList.value.length === 0 && currentPage.value > 1) {
+          currentPage.value--
+        }
       } else {
         ElMessage.error(res.message || '删除失败')
       }
@@ -260,13 +338,28 @@ h2 {
 
 .card-header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
 }
 
-.filter-controls {
+.header-actions {
   display: flex;
   align-items: center;
+  width: 100%;
+}
+
+.data-stat {
+  margin-left: auto;
+  font-size: 13px;
+  color: #606266;
+}
+
+.stat-item {
+  margin-left: 15px;
+}
+
+.highlight-text {
+  color: #f56c6c;
 }
 
 .evaluation-list {
@@ -339,6 +432,7 @@ h2 {
   background: #f6f8fa;
   padding: 10px;
   border-radius: 6px;
+  white-space: pre-wrap;
 }
 
 .evaluation-images {

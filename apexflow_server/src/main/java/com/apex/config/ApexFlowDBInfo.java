@@ -14,9 +14,9 @@ public class ApexFlowDBInfo {
     private static final String H2_PASSWORD = "";
 
     // MySQL数据库配置
-    private static final String MYSQL_URL = "jdbc:mysql://localhost:3306/apexflow";
+    private static final String MYSQL_URL = "jdbc:mysql://localhost:3306/apex_flow_root";
     private static final String MYSQL_NAME = "root";
-    private static final String MYSQL_PASSWORD = "20050823Yzj";
+    private static final String MYSQL_PASSWORD = "fuckumysql";
 
     /**
      * 根据配置返回数据库URL
