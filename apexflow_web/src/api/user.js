@@ -1,8 +1,9 @@
 // src/api/user.js
 import axios from 'axios';
 import userDataManager from '@/utils/userData';
+import { API_BASE_URL } from '../tomcat/tomcatURL';
 
-const BASE_URL = 'http://localhost:8080/ApexFlow/api';
+const BASE_URL = API_BASE_URL;
 
 function getAuthHeaders() {
   const token = userDataManager.getToken();

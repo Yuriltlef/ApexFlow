@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
+import { BASE_URL } from '../tomcat/tomcatURL';
 
 const service = axios.create({
   // 补充项目上下文路径 /ApexFlow，与后端Tomcat配置一致
-  baseURL: 'http://localhost:8080/ApexFlow', 
+  baseURL: BASE_URL, 
   timeout: 10000,
   // 强制设置Content-Type为application/json，避免解析失败
   headers: {
